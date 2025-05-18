@@ -1,20 +1,22 @@
-﻿
+﻿CREATE DATABASE IF NOT EXISTS TiecCuoiDB CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+USE TiecCuoiDB;
+
 CREATE TABLE TaiKhoan (
-    ID_TaiKhoan INT PRIMARY KEY IDENTITY(1,1),
-    Username NVARCHAR(100) UNIQUE,
-    PasswordHash NVARCHAR(255)
+    ID_TaiKhoan INT PRIMARY KEY AUTO_INCREMENT,
+    Username VARCHAR(100) UNIQUE NOT NULL,
+    PasswordHash VARCHAR(255) NOT NULL
 );
 
 CREATE TABLE VaiTro (
-    ID_VaiTro INT PRIMARY KEY IDENTITY(1,1),
-    TenVaiTro NVARCHAR(100) UNIQUE,
-    MoTa NVARCHAR(255)
+    ID_VaiTro INT PRIMARY KEY AUTO_INCREMENT,
+    TenVaiTro VARCHAR(100) UNIQUE NOT NULL,
+    MoTa VARCHAR(255)
 );
 
 CREATE TABLE Quyen (
-    ID_Quyen INT PRIMARY KEY IDENTITY(1,1),
-    Ten_Quyen NVARCHAR(100) UNIQUE,
-    MoTa NVARCHAR(255),
+    ID_Quyen INT PRIMARY KEY AUTO_INCREMENT,
+    Ten_Quyen VARCHAR(100) UNIQUE NOT NULL,
+    MoTa VARCHAR(255),
     GiaTri INT NOT NULL
 );
 
@@ -34,106 +36,86 @@ CREATE TABLE TaiKhoan_VaiTro (
     FOREIGN KEY (ID_VaiTro) REFERENCES VaiTro(ID_VaiTro)
 );
 
-
 CREATE TABLE KhachHang (
-    ID_KhachHang INT PRIMARY KEY IDENTITY(1,1),
-    HoTen NVARCHAR(100),
-    SoDienThoai VARCHAR(15),
-    Email VARCHAR(100),
+    ID_KhachHang INT PRIMARY KEY AUTO_INCREMENT,
+    HoTen VARCHAR(100) NOT NULL,
+    SoDienThoai VARCHAR(15) UNIQUE NOT NULL,
+    Email VARCHAR(100) UNIQUE NOT NULL,
     ID_TaiKhoan INT UNIQUE NOT NULL,
     FOREIGN KEY (ID_TaiKhoan) REFERENCES TaiKhoan(ID_TaiKhoan)
 );
 
 CREATE TABLE NhanVien (
-    ID_NhanVien INT PRIMARY KEY IDENTITY(1,1),
-    HoTen NVARCHAR(100),
-    ChucVu NVARCHAR(50),
+    ID_NhanVien INT PRIMARY KEY AUTO_INCREMENT,
+    HoTen VARCHAR(100) NOT NULL,
+    ChucVu VARCHAR(50),
     ID_TaiKhoan INT UNIQUE NOT NULL,
     FOREIGN KEY (ID_TaiKhoan) REFERENCES TaiKhoan(ID_TaiKhoan)
 );
 
-
 CREATE TABLE LoaiSanh (
-    ID_LoaiSanh INT PRIMARY KEY IDENTITY(1,1),
-    TenLoai CHAR(1) UNIQUE,
-    GiaBanToiThieu DECIMAL(18,2)
+    ID_LoaiSanh INT PRIMARY KEY AUTO_INCREMENT,
+    TenLoai CHAR(1) UNIQUE NOT NULL,
+    GiaBanToiThieu DECIMAL(18,2) NOT NULL
 );
 
 CREATE TABLE CaTiec (
     ID_Ca INT PRIMARY KEY,
-    TenCa NVARCHAR(20) UNIQUE
+    TenCa VARCHAR(20) UNIQUE NOT NULL
 );
 
-
 CREATE TABLE SanhTiec (
-    ID_SanhTiec INT PRIMARY KEY IDENTITY(1,1),
-    TenSanh NVARCHAR(100),
-    SucChua INT,
-    GiaThue DECIMAL(18,2),
-    ID_LoaiSanh INT,
+    ID_SanhTiec INT PRIMARY KEY AUTO_INCREMENT,
+    TenSanh VARCHAR(100) NOT NULL,
+    SucChua INT NOT NULL,
+    GiaThue DECIMAL(18,2) NOT NULL,
+    ID_LoaiSanh INT NOT NULL,
     FOREIGN KEY (ID_LoaiSanh) REFERENCES LoaiSanh(ID_LoaiSanh)
 );
 
-
 CREATE TABLE TiecCuoi (
-    ID_TiecCuoi INT PRIMARY KEY IDENTITY(1,1),
-    ID_KhachHang INT FOREIGN KEY REFERENCES KhachHang(ID_KhachHang),
-    ID_SanhTiec INT FOREIGN KEY REFERENCES SanhTiec(ID_SanhTiec),
-    NgayToChuc DATE,
+    ID_TiecCuoi INT PRIMARY KEY AUTO_INCREMENT,
+    ID_KhachHang INT NOT NULL,
+    ID_SanhTiec INT NOT NULL,
+    NgayToChuc DATE NOT NULL,
     ID_Ca INT NOT NULL,
-    ThoiDiemDat DATETIME,
-    SoLuongBan INT,
+    ThoiDiemDat DATETIME NOT NULL,
+    SoLuongBan INT NOT NULL,
     SoBanDuTru INT,
+    FOREIGN KEY (ID_KhachHang) REFERENCES KhachHang(ID_KhachHang),
+    FOREIGN KEY (ID_SanhTiec) REFERENCES SanhTiec(ID_SanhTiec),
     FOREIGN KEY (ID_Ca) REFERENCES CaTiec(ID_Ca)
 );
 
-
 CREATE TABLE HoaDon (
-    ID_HoaDon INT PRIMARY KEY IDENTITY(1,1),
-    ID_TiecCuoi INT FOREIGN KEY REFERENCES TiecCuoi(ID_TiecCuoi),
-    NgayLap DATE,
-    TongTien DECIMAL(18,2),
-    TienDatCoc DECIMAL(18,2),
-    ConLai AS (TongTien - TienDatCoc)
-);
-
-
-CREATE TABLE MonAn (
-    ID_MonAn INT PRIMARY KEY IDENTITY(1,1),
-    TenMonAn NVARCHAR(100),
-    DonGia DECIMAL(18,2)
+    ID_HoaDon INT PRIMARY KEY AUTO_INCREMENT,
+    ID_TiecCuoi INT NOT NULL,
+    NgayLap DATE NOT NULL,
+    TongTien DECIMAL(18,2) NOT NULL,
+    TienThanhToan DECIMAL(18,2) NOT NULL,
+    LoaiHoaDon VARCHAR(50) NOT NULL,
+    GhiChu VARCHAR(255),
+    FOREIGN KEY (ID_TiecCuoi) REFERENCES TiecCuoi(ID_TiecCuoi)
 );
 
 CREATE TABLE DichVu (
-    ID_DichVu INT PRIMARY KEY IDENTITY(1,1),
-    TenDichVu NVARCHAR(100),
-    DonGia DECIMAL(18,2)
-);
-
-
-CREATE TABLE Tiec_MonAn (
-    ID_TiecCuoi INT,
-    ID_MonAn INT,
-    DonGia DECIMAL(18,2),
-    PRIMARY KEY (ID_TiecCuoi, ID_MonAn),
-    FOREIGN KEY (ID_TiecCuoi) REFERENCES TiecCuoi(ID_TiecCuoi),
-    FOREIGN KEY (ID_MonAn) REFERENCES MonAn(ID_MonAn)
+    ID_DichVu INT PRIMARY KEY AUTO_INCREMENT,
+    TenDichVu VARCHAR(100) NOT NULL,
+    DonGia DECIMAL(18,2) NOT NULL
 );
 
 CREATE TABLE Tiec_DichVu (
     ID_TiecCuoi INT,
     ID_DichVu INT,
-    SoLuong INT,
-    DonGia DECIMAL(18,2),
+    SoLuong INT NOT NULL,
+    DonGia DECIMAL(18,2) NOT NULL,
     PRIMARY KEY (ID_TiecCuoi, ID_DichVu),
     FOREIGN KEY (ID_TiecCuoi) REFERENCES TiecCuoi(ID_TiecCuoi),
     FOREIGN KEY (ID_DichVu) REFERENCES DichVu(ID_DichVu)
 );
 
---Template 2 ca
+-- Dữ liệu mẫu
 INSERT INTO CaTiec (ID_Ca, TenCa) VALUES (1, 'Trưa'), (2, 'Tối');
 
---Template 5 cái sảnh có giá bàn 
 INSERT INTO LoaiSanh (TenLoai, GiaBanToiThieu)
 VALUES ('A', 1000000), ('B', 1100000), ('C', 1200000), ('D', 1400000), ('E', 1600000);
-
