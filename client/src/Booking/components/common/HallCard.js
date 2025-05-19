@@ -1,6 +1,7 @@
 import React from 'react';
 import { Card, Button } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
+import { FormattedPrice } from './StatusComponents';
 
 /**
  * Card hiển thị thông tin sảnh tiệc
@@ -26,7 +27,7 @@ export function HallCard({ hall }) {
         <Card.Title>{hall.TenSanh || 'Tên sảnh'}</Card.Title>
         <Card.Text>
           <strong>Sức chứa:</strong> {hall.SucChua || '0'} khách<br />
-          <strong>Giá thuê:</strong> {hall.GiaThue?.toLocaleString() || '0'} VNĐ<br />
+          <strong>Giá thuê:</strong> <FormattedPrice amount={hall.GiaThue} /><br />
           <strong>Loại sảnh:</strong> {hall.TenLoai || 'Chưa có thông tin'}
         </Card.Text>
         
@@ -59,7 +60,7 @@ export function ServiceCard({ service }) {
       <Card.Body>
         <Card.Title>{service.TenDichVu}</Card.Title>
         <Card.Text>
-          <strong>Giá:</strong> {service.DonGia?.toLocaleString()} VNĐ
+          <strong>Giá:</strong> <FormattedPrice amount={service.DonGia} />
         </Card.Text>
       </Card.Body>
     </Card>

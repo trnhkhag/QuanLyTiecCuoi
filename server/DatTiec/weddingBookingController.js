@@ -1,5 +1,5 @@
-// filepath: d:\CNPM\QuanLyTiecCuoi\server\DatTiec\weddingBookingController.js
 const weddingBookingService = require('./weddingBookingService');
+const pool = require('../config/db');
 
 /**
  * Controller quản lý các API cho chức năng đặt tiệc cưới
@@ -8,64 +8,142 @@ class WeddingBookingController {
   /**
    * Tạo đặt tiệc mới
    * POST /api/bookings
-   */
-  async createBooking(req, res) {
+   */  async createBooking(req, res) {
+    const connection = await pool.getConnection();
+    
     try {
+      // Lấy dữ liệu từ request
       const bookingData = req.body;
+      console.log('Received booking data:', bookingData);
       
-      // Validate dữ liệu
-      if (!bookingData.customerId || !bookingData.hallId || !bookingData.weddingDate || 
-          !bookingData.shiftId || !bookingData.tableCount) {
-        return res.status(400).json({ 
+      // Validate required fields
+      if (!bookingData.hallId || !bookingData.weddingDate || !bookingData.shiftId) {
+        return res.status(400).json({
           success: false,
           message: 'Thiếu thông tin bắt buộc',
-          missingFields: [
-            !bookingData.customerId ? 'customerId' : null,
-            !bookingData.hallId ? 'hallId' : null,
-            !bookingData.weddingDate ? 'weddingDate' : null,
-            !bookingData.shiftId ? 'shiftId' : null,
-            !bookingData.tableCount ? 'tableCount' : null
-          ].filter(Boolean)
+          error: 'Missing required fields'
         });
       }
       
-      // Validate wedding date
-      const weddingDate = new Date(bookingData.weddingDate);
-      const today = new Date();
+      await connection.beginTransaction();
       
-      if (isNaN(weddingDate.getTime()) || weddingDate < today) {
-        return res.status(400).json({ 
-          success: false,
-          message: 'Ngày tổ chức không hợp lệ',
-          error: 'Wedding date must be in the future'
-        });
+      // Luôn sử dụng khách hàng mẫu có sẵn trong database (ID=1)
+      // Sử dụng let thay vì const vì biến này có thể thay đổi giá trị sau này
+      let customerId = 1;
+      console.log('Using sample customer with ID:', customerId);
+      
+      /* 
+       * Đã bỏ phần tạo khách hàng mới vì hiện chưa có chức năng login
+       * Sau này sẽ thêm chức năng đăng nhập và tạo khách hàng mới khi người dùng đăng nhập
+       * Hiện tại chỉ sử dụng khách hàng mẫu đã có sẵn trong database với ID=1
+       */      // Format wedding date to YYYY-MM-DD for MySQL compatibility
+      let formattedWeddingDate = bookingData.weddingDate;
+      if (bookingData.weddingDate && bookingData.weddingDate.includes('T')) {
+        formattedWeddingDate = bookingData.weddingDate.split('T')[0];
+        console.log('Formatted wedding date:', formattedWeddingDate);
+      }      // Chuẩn bị dữ liệu cho booking service
+      const serviceBookingData = {
+        customerId,
+        customerName: bookingData.customerName || 'Khách hàng', // Add customer name field
+        hallId: parseInt(bookingData.hallId),
+        weddingDate: formattedWeddingDate, // Use the formatted date
+        shiftId: parseInt(bookingData.shiftId),
+        tableCount: parseInt(bookingData.numberOfTables) || 0,
+        reserveTableCount: parseInt(bookingData.numberOfGuests) || 0, // Using guest count as reserve tables for now
+        note: bookingData.note || '',
+        deposit: parseInt(bookingData.deposit) || 0,
+        services: []
+      };
+      
+      console.log('Prepared booking data:', serviceBookingData);// Xử lý dịch vụ nếu có
+      if (bookingData.services && bookingData.services.length > 0) {
+        console.log('Processing services:', bookingData.services);
+        
+        for (const service of bookingData.services) {
+          // Log để debug
+          console.log('Processing service:', service);
+          
+          if (!service.id) {
+            console.warn('Missing service ID, skipping service:', service);
+            continue;
+          }
+          
+          try {
+            const [serviceData] = await connection.query(
+              'SELECT DonGia FROM DichVu WHERE ID_DichVu = ?',
+              [service.id]
+            );
+            
+            if (serviceData && serviceData.length > 0) {
+              const serviceItem = {
+                id: parseInt(service.id),
+                quantity: parseInt(service.quantity) || 1,
+                price: parseFloat(serviceData[0].DonGia)
+              };
+              
+              console.log('Adding service to booking data:', serviceItem);
+              serviceBookingData.services.push(serviceItem);
+            } else {
+              console.warn('Service not found in database:', service.id);
+            }
+          } catch (serviceError) {
+            console.error('Error processing service:', serviceError);
+          }
+        }
       }
       
-      const result = await weddingBookingService.createBooking(bookingData);
-      return res.status(201).json({
-        success: true,
-        message: 'Đặt tiệc thành công',
-        data: result
-      });
-    } catch (error) {
-      console.error('Create booking error:', error);
+      // Kiểm tra sảnh có sẵn không
+      const isAvailable = await weddingBookingService.checkHallAvailability(
+        serviceBookingData.hallId,
+        serviceBookingData.weddingDate,
+        serviceBookingData.shiftId
+      );
       
-      if (error.message === 'Sảnh đã được đặt vào ngày và ca này') {
-        return res.status(409).json({
+      if (!isAvailable) {
+        await connection.rollback();
+        return res.status(400).json({
           success: false,
-          message: error.message,
+          message: 'Sảnh đã được đặt vào ngày và ca này',
           error: 'Hall already booked'
         });
       }
+        // Chỉ commit khi xác minh sảnh có sẵn
+      // await connection.commit();
       
-      return res.status(500).json({ 
+      try {
+        // Gọi service để tạo đặt tiệc
+        const result = await weddingBookingService.createBooking(serviceBookingData);
+        
+        await connection.commit();
+        
+        res.status(201).json({
+          success: true,
+          message: 'Đặt tiệc thành công',
+          data: result
+        });
+      } catch (serviceError) {
+        await connection.rollback();
+        console.error('Error in booking service:', serviceError);
+        res.status(500).json({
+          success: false,
+          message: 'Lỗi khi tạo đơn đặt tiệc',
+          error: serviceError.message
+        });
+      }
+      
+    } catch (error) {
+      await connection.rollback();
+      console.error('Error creating booking:', error);
+      res.status(500).json({
         success: false,
-        message: 'Lỗi khi tạo đặt tiệc', 
-        error: error.message 
+        message: 'Lỗi khi tạo đơn đặt tiệc',
+        error: error.message
       });
+    } finally {
+      connection.release();
     }
   }
-
+      
   /**
    * Lấy danh sách đặt tiệc
    * GET /api/bookings
@@ -246,6 +324,61 @@ class WeddingBookingController {
     }
   }
 
+  /**
+   * Cập nhật trạng thái đặt tiệc
+   * PATCH /api/bookings/:id/status
+   */
+  async updateBookingStatus(req, res) {
+    try {
+      const bookingId = parseInt(req.params.id);
+      const { status } = req.body;
+      
+      if (isNaN(bookingId)) {
+        return res.status(400).json({
+          success: false,
+          message: 'ID không hợp lệ',
+          error: 'Invalid booking ID'
+        });
+      }
+      
+      // Validate status
+      if (!status || status.trim() === '') {
+        return res.status(400).json({
+          success: false,
+          message: 'Cần cung cấp trạng thái mới',
+          error: 'Status is required'
+        });
+      }
+      
+      // Call service to update booking status
+      await pool.query(
+        'UPDATE TiecCuoi SET TrangThai = ? WHERE ID_TiecCuoi = ?',
+        [status, bookingId]
+      );
+      
+      return res.status(200).json({
+        success: true,
+        message: 'Cập nhật trạng thái đặt tiệc thành công',
+        data: { bookingId, status }
+      });
+    } catch (error) {
+      console.error('Update booking status error:', error);
+      
+      if (error.message === 'Không tìm thấy đặt tiệc') {
+        return res.status(404).json({
+          success: false,
+          message: error.message,
+          error: 'Booking not found'
+        });
+      }
+      
+      return res.status(500).json({ 
+        success: false,
+        message: 'Lỗi khi cập nhật trạng thái đặt tiệc', 
+        error: error.message 
+      });
+    }
+  }
 }
 
 module.exports = new WeddingBookingController();

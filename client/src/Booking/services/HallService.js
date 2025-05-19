@@ -26,16 +26,24 @@ class HallService {
    * @param {string|number} id - Id sảnh
    * @returns {Promise} - Promise that resolves to the API response
    */
-  getHallById(id) {
+    getHallById(id) {
+    console.log('Fetching hall with ID:', id);
     return axios.get(`${API_URL}/halls/${id}`)
-      .then(response => {
-        return { success: true, data: response.data.data || response.data };
-      })
-      .catch(error => {
-        console.error(`Error fetching hall with id ${id}:`, error);
-        throw new Error('Failed to fetch wedding hall details');
-      });
-  }
+        .then(response => {
+        console.log('Hall response:', response);
+        // Kiểm tra cấu trúc dữ liệu trả về
+        if (response.data && response.data.success) {
+            return response.data.data; // Trả về data nếu API trả về format {success: true, data: {...}}
+        } else if (response.data) {
+            return response.data; // Trả về trực tiếp data nếu API không đóng gói trong success/data
+        }
+        return null;
+        })
+        .catch(error => {
+        console.error('Error fetching hall by ID:', error);
+        throw error;
+        });
+    }
 
   /**
    * Kiểm tra tình trạng sảnh
