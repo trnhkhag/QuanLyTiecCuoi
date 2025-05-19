@@ -5,11 +5,16 @@ import {
   Space,
   Modal,
   message,
-  Popconfirm
+  Popconfirm,
+  Card,
+  Typography,
+  Image
 } from 'antd';
-import { EditOutlined, DeleteOutlined } from '@ant-design/icons';
+import { EditOutlined, DeleteOutlined, PlusOutlined } from '@ant-design/icons';
 import HallManagementService from '../services/HallManagementService';
 import HallForm from './HallForm';
+
+const { Title } = Typography;
 
 const HallList = () => {
   const [halls, setHalls] = useState([]);
@@ -66,31 +71,76 @@ const HallList = () => {
 
   const columns = [
     {
+      title: 'Hình ảnh',
+      key: 'HinhAnh',
+      width: '15%',
+      render: (_, record) => (
+        record.HinhAnh ? (
+          <Image
+            src={`http://localhost:5000${record.HinhAnh}`}
+            alt={record.TenSanh}
+            style={{ width: 100, height: 60, objectFit: 'cover' }}
+            placeholder={
+              <div style={{ 
+                width: 100, 
+                height: 60, 
+                display: 'flex', 
+                alignItems: 'center',
+                justifyContent: 'center',
+                background: '#f5f5f5' 
+              }}>
+                Loading...
+              </div>
+            }
+          />
+        ) : (
+          <div style={{ 
+            width: 100, 
+            height: 60, 
+            display: 'flex', 
+            alignItems: 'center',
+            justifyContent: 'center',
+            background: '#f5f5f5' 
+          }}>
+            No image
+          </div>
+        )
+      ),
+    },
+    {
       title: 'Tên sảnh',
       dataIndex: 'TenSanh',
       key: 'TenSanh',
+      width: '20%',
     },
     {
       title: 'Loại sảnh',
       dataIndex: 'TenLoai',
       key: 'TenLoai',
+      width: '15%',
     },
     {
       title: 'Sức chứa',
       dataIndex: 'SucChua',
       key: 'SucChua',
+      width: '15%',
+      align: 'right',
+      render: (value) => `${value} khách`,
       sorter: (a, b) => a.SucChua - b.SucChua,
     },
     {
       title: 'Giá thuê',
       dataIndex: 'GiaThue',
       key: 'GiaThue',
+      width: '15%',
+      align: 'right',
       render: (value) => new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(value),
       sorter: (a, b) => a.GiaThue - b.GiaThue,
     },
     {
       title: 'Thao tác',
       key: 'action',
+      width: '20%',
       render: (_, record) => (
         <Space size="middle">
           <Button
@@ -116,10 +166,12 @@ const HallList = () => {
   ];
 
   return (
-    <div>
-      <div style={{ marginBottom: 16 }}>
+    <Card>
+      <div style={{ marginBottom: 16, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <Title level={5} style={{ margin: 0 }}>Danh sách sảnh cưới</Title>
         <Button
           type="primary"
+          icon={<PlusOutlined />}
           onClick={() => {
             setEditingHall(null);
             setIsModalVisible(true);
@@ -134,6 +186,11 @@ const HallList = () => {
         dataSource={halls}
         rowKey="ID_SanhTiec"
         loading={loading}
+        pagination={{
+          defaultPageSize: 10,
+          showSizeChanger: true,
+          showTotal: (total, range) => `${range[0]}-${range[1]} của ${total} sảnh`
+        }}
       />
 
       <Modal
@@ -144,6 +201,7 @@ const HallList = () => {
           setEditingHall(null);
         }}
         footer={null}
+        width={800}
       >
         <HallForm
           initialValues={editingHall}
@@ -154,7 +212,7 @@ const HallList = () => {
           }}
         />
       </Modal>
-    </div>
+    </Card>
   );
 };
 

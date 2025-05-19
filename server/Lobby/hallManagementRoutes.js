@@ -1,12 +1,13 @@
 const express = require('express');
 const router = express.Router();
 const hallManagementController = require('./hallManagementController');
+const upload = require('../middlewares/uploadMiddleware');
 
 // Routes quản lý sảnh
 router.get('/halls', hallManagementController.getAllHalls);
 router.get('/halls/:id', hallManagementController.getHallById);
-router.post('/halls', hallManagementController.createHall);
-router.put('/halls/:id', hallManagementController.updateHall);
+router.post('/halls', upload.single('image'), hallManagementController.createHall);
+router.put('/halls/:id', upload.single('image'), hallManagementController.updateHall);
 router.delete('/halls/:id', hallManagementController.deleteHall);
 
 // Routes quản lý loại sảnh

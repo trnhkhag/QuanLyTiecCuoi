@@ -1,139 +1,154 @@
 import React from 'react';
-import { useParams, Link } from 'react-router-dom';
-import { Container, Card, Button, Row, Col, Alert } from 'react-bootstrap';
-import BookingLayout from '../components/layout/BookingLayout';
-import { LoadingSpinner, FormattedPrice } from '../components/common/StatusComponents';
-import { useBookingDetails } from '../hooks/useBookings';
+import { Result, Button, Card, Descriptions, Typography, Timeline } from 'antd';
+import { useLocation, useNavigate } from 'react-router-dom';
+import {
+  CheckCircleOutlined,
+  HomeOutlined,
+  SearchOutlined,
+} from '@ant-design/icons';
+import UserLayout from '../components/layout/UserLayout';
+import { FormattedPrice, FormattedDate } from '../components/common/StatusComponents';
+
+const { Title, Paragraph } = Typography;
 
 /**
  * Trang xác nhận đặt tiệc thành công
  */
 function BookingSuccessPage() {
-  const { id } = useParams();
-  const { booking, loading, error } = useBookingDetails(id);
-  
-  if (loading) return (
-    <BookingLayout>
-      <LoadingSpinner text="Đang tải thông tin đặt tiệc..." />
-    </BookingLayout>
-  );
-  
-  if (error) return (
-    <BookingLayout>
-      <Alert variant="danger">{error}</Alert>
-    </BookingLayout>
-  );
-  
-  if (!booking) return (
-    <BookingLayout>
-      <Alert variant="warning">Không tìm thấy thông tin đặt tiệc</Alert>
-    </BookingLayout>
-  );
-  
+  const location = useLocation();
+  const navigate = useNavigate();
+  const bookingData = location.state;
+
+  if (!bookingData) {
+    return (
+      <UserLayout>
+        <Result
+          status="404"
+          title="Không tìm thấy thông tin đặt tiệc"
+          subTitle="Vui lòng thực hiện đặt tiệc mới hoặc tra cứu đơn đặt tiệc của bạn"
+          extra={[
+            <Button 
+              type="primary" 
+              key="booking" 
+              onClick={() => navigate('/booking/new')}
+            >
+              Đặt tiệc mới
+            </Button>,
+            <Button 
+              key="lookup" 
+              onClick={() => navigate('/booking/lookup')}
+            >
+              Tra cứu đơn
+            </Button>,
+          ]}
+        />
+      </UserLayout>
+    );
+  }
+
   return (
-    <BookingLayout>      <div className="text-center mb-5">
-        <div className="display-1 text-success mb-3">✓</div>
-        <h1 className="mb-3">Đặt Tiệc Thành Công</h1>
-        <div className="alert alert-success py-2 w-75 mx-auto">
-          Trạng thái: <strong>{booking.TrangThai || 'Đã đặt'}</strong>
-        </div>
-        <p className="lead mt-3">
-          Cảm ơn bạn đã đặt tiệc cưới tại Hệ thống Quản lý Tiệc Cưới
-        </p>
-      </div>
-      
-      <Row className="justify-content-center">
-        <Col lg={8}>
-          <Card className="mb-4">
-            <Card.Header as="h5">Thông tin đặt tiệc #{booking.id}</Card.Header>
-            <Card.Body>              
-              <Row>                <Col md={6}>
-                  <h6>Thông tin người đặt</h6>
-                  <p>
-                    <strong>Họ tên:</strong> {booking.TenKhachHang || booking.customerName}<br />
-                    <strong>Số điện thoại:</strong> {booking.phoneNumber}<br />
-                    <strong>Email:</strong> {booking.email}
-                  </p>
-                </Col>
-                <Col md={6}>
-                  <h6>Thông tin tiệc cưới</h6>
-                  <p>                    <strong>Ngày tổ chức:</strong> {new Date(booking.weddingDate).toLocaleDateString('vi-VN')}<br />
-                    <strong>Ca:</strong> {booking.shiftName}<br />
-                    <strong>Sảnh:</strong> {booking.hallName}<br />
-                    <strong>Trạng thái:</strong> <span className="badge bg-success rounded-pill ms-1">{booking.TrangThai || 'Đã đặt'}</span>
-                  </p>
-                </Col>
-              </Row>
-              <hr />
-              <Row>
-                <Col>
-                  <h6>Chi tiết đặt tiệc</h6>
-                  <p>
-                    <strong>Số lượng bàn:</strong> {booking.tableCount} bàn chính + {booking.reserveTableCount} bàn dự trữ<br />
-                    <strong>Số dịch vụ:</strong> {booking.services?.length || 0} dịch vụ
-                  </p>
-                  
-                  <div className="d-flex justify-content-between align-items-center mt-4">
-                    <div>
-                      <h6>Tổng chi phí dự kiến:</h6>
-                      <h4 className="text-primary mb-0">
-                        <FormattedPrice amount={booking.totalCost} />
-                      </h4>
-                    </div>
-                    <div className="text-end">
-                      <h6>Đã đặt cọc:</h6>
-                      <h4 className="text-success mb-0">
-                        <FormattedPrice amount={booking.deposit} />
-                      </h4>
-                    </div>
-                  </div>
-                </Col>
-              </Row>
-            </Card.Body>
-          </Card>
-            <Card className="mb-4">
-            <Card.Header as="h5">Các bước tiếp theo</Card.Header>
-            <Card.Body>
-              <div className="alert alert-info mb-3">
-                <small><strong>Thông tin trạng thái:</strong> Đơn đặt tiệc của bạn hiện có trạng thái <strong>{booking.TrangThai || 'Đã đặt'}</strong>. 
-                Trạng thái sẽ được cập nhật khi nhân viên xác nhận và khi bạn hoàn tất thanh toán.</small>
-              </div>
-              <ol>
-                <li className="mb-2">
-                  Nhân viên của chúng tôi sẽ liên hệ với bạn trong vòng 24 giờ để xác nhận đặt tiệc.
-                </li>
-                <li className="mb-2">
-                  Vui lòng thanh toán đặt cọc trong vòng 3 ngày để giữ sảnh.
-                </li>
-                <li className="mb-2">
-                  Trước ngày tiệc 1 tháng, bạn cần xác nhận số lượng bàn chính thức và thanh toán phần còn lại.
-                </li>
-                <li>
-                  Thông tin chi tiết đã được gửi vào email của bạn (nếu có cung cấp).
-                </li>
-              </ol>
-              
-              <div className="mt-4">
-                <h6>Thông tin liên hệ:</h6>
-                <p>
-                  Hotline: 0123 456 789<br />
-                  Email: info@tieccuoi.example.com
-                </p>
-              </div>
-            </Card.Body>
-          </Card>
+    <UserLayout>
+      <div style={{ maxWidth: 800, margin: '0 auto' }}>
+        <Result
+          status="success"
+          title="Đặt tiệc thành công!"
+          subTitle={
+            <div>
+              <Paragraph>
+                Mã đơn đặt tiệc của bạn là: <strong>{bookingData.bookingId}</strong>
+              </Paragraph>
+              <Paragraph>
+                Vui lòng lưu lại mã đơn này để tra cứu thông tin tiệc cưới của bạn sau này.
+              </Paragraph>
+            </div>
+          }
+          extra={[
+            <Button
+              type="primary"
+              key="lookup"
+              icon={<SearchOutlined />}
+              onClick={() => navigate('/booking/lookup')}
+            >
+              Tra cứu đơn
+            </Button>,
+            <Button
+              key="home"
+              icon={<HomeOutlined />}
+              onClick={() => navigate('/booking')}
+            >
+              Về trang chủ
+            </Button>,
+          ]}
+        />
+
+        <Card style={{ marginTop: 24 }} bordered={false}>
+          <Title level={4}>Thông tin đặt tiệc</Title>
           
-          <div className="d-flex justify-content-center gap-3">
-            <Link to="/">
-              <Button variant="outline-primary">Về trang chủ</Button>
-            </Link>
-            <Link to={`/bookings/${booking.id}`}>
-              <Button variant="primary">Xem chi tiết đặt tiệc</Button>
-            </Link>
-          </div>
-        </Col>
-      </Row>
-    </BookingLayout>
+          <Descriptions column={1} bordered style={{ marginTop: 16 }}>
+            <Descriptions.Item label="Mã đơn đặt tiệc">
+              {bookingData.bookingId}
+            </Descriptions.Item>
+            <Descriptions.Item label="Tên khách hàng">
+              {bookingData.customerName}
+            </Descriptions.Item>
+            <Descriptions.Item label="Số điện thoại">
+              {bookingData.phone}
+            </Descriptions.Item>
+            <Descriptions.Item label="Email">
+              {bookingData.email}
+            </Descriptions.Item>
+            <Descriptions.Item label="Địa chỉ">
+              {bookingData.address}
+            </Descriptions.Item>
+            <Descriptions.Item label="Ngày tổ chức">
+              <FormattedDate date={bookingData.date} />
+            </Descriptions.Item>
+            <Descriptions.Item label="Ca tiệc">
+              {bookingData.shiftName}
+            </Descriptions.Item>
+            <Descriptions.Item label="Sảnh tiệc">
+              {bookingData.hallName}
+            </Descriptions.Item>
+            <Descriptions.Item label="Số lượng khách">
+              {bookingData.guestCount} khách
+            </Descriptions.Item>
+            <Descriptions.Item label="Tổng tiền">
+              <FormattedPrice amount={bookingData.totalAmount} />
+            </Descriptions.Item>
+          </Descriptions>
+
+          <Title level={4} style={{ marginTop: 24 }}>
+            Các bước tiếp theo
+          </Title>
+
+          <Timeline style={{ marginTop: 16 }}>
+            <Timeline.Item 
+              color="green"
+              dot={<CheckCircleOutlined />}
+            >
+              Đã tạo đơn đặt tiệc thành công
+            </Timeline.Item>
+            <Timeline.Item>
+              Nhân viên của chúng tôi sẽ liên hệ với bạn trong vòng 24h để xác nhận
+            </Timeline.Item>
+            <Timeline.Item>
+              Sau khi xác nhận, bạn cần đặt cọc để hoàn tất việc đặt tiệc
+            </Timeline.Item>
+            <Timeline.Item>
+              Chúng tôi sẽ hỗ trợ bạn trong suốt quá trình chuẩn bị tiệc cưới
+            </Timeline.Item>
+          </Timeline>
+
+          <Paragraph style={{ marginTop: 24 }}>
+            Nếu bạn có bất kỳ thắc mắc nào, vui lòng liên hệ với chúng tôi qua:
+          </Paragraph>
+          <ul>
+            <li>Hotline: (028) 1234 5678</li>
+            <li>Email: support@tieccuoihoanggia.com</li>
+          </ul>
+        </Card>
+      </div>
+    </UserLayout>
   );
 }
 

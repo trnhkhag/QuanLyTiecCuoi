@@ -5,7 +5,7 @@ class HallManagementService {
   async getAllHalls() {
     try {
       const [halls] = await db.query(`
-        SELECT s.ID_SanhTiec, s.TenSanh, s.SucChua, s.GiaThue, 
+        SELECT s.ID_SanhTiec, s.TenSanh, s.SucChua, s.GiaThue, s.HinhAnh,
                l.ID_LoaiSanh, l.TenLoai, l.GiaBanToiThieu
         FROM SanhTiec s
         JOIN LoaiSanh l ON s.ID_LoaiSanh = l.ID_LoaiSanh
@@ -22,7 +22,7 @@ class HallManagementService {
   async getHallById(hallId) {
     try {
       const [halls] = await db.query(`
-        SELECT s.ID_SanhTiec, s.TenSanh, s.SucChua, s.GiaThue,
+        SELECT s.ID_SanhTiec, s.TenSanh, s.SucChua, s.GiaThue, s.HinhAnh,
                l.ID_LoaiSanh, l.TenLoai, l.GiaBanToiThieu
         FROM SanhTiec s
         JOIN LoaiSanh l ON s.ID_LoaiSanh = l.ID_LoaiSanh
@@ -39,8 +39,8 @@ class HallManagementService {
   async createHall(hallData) {
     try {
       const [result] = await db.query(
-        'INSERT INTO SanhTiec (TenSanh, SucChua, GiaThue, ID_LoaiSanh) VALUES (?, ?, ?, ?)',
-        [hallData.TenSanh, hallData.SucChua, hallData.GiaThue, hallData.ID_LoaiSanh]
+        'INSERT INTO SanhTiec (TenSanh, SucChua, GiaThue, ID_LoaiSanh, HinhAnh) VALUES (?, ?, ?, ?, ?)',
+        [hallData.TenSanh, hallData.SucChua, hallData.GiaThue, hallData.ID_LoaiSanh, hallData.HinhAnh]
       );
       return this.getHallById(result.insertId);
     } catch (error) {
@@ -52,9 +52,35 @@ class HallManagementService {
   // Cập nhật thông tin sảnh
   async updateHall(hallId, hallData) {
     try {
+      const updateFields = [];
+      const params = [];
+
+      if (hallData.TenSanh !== undefined) {
+        updateFields.push('TenSanh = ?');
+        params.push(hallData.TenSanh);
+      }
+      if (hallData.SucChua !== undefined) {
+        updateFields.push('SucChua = ?');
+        params.push(hallData.SucChua);
+      }
+      if (hallData.GiaThue !== undefined) {
+        updateFields.push('GiaThue = ?');
+        params.push(hallData.GiaThue);
+      }
+      if (hallData.ID_LoaiSanh !== undefined) {
+        updateFields.push('ID_LoaiSanh = ?');
+        params.push(hallData.ID_LoaiSanh);
+      }
+      if (hallData.HinhAnh !== undefined) {
+        updateFields.push('HinhAnh = ?');
+        params.push(hallData.HinhAnh);
+      }
+
+      params.push(hallId);
+
       await db.query(
-        'UPDATE SanhTiec SET TenSanh = ?, SucChua = ?, GiaThue = ?, ID_LoaiSanh = ? WHERE ID_SanhTiec = ?',
-        [hallData.TenSanh, hallData.SucChua, hallData.GiaThue, hallData.ID_LoaiSanh, hallId]
+        `UPDATE SanhTiec SET ${updateFields.join(', ')} WHERE ID_SanhTiec = ?`,
+        params
       );
       return this.getHallById(hallId);
     } catch (error) {
@@ -81,47 +107,6 @@ class HallManagementService {
       return types;
     } catch (error) {
       console.error('Error in getAllHallTypes service:', error);
-      throw error;
-    }
-  }
-
-  // Tạo loại sảnh mới
-  async createHallType(typeData) {
-    try {
-      const [result] = await db.query(
-        'INSERT INTO LoaiSanh (TenLoai, GiaBanToiThieu) VALUES (?, ?)',
-        [typeData.TenLoai, typeData.GiaBanToiThieu]
-      );
-      const [newType] = await db.query('SELECT * FROM LoaiSanh WHERE ID_LoaiSanh = ?', [result.insertId]);
-      return newType[0];
-    } catch (error) {
-      console.error('Error in createHallType service:', error);
-      throw error;
-    }
-  }
-
-  // Cập nhật loại sảnh
-  async updateHallType(typeId, typeData) {
-    try {
-      await db.query(
-        'UPDATE LoaiSanh SET TenLoai = ?, GiaBanToiThieu = ? WHERE ID_LoaiSanh = ?',
-        [typeData.TenLoai, typeData.GiaBanToiThieu, typeId]
-      );
-      const [updatedType] = await db.query('SELECT * FROM LoaiSanh WHERE ID_LoaiSanh = ?', [typeId]);
-      return updatedType[0];
-    } catch (error) {
-      console.error('Error in updateHallType service:', error);
-      throw error;
-    }
-  }
-
-  // Xóa loại sảnh
-  async deleteHallType(typeId) {
-    try {
-      const [result] = await db.query('DELETE FROM LoaiSanh WHERE ID_LoaiSanh = ?', [typeId]);
-      return result.affectedRows > 0;
-    } catch (error) {
-      console.error('Error in deleteHallType service:', error);
       throw error;
     }
   }

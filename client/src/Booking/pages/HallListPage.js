@@ -1,20 +1,46 @@
 import React, { useState, useEffect } from 'react';
-import { Container, Row, Col, Card, Button } from 'react-bootstrap';
+import { 
+  Row, 
+  Col, 
+  Card, 
+  Input, 
+  Select, 
+  Slider, 
+  Button,
+  Empty,
+  Space,
+} from 'antd';
+import {
+  SearchOutlined,
+  TeamOutlined,
+  DollarOutlined,
+} from '@ant-design/icons';
 import { Link } from 'react-router-dom';
+import UserLayout from '../components/layout/UserLayout';
 import { LoadingSpinner, ErrorMessage } from '../components/common/StatusComponents';
 import HallService from '../services/HallService';
-import { FormattedPrice } from '../components/common/StatusComponents';
+import { FormattedPrice } from '../components/common/FormattedPrice';
+
+const { Option } = Select;
 
 /**
  * Trang danh sách sảnh tiệc
  */
 function HallListPage() {
   const [halls, setHalls] = useState([]);
+  const [filteredHalls, setFilteredHalls] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [hallTypes, setHallTypes] = useState([]);
+  const [filters, setFilters] = useState({
+    search: '',
+    type: 'all',
+    capacity: [0, 1000],
+    priceRange: [0, 100000000],
+  });
 
   useEffect(() => {
-    // Fetch danh sách sảnh
+    // Fetch danh sách sảnh và loại sảnh
     const fetchHalls = async () => {
       setLoading(true);
       setError(null);
@@ -36,65 +62,164 @@ function HallListPage() {
       }
     };
     
+    const fetchHallTypes = async () => {
+      try {
+        const response = await HallService.getHallTypes();
+        setHallTypes(response.data);
+      } catch (err) {
+        console.error('Error fetching hall types:', err);
+      }
+    };
+
     fetchHalls();
+    fetchHallTypes();
   }, []);
 
+  useEffect(() => {
+    // Lọc sảnh khi có thay đổi về bộ lọc hoặc danh sách sảnh
+    let result = [...halls];
+
+    // Lọc theo tên
+    if (filters.search) {
+      result = result.filter(hall => 
+        hall.TenSanh.toLowerCase().includes(filters.search.toLowerCase())
+      );
+    }
+
+    // Lọc theo loại sảnh
+    if (filters.type !== 'all') {
+      result = result.filter(hall => hall.ID_LoaiSanh === filters.type);
+    }
+
+    // Lọc theo sức chứa
+    result = result.filter(hall => 
+      hall.SucChua >= filters.capacity[0] && 
+      hall.SucChua <= filters.capacity[1]
+    );
+
+    // Lọc theo giá
+    result = result.filter(hall => 
+      hall.GiaThue >= filters.priceRange[0] && 
+      hall.GiaThue <= filters.priceRange[1]
+    );
+
+    setFilteredHalls(result);
+  }, [filters, halls]);
+
   if (loading) return (
-    <Container className="py-4">
+    <UserLayout>
       <LoadingSpinner text="Đang tải danh sách sảnh..." />
-    </Container>
+    </UserLayout>
   );
   
   if (error) return (
-    <Container className="py-4">
+    <UserLayout>
       <ErrorMessage message={error} />
-    </Container>
+    </UserLayout>
   );
 
   return (
-    <Container className="py-4">
-      <h1 className="mb-4">Danh sách sảnh tiệc</h1>
-      
-      {halls.length === 0 ? (
-        <div className="text-center py-5">
-          <h3>Không có sảnh tiệc nào!</h3>
-          <p className="text-muted">Vui lòng thử lại sau hoặc liên hệ với quản trị viên.</p>
-        </div>
+    <UserLayout>
+      <div style={{ marginBottom: 24 }}>
+        <h1 style={{ fontSize: '32px', marginBottom: 24 }}>Danh sách sảnh tiệc</h1>
+        
+        <Card>
+          <Row gutter={[16, 16]}>
+            <Col xs={24} sm={24} md={6}>
+              <Input
+                placeholder="Tìm kiếm sảnh"
+                prefix={<SearchOutlined />}
+                value={filters.search}
+                onChange={e => setFilters({ ...filters, search: e.target.value })}
+              />
+            </Col>
+            <Col xs={24} sm={12} md={6}>
+              <Select
+                style={{ width: '100%' }}
+                value={filters.type}
+                onChange={value => setFilters({ ...filters, type: value })}
+              >
+                <Option value="all">Tất cả loại sảnh</Option>
+                {hallTypes.map(type => (
+                  <Option key={type.ID_LoaiSanh} value={type.ID_LoaiSanh}>
+                    {type.TenLoai}
+                  </Option>
+                ))}
+              </Select>
+            </Col>
+            <Col xs={24} sm={12} md={6}>
+              <Space direction="vertical" style={{ width: '100%' }}>
+                <span>Sức chứa (khách):</span>
+                <Slider
+                  range
+                  value={filters.capacity}
+                  min={0}
+                  max={1000}
+                  onChange={value => setFilters({ ...filters, capacity: value })}
+                />
+              </Space>
+            </Col>
+            <Col xs={24} sm={12} md={6}>
+              <Space direction="vertical" style={{ width: '100%' }}>
+                <span>Giá thuê (VNĐ):</span>
+                <Slider
+                  range
+                  value={filters.priceRange}
+                  min={0}
+                  max={100000000}
+                  step={1000000}
+                  onChange={value => setFilters({ ...filters, priceRange: value })}
+                />
+              </Space>
+            </Col>
+          </Row>
+        </Card>
+      </div>
+
+      {filteredHalls.length === 0 ? (
+        <Empty
+          description="Không tìm thấy sảnh tiệc nào phù hợp"
+          style={{ margin: '48px 0' }}
+        />
       ) : (
-        <Row>
-          {halls.map(hall => (
-            <Col lg={4} md={6} className="mb-4" key={hall.ID_SanhTiec}>
-              <Card className="h-100 shadow-sm">
-                <Card.Img 
-                    variant="top" 
-                    src={hall.HinhAnh || `/assets/hall-${hall.ID_SanhTiec}.jpg`} 
+        <Row gutter={[24, 24]}>
+          {filteredHalls.map(hall => (
+            <Col xs={24} sm={12} md={8} key={hall.ID_SanhTiec}>
+              <Card
+                hoverable
+                cover={
+                  <img
                     alt={hall.TenSanh}
-                    style={{ height: '200px', objectFit: 'cover' }}
+                    src={`/assets/hall-${hall.ID_SanhTiec}.jpg`}
+                    style={{ height: 200, objectFit: 'cover' }}
                     onError={e => { e.target.src = '/assets/hall-1.jpg' }}
-                    />
-                <Card.Body>
-                  <Card.Title>{hall.TenSanh}</Card.Title>
-                  <Card.Text>
-                    <strong>Sức chứa:</strong> {hall.SucChua} khách<br />
-                    <strong>Giá thuê:</strong> <FormattedPrice amount={hall.GiaThue} /><br />
-                    <strong>Loại sảnh:</strong> {hall.TenLoai}
-                  </Card.Text>
-                  
-                  <div className="d-flex justify-content-between mt-3">
-                    <Link to={`/booking/halls/${hall.ID_SanhTiec}`}>
-                      <Button variant="outline-primary">Chi tiết</Button>
-                    </Link>
-                    <Link to={`/booking/new?hallId=${hall.ID_SanhTiec}`}>
-                      <Button variant="primary">Đặt tiệc</Button>
-                    </Link>
-                  </div>
-                </Card.Body>
+                  />
+                }
+                actions={[
+                  <Link to={`/booking/halls/${hall.ID_SanhTiec}`}>
+                    <Button type="text">Chi tiết</Button>
+                  </Link>,
+                  <Link to={`/booking/new?hallId=${hall.ID_SanhTiec}`}>
+                    <Button type="primary">Đặt tiệc</Button>
+                  </Link>,
+                ]}
+              >
+                <Card.Meta
+                  title={hall.TenSanh}
+                  description={
+                    <>
+                      <p><TeamOutlined /> Sức chứa: {hall.SucChua} khách</p>
+                      <p><DollarOutlined /> Giá thuê: <FormattedPrice amount={hall.GiaThue} /></p>
+                      <p>Loại sảnh: {hallTypes.find(t => t.ID_LoaiSanh === hall.ID_LoaiSanh)?.TenLoai}</p>
+                    </>
+                  }
+                />
               </Card>
             </Col>
           ))}
         </Row>
       )}
-    </Container>
+    </UserLayout>
   );
 }
 

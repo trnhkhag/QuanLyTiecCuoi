@@ -1,137 +1,235 @@
 import React, { useState, useEffect } from 'react';
+import { 
+  Row, 
+  Col, 
+  Button, 
+  Card, 
+  Image, 
+  Descriptions,
+  Divider,
+  Rate,
+  Tag,
+  Modal,
+  Calendar,
+} from 'antd';
+import {
+  CalendarOutlined,
+  TeamOutlined,
+  DollarOutlined,
+  EnvironmentOutlined,
+  PictureOutlined,
+} from '@ant-design/icons';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Container, Row, Col, Card, Button, Carousel, Table } from 'react-bootstrap';
-import { LoadingSpinner, ErrorMessage, FormattedPrice } from '../components/common/StatusComponents';
+import moment from 'moment';
+import 'moment/locale/vi';
+import UserLayout from '../components/layout/UserLayout';
+import { LoadingSpinner, ErrorMessage } from '../components/common/StatusComponents';
+import { FormattedPrice } from '../components/common/FormattedPrice';
 import HallService from '../services/HallService';
 
-/**
- * Trang chi tiết sảnh tiệc
- */
-function HallDetailPage() {
+moment.locale('vi');
+
+const HallDetailPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [hall, setHall] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [showCalendar, setShowCalendar] = useState(false);
+  const [selectedImage, setSelectedImage] = useState(null);
+  const [bookedDates, setBookedDates] = useState([]);
+
+  // Thêm ảnh demo cho sảnh
+  const hallImages = [
+    `/assets/hall-${id}.jpg`,
+    '/assets/hall-1.jpg',
+    '/assets/hall-2.jpg',
+    '/assets/hall-3.jpg',
+  ];
 
   useEffect(() => {
-    const fetchHallDetails = async () => {
-      setLoading(true);
-      setError(null);
-      
-      try {
-        // Sử dụng HallService thay vì axios trực tiếp
-        const response = await HallService.getHallById(id);
-        
-        if (response.success) {
-          setHall(response.data);
-        } else {
-          setError('Không thể tải thông tin sảnh');
-        }
-      } catch (err) {
-        console.error(`Error fetching hall with id ${id}:`, err);
-        setError(err.message || 'Không thể tải thông tin chi tiết sảnh tiệc.');
-      } finally {
-        setLoading(false);
-      }
-    };
-    
     fetchHallDetails();
+    fetchBookedDates();
   }, [id]);
 
-  const handleBooking = () => {
-    navigate(`/booking/new?hallId=${id}`);
+  const fetchHallDetails = async () => {
+    try {
+      setLoading(true);
+      const response = await HallService.getHallById(id);
+      if (response.success) {
+        setHall(response.data);
+      } else {
+        setError('Không thể tải thông tin sảnh');
+      }
+    } catch (err) {
+      console.error('Error fetching hall details:', err);
+      setError('Không thể tải thông tin sảnh. Vui lòng thử lại sau.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchBookedDates = async () => {
+    try {
+      // TODO: Implement actual API call to get booked dates
+      // Mock data for now
+      setBookedDates([
+        moment().add(2, 'days').format('YYYY-MM-DD'),
+        moment().add(5, 'days').format('YYYY-MM-DD'),
+      ]);
+    } catch (err) {
+      console.error('Error fetching booked dates:', err);
+    }
+  };
+
+  const handleDateSelect = (date) => {
+    navigate(`/booking/new?hallId=${id}&date=${date.format('YYYY-MM-DD')}`);
   };
 
   if (loading) return (
-    <Container className="py-4">
+    <UserLayout>
       <LoadingSpinner text="Đang tải thông tin sảnh..." />
-    </Container>
-  );
-  
-  if (error) return (
-    <Container className="py-4">
-      <ErrorMessage message={error} />
-    </Container>
+    </UserLayout>
   );
 
-  if (!hall) return (
-    <Container className="py-4">
-      <ErrorMessage message="Không tìm thấy thông tin sảnh" variant="warning" />
-    </Container>
+  if (error) return (
+    <UserLayout>
+      <ErrorMessage message={error} />
+    </UserLayout>
   );
+
+  if (!hall) return null;
+
+  const disabledDate = (current) => {
+    // Disable dates before today and booked dates
+    return current && (
+      current < moment().startOf('day') ||
+      bookedDates.includes(current.format('YYYY-MM-DD'))
+    );
+  };
 
   return (
-    <Container className="py-4">
-      <h1 className="mb-4">{hall.TenSanh}</h1>
-      
-      <Row className="mb-4">
-        <Col md={8}>
-          {/* Thay thế đoạn kiểm tra hall.images bằng hiển thị ảnh từ thư mục assets */}
-          <div className="bg-light text-center p-5 rounded">
-            <img
-              src={`/assets/hall-${hall.ID_SanhTiec}.jpg`}
-              alt={hall.TenSanh}
-              className="img-fluid"
-              style={{ maxHeight: '500px', objectFit: 'cover' }}
-              onError={e => { e.target.src = '/assets/hall-1.jpg' }}
-            />
-          </div>
-        </Col>
-        
-        <Col md={4}>
-          <Card>
-            <Card.Header as="h5">Thông tin sảnh</Card.Header>
-            <Card.Body>
-              <Table borderless>
-                <tbody>
-                  <tr>
-                    <td>Loại sảnh:</td>
-                    <td>{hall.TenLoai}</td>
-                  </tr>
-                  <tr>
-                    <td>Sức chứa:</td>
-                    <td>{hall.SucChua} khách</td>
-                  </tr>
-                  <tr>
-                    <td>Số bàn tối đa:</td>
-                    <td>{Math.floor(hall.SucChua / 10) || '-'}</td>
-                  </tr>
-                  <tr>
-                    <td>Số bàn tối thiểu:</td>
-                    <td>{Math.floor(hall.SucChua / 20) || '-'}</td>
-                  </tr>
-                  <tr>
-                    <td>Giá thuê:</td>
-                    <td><FormattedPrice amount={hall.GiaThue} /></td>
-                  </tr>
-                </tbody>
-              </Table>
-              
-              <Button 
-                variant="primary"
-                className="w-100 mt-3"
-                onClick={handleBooking}
+    <UserLayout>
+      <div className="hall-detail">
+        <Row gutter={[24, 24]}>
+          <Col xs={24} md={16}>
+            <Card 
+              bordered={false}
+              cover={
+                <Image
+                  alt={hall.TenSanh}
+                  src={hallImages[0]}
+                  fallback="/assets/hall-1.jpg"
+                  preview={false}
+                  style={{ height: 400, objectFit: 'cover' }}
+                  onClick={() => setSelectedImage(hallImages[0])}
+                />
+              }
+            >
+              <div style={{ marginTop: 16 }}>
+                <Row gutter={[8, 8]}>
+                  {hallImages.slice(1).map((image, index) => (
+                    <Col span={8} key={index}>
+                      <Image
+                        alt={`${hall.TenSanh} ${index + 2}`}
+                        src={image}
+                        fallback="/assets/hall-1.jpg"
+                        style={{ height: 120, width: '100%', objectFit: 'cover' }}
+                        onClick={() => setSelectedImage(image)}
+                        preview={false}
+                      />
+                    </Col>
+                  ))}
+                </Row>
+              </div>
+            </Card>
+          </Col>
+
+          <Col xs={24} md={8}>
+            <Card bordered={false}>
+              <h1 style={{ fontSize: 24, marginBottom: 16 }}>{hall.TenSanh}</h1>
+              <Descriptions column={1}>
+                <Descriptions.Item label={<><TeamOutlined /> Sức chứa</>}>
+                  {hall.SucChua} khách
+                </Descriptions.Item>
+                <Descriptions.Item label={<><DollarOutlined /> Giá thuê</>}>
+                  <FormattedPrice amount={hall.GiaThue} />
+                </Descriptions.Item>
+                <Descriptions.Item label={<><EnvironmentOutlined /> Vị trí</>}>
+                  {hall.ViTri || 'Tầng 1'}
+                </Descriptions.Item>
+              </Descriptions>
+
+              <Divider />
+
+              <div style={{ marginBottom: 16 }}>
+                <Rate disabled defaultValue={4.5} />
+                <span style={{ marginLeft: 8 }}>4.5/5 (120 đánh giá)</span>
+              </div>
+
+              <Button
+                type="primary"
+                size="large"
+                block
+                icon={<CalendarOutlined />}
+                onClick={() => setShowCalendar(true)}
               >
-                Đặt tiệc tại sảnh này
+                Đặt Tiệc Ngay
               </Button>
-            </Card.Body>
-          </Card>
-        </Col>
-      </Row>
-      
-      <Card className="mb-4">
-        <Card.Header as="h5">Mô tả</Card.Header>
-        <Card.Body>
-          {hall.MoTa ? (
-            <div dangerouslySetInnerHTML={{ __html: hall.MoTa }} />
-          ) : (
-            <p className="text-muted">Không có mô tả chi tiết.</p>
-          )}
-        </Card.Body>
-      </Card>
-    </Container>
+            </Card>
+          </Col>
+        </Row>
+
+        <Card style={{ marginTop: 24 }} bordered={false}>
+          <h2>Thông tin chi tiết</h2>
+          <div style={{ whiteSpace: 'pre-line' }}>
+            {hall.MoTa || 'Chưa có mô tả chi tiết cho sảnh này.'}
+          </div>
+
+          <Divider />
+
+          <h2>Tiện nghi</h2>
+          <Row gutter={[16, 16]}>
+            <Col><Tag color="blue">Máy lạnh</Tag></Col>
+            <Col><Tag color="blue">Âm thanh</Tag></Col>
+            <Col><Tag color="blue">Ánh sáng</Tag></Col>
+            <Col><Tag color="blue">Sân khấu</Tag></Col>
+            <Col><Tag color="blue">Màn hình LED</Tag></Col>
+          </Row>
+        </Card>
+
+        <Modal
+          title="Xem ảnh"
+          open={!!selectedImage}
+          onCancel={() => setSelectedImage(null)}
+          footer={null}
+          width="80%"
+        >
+          <Image
+            alt="Hall preview"
+            src={selectedImage}
+            style={{ width: '100%' }}
+          />
+        </Modal>
+
+        <Modal
+          title="Chọn ngày đặt tiệc"
+          open={showCalendar}
+          onCancel={() => setShowCalendar(false)}
+          footer={null}
+        >
+          <Calendar
+            fullscreen={false}
+            disabledDate={disabledDate}
+            onSelect={(date) => {
+              setShowCalendar(false);
+              handleDateSelect(date);
+            }}
+          />
+        </Modal>
+      </div>
+    </UserLayout>
   );
-}
+};
 
 export default HallDetailPage;
