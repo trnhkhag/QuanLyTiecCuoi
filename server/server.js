@@ -28,6 +28,7 @@ pool.getConnection()
 const weddingBookingRoutes = require('./DatTiec/weddingBookingRoutes');
 const hallRoutes = require('./DatTiec/hallRoutes');
 const serviceRoutes = require('./DatTiec/serviceRoutes');
+const regulationRoutes = require('./QuyDinh/regulationRoutes');
 // Thêm các routes khác khi cần
 // const hallRoutes = require('./routes/hallRoutes');
 // const foodRoutes = require('./routes/foodRoutes');
@@ -37,6 +38,7 @@ const serviceRoutes = require('./DatTiec/serviceRoutes');
 app.use('/api/bookings', weddingBookingRoutes);
 app.use('/api/halls', hallRoutes);
 app.use('/api/services', serviceRoutes);
+app.use('/api/regulations', regulationRoutes);
 // Thêm các routes khác khi cần
 // app.use('/api/halls', hallRoutes);
 // app.use('/api/foods', foodRoutes);

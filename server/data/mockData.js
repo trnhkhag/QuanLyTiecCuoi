@@ -156,6 +156,40 @@ const mockData = {
       services: [2, 5],
       foods: [2, 4, 5]
     }
+  ],
+  
+  // Regulations
+  regulations: [
+    {
+      ID_QuyDinh: "QD1",
+      TenQuyDinh: "Quy định về đơn giá theo loại sảnh",
+      MoTa: "Quy định về giá tối thiểu cho từng loại sảnh",
+      details: {
+        halls: [
+          { type: "A", minPrice: 5000000 },
+          { type: "B", minPrice: 3000000 },
+          { type: "C", minPrice: 2000000 }
+        ]
+      }
+    },
+    {
+      ID_QuyDinh: "QD2",
+      TenQuyDinh: "Quy định về số lượng dịch vụ và món ăn",
+      MoTa: "Giới hạn số lượng dịch vụ và món ăn cho mỗi tiệc",
+      details: {
+        maxServices: 5,
+        maxDishes: 10
+      }
+    },
+    {
+      ID_QuyDinh: "QD4",
+      TenQuyDinh: "Quy định về phí phạt",
+      MoTa: "Quy định về phí phạt khi thay đổi hoặc hủy tiệc",
+      details: {
+        lateFeePercentage: 10,
+        enabled: true
+      }
+    }
   ]
 };
 
