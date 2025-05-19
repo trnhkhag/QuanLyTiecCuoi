@@ -5,11 +5,15 @@ import {
   Space,
   Modal,
   message,
-  Popconfirm
+  Popconfirm,
+  Card,
+  Typography
 } from 'antd';
-import { EditOutlined, DeleteOutlined } from '@ant-design/icons';
+import { EditOutlined, DeleteOutlined, PlusOutlined } from '@ant-design/icons';
 import HallManagementService from '../services/HallManagementService';
 import HallTypeForm from './HallTypeForm';
+
+const { Title } = Typography;
 
 const HallTypeList = () => {
   const [types, setTypes] = useState([]);
@@ -66,20 +70,24 @@ const HallTypeList = () => {
 
   const columns = [
     {
-      title: 'Tên loại',
+      title: 'Tên loại sảnh',
       dataIndex: 'TenLoai',
       key: 'TenLoai',
+      width: '40%',
     },
     {
       title: 'Giá bàn tối thiểu',
       dataIndex: 'GiaBanToiThieu',
       key: 'GiaBanToiThieu',
+      width: '40%',
+      align: 'right',
       render: (value) => new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(value),
       sorter: (a, b) => a.GiaBanToiThieu - b.GiaBanToiThieu,
     },
     {
       title: 'Thao tác',
       key: 'action',
+      width: '20%',
       render: (_, record) => (
         <Space size="middle">
           <Button
@@ -105,10 +113,12 @@ const HallTypeList = () => {
   ];
 
   return (
-    <div>
-      <div style={{ marginBottom: 16 }}>
+    <Card>
+      <div style={{ marginBottom: 16, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <Title level={5} style={{ margin: 0 }}>Danh sách loại sảnh</Title>
         <Button
           type="primary"
+          icon={<PlusOutlined />}
           onClick={() => {
             setEditingType(null);
             setIsModalVisible(true);
@@ -123,6 +133,11 @@ const HallTypeList = () => {
         dataSource={types}
         rowKey="ID_LoaiSanh"
         loading={loading}
+        pagination={{
+          defaultPageSize: 10,
+          showSizeChanger: true,
+          showTotal: (total, range) => `${range[0]}-${range[1]} của ${total} loại sảnh`
+        }}
       />
 
       <Modal
@@ -133,6 +148,7 @@ const HallTypeList = () => {
           setEditingType(null);
         }}
         footer={null}
+        width={600}
       >
         <HallTypeForm
           initialValues={editingType}
@@ -143,7 +159,7 @@ const HallTypeList = () => {
           }}
         />
       </Modal>
-    </div>
+    </Card>
   );
 };
 

@@ -3,16 +3,12 @@ import { BrowserRouter, Routes, Route, Link } from 'react-router-dom';
 import axios from 'axios';
 import './App.css';
 
-// Import Booking Module
+// Import Routes
 import BookingRoutes from './Booking';
-// Import Lobby Module
-import HallManagementPage from './Lobby/pages/HallManagementPage';
+import AdminRoutes from './Admin/AdminRoutes';
 
 function App() {
   const [apiStatus, setApiStatus] = useState('Loading...');
-  const [halls, setHalls] = useState([]);
-  const [foods, setFoods] = useState([]);
-  const [services, setServices] = useState([]);
 
   useEffect(() => {
     // Test API connection
@@ -26,52 +22,14 @@ function App() {
       });
   }, []);
 
-  // Fetch wedding halls data
-  const fetchHalls = () => {
-    axios.get('http://localhost:5000/api/halls')
-      .then(response => {
-        setHalls(response.data);
-      })
-      .catch(error => {
-        console.error('Error fetching halls:', error);
-      });
-  };
-
-  // Fetch foods data
-  const fetchFoods = () => {
-    axios.get('http://localhost:5000/api/foods')
-      .then(response => {
-        setFoods(response.data);
-      })
-      .catch(error => {
-        console.error('Error fetching foods:', error);
-      });
-  };
-
-  // Fetch services data
-  const fetchServices = () => {
-    axios.get('http://localhost:5000/api/services')
-      .then(response => {
-        setServices(response.data);
-      })
-      .catch(error => {
-        console.error('Error fetching services:', error);
-      });
-  };
-
-  // Load initial data
-  useEffect(() => {
-    fetchHalls();
-  }, []);
-
   return (
     <BrowserRouter>
       <Routes>
-        {/* Booking Routes - Completely separate UI */}
-        <Route path="/booking/*" element={<BookingRoutes />} />
+        {/* Admin Routes */}
+        <Route path="/admin/*" element={<AdminRoutes />} />
         
-        {/* Management Routes */}
-        <Route path="/lobby/halls" element={<HallManagementPage />} />
+        {/* Booking Routes */}
+        <Route path="/booking/*" element={<BookingRoutes />} />
         
         {/* Main App Routes */}
         <Route path="/*" element={
@@ -83,10 +41,7 @@ function App() {
               <div className="navigation">
                 <Link to="/" className="nav-link">Trang chủ</Link>
                 <Link to="/booking" className="nav-link">Đặt tiệc</Link>
-                <Link to="/lobby/halls" className="nav-link">Quản lý sảnh</Link>
-                <Link to="/halls" className="nav-link" onClick={fetchHalls}>Sảnh cưới</Link>
-                <Link to="/foods" className="nav-link" onClick={fetchFoods}>Món ăn</Link>
-                <Link to="/services" className="nav-link" onClick={fetchServices}>Dịch vụ</Link>
+                <Link to="/admin" className="nav-link">Quản trị</Link>
               </div>
             </header>
             

@@ -51,6 +51,11 @@ class HallManagementController {
     try {
       const hallData = req.body;
       
+      // Thêm đường dẫn ảnh nếu có upload file
+      if (req.file) {
+        hallData.HinhAnh = '/uploads/halls/' + req.file.filename;
+      }
+      
       // Validate dữ liệu đầu vào
       if (!hallData.TenSanh || !hallData.SucChua || !hallData.GiaThue || !hallData.ID_LoaiSanh) {
         return res.status(400).json({
@@ -81,12 +86,17 @@ class HallManagementController {
       const hallId = req.params.id;
       const hallData = req.body;
 
-      // Validate dữ liệu đầu vào
+      // Validate dữ liệu đầu vào cơ bản
       if (!hallData.TenSanh || !hallData.SucChua || !hallData.GiaThue || !hallData.ID_LoaiSanh) {
         return res.status(400).json({
           success: false,
           message: 'Thiếu thông tin sảnh bắt buộc'
         });
+      }
+
+      // Thêm đường dẫn ảnh nếu có upload file mới
+      if (req.file) {
+        hallData.HinhAnh = '/uploads/halls/' + req.file.filename;
       }
 
       const updatedHall = await hallManagementService.updateHall(hallId, hallData);

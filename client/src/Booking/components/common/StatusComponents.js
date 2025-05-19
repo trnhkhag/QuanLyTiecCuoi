@@ -1,49 +1,59 @@
 import React from 'react';
-import { Spinner, Alert } from 'react-bootstrap';
+import { Spin, Alert, Result, Button } from 'antd';
 
 /**
  * Component hiển thị trạng thái loading
  */
-export function LoadingSpinner({ text = 'Đang tải...' }) {
-  return (
-    <div className="text-center my-5">
-      <Spinner animation="border" role="status" variant="primary" />
-      <p className="mt-2">{text}</p>
-    </div>
-  );
-}
+export const LoadingSpinner = ({ text = 'Đang tải...' }) => (
+  <div style={{ 
+    display: 'flex', 
+    justifyContent: 'center', 
+    alignItems: 'center',
+    minHeight: '200px',
+    flexDirection: 'column',
+    gap: '16px'
+  }}>
+    <Spin size="large" />
+    <div>{text}</div>
+  </div>
+);
 
 /**
  * Component hiển thị thông báo lỗi
  */
-export function ErrorMessage({ message, variant = 'danger' }) {
-  if (!message) return null;
-  
-  return (
-    <Alert variant={variant} className="mb-4">
-      {message}
-    </Alert>
-  );
-}
+export const ErrorMessage = ({ 
+  message = 'Đã xảy ra lỗi', 
+  description,
+  onRetry
+}) => (
+  <Result
+    status="error"
+    title={message}
+    subTitle={description}
+    extra={onRetry && [
+      <Button type="primary" key="retry" onClick={onRetry}>
+        Thử lại
+      </Button>
+    ]}
+  />
+);
 
 /**
  * Component hiển thị trạng thái không có dữ liệu
  */
-export function NoDataMessage({ message = 'Không có dữ liệu' }) {
-  return (
-    <div className="text-center my-5">
-      <p className="text-muted">{message}</p>
-    </div>
-  );
-}
-export function EmptyState({ message = 'Không có dữ liệu', icon }) {
-  return (
-    <div className="text-center my-5 text-muted">
-      {icon}
-      <p className="mt-2">{message}</p>
-    </div>
-  );
-}
+export const EmptyState = ({ 
+  title = 'Không có dữ liệu',
+  description = 'Không tìm thấy dữ liệu phù hợp',
+  image,
+  extra 
+}) => (
+  <Result
+    icon={image}
+    title={title}
+    subTitle={description}
+    extra={extra}
+  />
+);
 
 /**
  * Component định dạng giá tiền
