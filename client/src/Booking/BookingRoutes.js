@@ -10,6 +10,8 @@ import HallListPage from './pages/HallListPage';
 import BookingSuccessPage from './pages/BookingSuccessPage';
 import RegulationListPage from './pages/RegulationListPage';
 import RegulationManagementPage from './pages/RegulationManagementPage';
+import WeddingLookupPage from './pages/WeddingLookupPage';
+import WeddingDetailPage from './pages/WeddingDetailPage';
 
 /**
  * Main component for the Booking feature that handles all routing
@@ -29,6 +31,8 @@ function BookingRoutes() {
           <Route path="success/:id" element={<BookingSuccessPage />} />
           <Route path="regulations" element={<RegulationListPage />} />
           <Route path="regulations/manage" element={<RegulationManagementPage />} />
+          <Route path="lookup" element={<WeddingLookupPage />} />
+          <Route path="weddings/:id" element={<WeddingDetailPage />} />
         </Routes>
       </div>
       <BookingFooter />
