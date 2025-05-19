@@ -31,11 +31,13 @@ function BookingSuccessPage() {
   );
   
   return (
-    <BookingLayout>
-      <div className="text-center mb-5">
+    <BookingLayout>      <div className="text-center mb-5">
         <div className="display-1 text-success mb-3">✓</div>
         <h1 className="mb-3">Đặt Tiệc Thành Công</h1>
-        <p className="lead">
+        <div className="alert alert-success py-2 w-75 mx-auto">
+          Trạng thái: <strong>{booking.TrangThai || 'Đã đặt'}</strong>
+        </div>
+        <p className="lead mt-3">
           Cảm ơn bạn đã đặt tiệc cưới tại Hệ thống Quản lý Tiệc Cưới
         </p>
       </div>
@@ -44,22 +46,21 @@ function BookingSuccessPage() {
         <Col lg={8}>
           <Card className="mb-4">
             <Card.Header as="h5">Thông tin đặt tiệc #{booking.id}</Card.Header>
-            <Card.Body>
-              <Row>
-                <Col md={6}>
-                  <h6>Thông tin cặp đôi</h6>
+            <Card.Body>              
+              <Row>                <Col md={6}>
+                  <h6>Thông tin người đặt</h6>
                   <p>
-                    <strong>Chú rể:</strong> {booking.groomName}<br />
-                    <strong>Cô dâu:</strong> {booking.brideName}<br />
-                    <strong>Số điện thoại:</strong> {booking.phoneNumber}
+                    <strong>Họ tên:</strong> {booking.TenKhachHang || booking.customerName}<br />
+                    <strong>Số điện thoại:</strong> {booking.phoneNumber}<br />
+                    <strong>Email:</strong> {booking.email}
                   </p>
                 </Col>
                 <Col md={6}>
                   <h6>Thông tin tiệc cưới</h6>
-                  <p>
-                    <strong>Ngày tổ chức:</strong> {new Date(booking.weddingDate).toLocaleDateString('vi-VN')}<br />
+                  <p>                    <strong>Ngày tổ chức:</strong> {new Date(booking.weddingDate).toLocaleDateString('vi-VN')}<br />
                     <strong>Ca:</strong> {booking.shiftName}<br />
-                    <strong>Sảnh:</strong> {booking.hallName}
+                    <strong>Sảnh:</strong> {booking.hallName}<br />
+                    <strong>Trạng thái:</strong> <span className="badge bg-success rounded-pill ms-1">{booking.TrangThai || 'Đã đặt'}</span>
                   </p>
                 </Col>
               </Row>
@@ -69,7 +70,6 @@ function BookingSuccessPage() {
                   <h6>Chi tiết đặt tiệc</h6>
                   <p>
                     <strong>Số lượng bàn:</strong> {booking.tableCount} bàn chính + {booking.reserveTableCount} bàn dự trữ<br />
-                    <strong>Số món ăn:</strong> {booking.foods?.length || 0} món<br />
                     <strong>Số dịch vụ:</strong> {booking.services?.length || 0} dịch vụ
                   </p>
                   
@@ -91,10 +91,13 @@ function BookingSuccessPage() {
               </Row>
             </Card.Body>
           </Card>
-          
-          <Card className="mb-4">
+            <Card className="mb-4">
             <Card.Header as="h5">Các bước tiếp theo</Card.Header>
             <Card.Body>
+              <div className="alert alert-info mb-3">
+                <small><strong>Thông tin trạng thái:</strong> Đơn đặt tiệc của bạn hiện có trạng thái <strong>{booking.TrangThai || 'Đã đặt'}</strong>. 
+                Trạng thái sẽ được cập nhật khi nhân viên xác nhận và khi bạn hoàn tất thanh toán.</small>
+              </div>
               <ol>
                 <li className="mb-2">
                   Nhân viên của chúng tôi sẽ liên hệ với bạn trong vòng 24 giờ để xác nhận đặt tiệc.

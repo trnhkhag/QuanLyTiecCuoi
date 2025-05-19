@@ -57,19 +57,44 @@ class BookingService {
         throw new Error(response.data?.message || 'Unknown error');
       });
   }
-
   /**
    * Tạo đặt tiệc mới
    * @param {Object} bookingData - Dữ liệu đặt tiệc
    * @returns {Promise} - Promise that resolves to the API response
-   */
-  createBooking(bookingData) {
+   */  createBooking(bookingData) {
+    console.log('Sending booking request with data:', bookingData);
+    
     return axios.post(`${API_URL}/bookings`, bookingData)
       .then(response => {
+        console.log('Booking response:', response.data);
         if (response.data && response.data.success) {
-          return response.data;
+          return response.data.data;
         }
         throw new Error(response.data?.message || 'Unknown error');
+      })
+      .catch(error => {
+        console.error('Booking error:', error);
+        
+        // Handle specific error scenarios
+        if (error.response) {
+          console.error('Error response:', error.response.data);
+          
+          // Handle 400 Bad Request - could be validation errors or already booked hall
+          if (error.response.status === 400) {
+            const errorMessage = error.response.data?.message || 'Dữ liệu đặt tiệc không hợp lệ';
+            throw new Error(errorMessage);
+          }
+          
+          // Handle 500 Internal Server Error
+          if (error.response.status === 500) {
+            throw new Error('Lỗi máy chủ: ' + (error.response.data?.message || 'Hệ thống đang gặp sự cố'));
+          }
+          
+          throw new Error(error.response.data?.message || 'Lỗi máy chủ');
+        }
+        
+        // Network errors or other issues
+        throw new Error('Lỗi kết nối: ' + (error.message || 'Không thể kết nối đến máy chủ'));
       });
   }
 
@@ -102,6 +127,31 @@ class BookingService {
           return response.data;
         }
         throw new Error(response.data?.message || 'Unknown error');
+      });
+  }
+
+  /**
+   * Cập nhật trạng thái đặt tiệc
+   * @param {string|number} id - Id đặt tiệc
+   * @param {string} status - Trạng thái mới
+   * @returns {Promise} - Promise that resolves to the API response
+   */
+  updateBookingStatus(id, status) {
+    return axios.patch(`${API_URL}/bookings/${id}/status`, { status })
+      .then(response => {
+        if (response.data && response.data.success) {
+          return response.data;
+        }
+        throw new Error(response.data?.message || 'Unknown error');
+      })
+      .catch(error => {
+        console.error('Update booking status error:', error);
+        
+        if (error.response) {
+          throw new Error(error.response.data?.message || 'Server error');
+        }
+        
+        throw error;
       });
   }
 }

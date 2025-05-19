@@ -3,6 +3,7 @@ import { Container, Row, Col, Card, Button } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import { LoadingSpinner, ErrorMessage } from '../components/common/StatusComponents';
 import HallService from '../services/HallService';
+import { FormattedPrice } from '../components/common/StatusComponents';
 
 /**
  * Trang danh sách sảnh tiệc
@@ -75,7 +76,7 @@ function HallListPage() {
                   <Card.Title>{hall.TenSanh}</Card.Title>
                   <Card.Text>
                     <strong>Sức chứa:</strong> {hall.SucChua} khách<br />
-                    <strong>Giá thuê:</strong> {hall.GiaThue?.toLocaleString()} VNĐ<br />
+                    <strong>Giá thuê:</strong> <FormattedPrice amount={hall.GiaThue} /><br />
                     <strong>Loại sảnh:</strong> {hall.TenLoai}
                   </Card.Text>
                   
