@@ -1,0 +1,84 @@
+.wedding-lookup {
+    max-width: 900px;
+    margin: 0 auto;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  }
+  
+  .wedding-lookup h2 {
+  text-align: center;
+    color: #333;
+    margin-bottom: 20px;
+  }
+  
+  .wedding-lookup div {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+  }
+  
+  .wedding-lookup input[type="text"],
+  .wedding-lookup input[type="date"] {
+    padding: 8px 12px;
+    border: 1.5px solid #ccc;
+    border-radius: 6px;
+    font-size: 1rem;
+    min-width: 180px;
+    transition: border-color 0.3s ease;
+  }
+  
+  .wedding-lookup input[type="text"]:focus,
+  .wedding-lookup input[type="date"]:focus {
+    border-color: #4a90e2;
+    outline: none;
+  }
+  
+  .wedding-lookup button {
+    background-color: #4a90e2;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 10px 18px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    min-width: 100px;
+  }
+  
+  .wedding-lookup button:hover {
+    background-color: #357ABD;
+  }
+  
+  .wedding-lookup table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.95rem;
+  }
+  
+  .wedding-lookup table th,
+  .wedding-lookup table td {
+    border: 1px solid #ddd;
+    padding: 10px;
+    text-align: center;
+  }
+  
+  .wedding-lookup table th {
+    background-color: #f4f6f8;
+    color: #555;
+  }
+  
+  .wedding-lookup table tbody tr:nth-child(even) {
+    background-color: #fafafa;
+  }
+  
+  .wedding-lookup p {
+    text-align: center;
+    color: #d9534f; /* màu đỏ báo lỗi */
+    font-weight: 600;
+  }
+
+  .wedding-lookup table tbody tr:hover {
+    background-color: #f0f0f0;
+  }
+  

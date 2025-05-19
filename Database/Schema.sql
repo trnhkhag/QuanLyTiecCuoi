@@ -82,6 +82,7 @@ CREATE TABLE TiecCuoi (
     ThoiDiemDat DATETIME NOT NULL,
     SoLuongBan INT NOT NULL,
     SoBanDuTru INT,
+    TrangThai VARCHAR(50) DEfAULT 'Đã đặt',
     FOREIGN KEY (ID_KhachHang) REFERENCES KhachHang(ID_KhachHang),
     FOREIGN KEY (ID_SanhTiec) REFERENCES SanhTiec(ID_SanhTiec),
     FOREIGN KEY (ID_Ca) REFERENCES CaTiec(ID_Ca)

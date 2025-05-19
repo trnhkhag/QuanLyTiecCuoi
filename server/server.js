@@ -110,9 +110,11 @@ require('dotenv').config();
 
 const app = express();
 const PORT = process.env.PORT || 5000;
+const weddingLookupRoutes = require('./TraCuu/WeddingLookupRoutes');
 
 app.use(cors());
 app.use(express.json());
+app.use('/api/lookup', weddingLookupRoutes);
 
 // Kiểm tra kết nối database
 pool.getConnection()
@@ -132,3 +134,6 @@ app.get('/api/test', (req, res) => {
 app.listen(PORT, () => {
   console.log(`🌐 Server đang chạy tại http://localhost:${PORT}`);
 });
+
+const tiecCuoiRoutes = require('./routes/tiecCuoiRoutes');
+app.use('/api/tiec-cuoi', tiecCuoiRoutes);
