@@ -7,6 +7,9 @@ import BookingBasicInfo from '../components/features/BookingBasicInfo';
 import ServiceSelection from '../components/features/ServiceSelection';
 import BookingSummary from '../components/features/BookingSummary';
 import { useBookingForm } from '../hooks/useBookings';
+import HallService from '../services/HallService';
+import ServiceService from '../services/ServiceService';
+import { FormattedPrice } from '../components/common/StatusComponents';
 
 /**
  * Trang đặt tiệc mới
@@ -19,12 +22,15 @@ function BookingFormPage() {
   // Tab hiện tại
   const [activeTab, setActiveTab] = useState('basic');
   
+  // State cho sảnh được chọn
+  const [selectedHall, setSelectedHall] = useState(null);
+  const [loadingHall, setLoadingHall] = useState(!!preSelectedHallId);
+  
   // Lấy dữ liệu form từ custom hook
   const {
     formData,
     halls,
     shifts,
-    foods,
     services,
     loading,
     error,
@@ -40,27 +46,63 @@ function BookingFormPage() {
     hallId: preSelectedHallId || ''
   });
   
+  // Fetch thông tin sảnh nếu có preSelectedHallId
+  useEffect(() => {
+    const fetchSelectedHall = async () => {
+      if (preSelectedHallId) {
+        try {
+          setLoadingHall(true);
+          const hallData = await HallService.getHallById(preSelectedHallId);
+          setSelectedHall(hallData);
+          
+          // Cập nhật formData với thông tin sảnh
+          setFormData(prev => ({
+            ...prev,
+            hallId: preSelectedHallId
+          }));
+        } catch (err) {
+          console.error('Error fetching hall details:', err);
+        } finally {
+          setLoadingHall(false);
+        }
+      }
+    };
+    
+    fetchSelectedHall();
+  }, [preSelectedHallId]);
+    // State for error messages and loading status
+  const [submitting, setSubmitting] = useState(false);
+  const [submissionError, setSubmissionError] = useState(null);
+  
   // Submit form
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
-    // Validation
-    if (!formData.groomName || !formData.brideName || !formData.phoneNumber ||
+    setSubmissionError(null);
+      // Validation
+    if (!formData.customerName || !formData.phoneNumber ||
         !formData.weddingDate || !formData.shiftId || !formData.hallId) {
-      alert('Vui lòng điền đầy đủ thông tin bắt buộc');
+      setSubmissionError('Vui lòng điền đầy đủ thông tin bắt buộc');
       return;
     }
     
-    const result = await submitBooking();
-    
-    if (result.success) {
-      navigate(`/booking/success/${result.data.bookingId}`);
-    } else {
-      alert(`Lỗi: ${result.error}`);
+    try {
+      setSubmitting(true);
+      const result = await submitBooking();
+      
+      if (result.success) {
+        navigate(`/booking/success/${result.data.bookingId}`);
+      } else {
+        setSubmissionError(result.error || 'Đã xảy ra lỗi khi đặt tiệc. Vui lòng thử lại.');
+      }
+    } catch (error) {
+      console.error('Error submitting booking:', error);
+      setSubmissionError('Lỗi kết nối: ' + (error.message || 'Không thể kết nối đến máy chủ'));
+    } finally {
+      setSubmitting(false);
     }
   };
   
-  if (loading) return (
+  if (loading || loadingHall) return (
     <BookingLayout>
       <LoadingSpinner text="Đang tải dữ liệu..." />
     </BookingLayout>
@@ -71,6 +113,17 @@ function BookingFormPage() {
       <h1 className="mb-4 text-center">Đặt Tiệc Cưới</h1>
       
       {error && <ErrorMessage message={error} />}
+      
+      {preSelectedHallId && selectedHall && (
+        <Alert variant="info" className="mb-4">
+          <h5>Sảnh đã chọn: {selectedHall.TenSanh}</h5>
+          <p className="mb-0">
+            <strong>Sức chứa:</strong> {selectedHall.SucChua} khách | 
+            <strong> Giá thuê:</strong> <FormattedPrice amount={selectedHall.GiaThue} /> | 
+            <strong> Loại sảnh:</strong> {selectedHall.TenLoai}
+          </p>
+        </Alert>
+      )}
       
       <Form onSubmit={handleSubmit}>
         <Row>
@@ -86,18 +139,11 @@ function BookingFormPage() {
                     1. Thông tin cơ bản
                   </div>
                   <div 
-                    className={`nav-link ${activeTab === 'food' ? 'active' : ''}`}
-                    onClick={() => setActiveTab('food')}
-                    style={{ cursor: 'pointer' }}
-                  >
-                    2. Chọn món ăn
-                  </div>
-                  <div 
                     className={`nav-link ${activeTab === 'service' ? 'active' : ''}`}
                     onClick={() => setActiveTab('service')}
                     style={{ cursor: 'pointer' }}
                   >
-                    3. Dịch vụ bổ sung
+                    2. Dịch vụ bổ sung
                   </div>
                 </nav>
               </Card.Header>
@@ -111,9 +157,10 @@ function BookingFormPage() {
                     shifts={shifts}
                     halls={halls}
                     handleHallSelect={handleHallSelect}
+                    preSelectedHallId={preSelectedHallId}
+                    selectedHall={selectedHall}
                   />
                 )}
-                
                 
                 {activeTab === 'service' && (
                   <ServiceSelection
@@ -128,11 +175,7 @@ function BookingFormPage() {
                   {activeTab !== 'basic' && (
                     <Button 
                       variant="outline-secondary"
-                      onClick={() => setActiveTab(prev => 
-                        prev === 'food' ? 'basic' : 
-                        prev === 'service' ? 'food' : 
-                        'basic'
-                      )}
+                      onClick={() => setActiveTab('basic')}
                     >
                       Quay lại
                     </Button>
@@ -141,11 +184,7 @@ function BookingFormPage() {
                   {activeTab !== 'service' && (
                     <Button 
                       variant="primary"
-                      onClick={() => setActiveTab(prev => 
-                        prev === 'basic' ? 'food' : 
-                        prev === 'food' ? 'service' : 
-                        'service'
-                      )}
+                      onClick={() => setActiveTab('service')}
                       className="ms-auto"
                     >
                       Tiếp theo
@@ -163,21 +202,27 @@ function BookingFormPage() {
                 <BookingSummary
                   formData={formData}
                   halls={halls}
-                  foods={foods}
+                  selectedHall={selectedHall}
                   calculateTotal={calculateTotal}
                   deposit={formData.deposit}
                   handleDepositChange={(e) => handleInputChange({
                     target: { name: 'deposit', value: e.target.value }
                   })}
                 />
+                  {submissionError && (
+                  <Alert variant="danger" className="mt-3 mb-0">
+                    {submissionError}
+                  </Alert>
+                )}
                 
                 <Button 
                   variant="success" 
                   type="submit" 
                   className="w-100 mt-3"
                   size="lg"
+                  disabled={submitting}
                 >
-                  Xác nhận đặt tiệc
+                  {submitting ? 'Đang xử lý...' : 'Xác nhận đặt tiệc'}
                 </Button>
               </Card.Body>
             </Card>

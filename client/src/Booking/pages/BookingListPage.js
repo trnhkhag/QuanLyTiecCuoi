@@ -5,7 +5,7 @@ import { Link } from 'react-router-dom';
 import BookingLayout from '../components/layout/BookingLayout';
 import { LoadingSpinner, ErrorMessage, EmptyState } from '../components/common/StatusComponents';
 import { BookingCard } from '../components/common/BookingCards';
-import { useBookings } from '../hooks/useBookings';
+import { useBookingForm } from '../hooks/useBookings';
 import 'react-datepicker/dist/react-datepicker.css';
 
 /**
@@ -22,7 +22,7 @@ function BookingListPage() {
     applyFilters,
     resetFilters,
     fetchBookings
-  } = useBookings();
+  } = useBookingForm();
   
   // State cho view mode (list/grid)
   const [viewMode, setViewMode] = useState('list');
@@ -48,8 +48,7 @@ function BookingListPage() {
             <Col md={3}>
               <Form.Group className="mb-3">
                 <Form.Label>Ngày tổ chức</Form.Label>
-                <DatePicker
-                  selected={filters.date ? new Date(filters.date) : null}
+                <DatePicker selected={filters && filters.date ? new Date(filters.date) : null}
                   onChange={(date) => updateFilter('date', date)}
                   dateFormat="dd/MM/yyyy"
                   isClearable
@@ -62,7 +61,7 @@ function BookingListPage() {
               <Form.Group className="mb-3">
                 <Form.Label>Sảnh</Form.Label>
                 <Form.Select
-                  value={filters.hallId || ''}
+                  value={filters?.hallId || ''}
                   onChange={(e) => updateFilter('hallId', e.target.value)}
                 >
                   <option value="">Tất cả sảnh</option>
@@ -76,7 +75,7 @@ function BookingListPage() {
               <Form.Group className="mb-3">
                 <Form.Label>Trạng thái</Form.Label>
                 <Form.Select
-                  value={filters.status || ''}
+                  value={filters?.status || ''}
                   onChange={(e) => updateFilter('status', e.target.value)}
                 >
                   <option value="">Tất cả trạng thái</option>
@@ -103,7 +102,7 @@ function BookingListPage() {
       
       {/* View mode switcher */}
       <div className="d-flex justify-content-between align-items-center mb-3">
-        <div>Hiển thị {bookings.length} đặt tiệc</div>
+        <div>Hiển thị {bookings?.length} đặt tiệc</div>
         <div className="btn-group" role="group">
           <Button
             variant={viewMode === 'list' ? 'primary' : 'outline-primary'}
@@ -128,7 +127,7 @@ function BookingListPage() {
         <LoadingSpinner />
       ) : (
         <>
-          {bookings.length === 0 ? (
+          {bookings?.length === 0 ? (
             <EmptyState message="Không tìm thấy đặt tiệc nào" />
           ) : viewMode === 'list' ? (
             /* List view */
@@ -147,7 +146,7 @@ function BookingListPage() {
                 </tr>
               </thead>
               <tbody>
-                {bookings.map(booking => (
+                {bookings?.map(booking => (
                   <tr key={booking.id}>
                     <td>{booking.id}</td>
                     <td>{booking.groomName}</td>

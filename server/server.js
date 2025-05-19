@@ -27,6 +27,9 @@ pool.getConnection()
 // Import routes
 const weddingBookingRoutes = require('./DatTiec/weddingBookingRoutes');
 const hallRoutes = require('./DatTiec/hallRoutes');
+const serviceRoutes = require('./DatTiec/serviceRoutes');
+const regulationRoutes = require('./QuyDinh/regulationRoutes');
+const weddingLookupRoutes = require('./TraCuu/WeddingLookupRoutes');
 // Thêm các routes khác khi cần
 // const hallRoutes = require('./routes/hallRoutes');
 // const foodRoutes = require('./routes/foodRoutes');
@@ -35,10 +38,24 @@ const hallRoutes = require('./DatTiec/hallRoutes');
 // Register routes
 app.use('/api/bookings', weddingBookingRoutes);
 app.use('/api/halls', hallRoutes);
+app.use('/api/services', serviceRoutes);
+app.use('/api/regulations', regulationRoutes);
+app.use('/api/lookup', weddingLookupRoutes);
 // Thêm các routes khác khi cần
 // app.use('/api/halls', hallRoutes);
 // app.use('/api/foods', foodRoutes);
 // app.use('/api/services', serviceRoutes);
+
+//Lấy cái ca tiệc rẻ rách
+app.get('/api/lookups/shifts', async (req, res) => {
+  try {
+    const [shifts] = await pool.query('SELECT ID_Ca, TenCa FROM CaTiec ORDER BY ID_Ca');
+    res.json({ success: true, data: shifts });
+  } catch (error) {
+    console.error('Error fetching shifts:', error);
+    res.status(500).json({ success: false, message: 'Lỗi khi lấy danh sách ca tiệc' });
+  }
+});
 
 // Sample route test
 app.get('/api/test', (req, res) => {

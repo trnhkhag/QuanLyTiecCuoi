@@ -82,6 +82,7 @@ CREATE TABLE TiecCuoi (
     ThoiDiemDat DATETIME NOT NULL,
     SoLuongBan INT NOT NULL,
     SoBanDuTru INT,
+    TrangThai VARCHAR(50) DEfAULT 'Đã đặt',
     FOREIGN KEY (ID_KhachHang) REFERENCES KhachHang(ID_KhachHang),
     FOREIGN KEY (ID_SanhTiec) REFERENCES SanhTiec(ID_SanhTiec),
     FOREIGN KEY (ID_Ca) REFERENCES CaTiec(ID_Ca)
@@ -114,7 +115,63 @@ CREATE TABLE Tiec_DichVu (
     FOREIGN KEY (ID_DichVu) REFERENCES DichVu(ID_DichVu)
 );
 
--- Dữ liệu mẫu
+-- Bảng Quy Định
+CREATE TABLE QuyDinh (
+    ID_QuyDinh VARCHAR(10) PRIMARY KEY,
+    TenQuyDinh VARCHAR(100) NOT NULL,
+    MoTa TEXT,
+    GhiChu TEXT
+);
+
+-- Bảng chi tiết quy định về sảnh (QD1)
+CREATE TABLE QD_Sanh (
+    ID_QuyDinh VARCHAR(10),
+    LoaiSanh CHAR(1),
+    GiaBanToiThieu DECIMAL(18,2) NOT NULL,
+    PRIMARY KEY (ID_QuyDinh, LoaiSanh),
+    FOREIGN KEY (ID_QuyDinh) REFERENCES QuyDinh(ID_QuyDinh)
+);
+
+-- Bảng chi tiết quy định về ca và dịch vụ (QD2)
+CREATE TABLE QD_CaDichVu (
+    ID_QuyDinh VARCHAR(10),
+    SoLuongDichVuToiDa INT NOT NULL,
+    SoLuongMonAnToiDa INT NOT NULL,
+    PRIMARY KEY (ID_QuyDinh),
+    FOREIGN KEY (ID_QuyDinh) REFERENCES QuyDinh(ID_QuyDinh)
+);
+
+-- Bảng chi tiết quy định về phạt (QD4)
+CREATE TABLE QD_PhatTre (
+    ID_QuyDinh VARCHAR(10),
+    TyLePhat DECIMAL(5,2) NOT NULL,
+    ApDung BOOLEAN DEFAULT true,
+    PRIMARY KEY (ID_QuyDinh),
+    FOREIGN KEY (ID_QuyDinh) REFERENCES QuyDinh(ID_QuyDinh)
+);
+
+-- Dữ liệu mẫu cho bảng QuyDinh
+INSERT INTO QuyDinh (ID_QuyDinh, TenQuyDinh, MoTa) VALUES
+('QD1', 'Qui định 1', 'Có 5 loại Sảnh (A, B, C, D, E) với đơn giá bàn tối thiểu tương ứng là (1.000.000, 1.100.000, 1.200.000, 1.400.000, 1.600.000)'),
+('QD2', 'Qui định 2', 'Chỉ nhận đặt tiệc khi sảnh chưa có người đặt (tương ứng với ngày và ca). Có hai ca (Trưa, Tối). Ngoài ra có 20 dịch vụ, 100 món ăn.'),
+('QD4', 'Qui định 4', 'Đơn giá thanh toán các dich vụ được tính theo đơn giá trong phiếu đặt tiệc cưới. Ngày thanh toán trùng với ngày đãi tiệc, thanh toán trễ phạt 1% ngày.');
+
+-- Dữ liệu mẫu cho QD1
+INSERT INTO QD_Sanh (ID_QuyDinh, LoaiSanh, GiaBanToiThieu) VALUES
+('QD1', 'A', 1000000),
+('QD1', 'B', 1100000),
+('QD1', 'C', 1200000),
+('QD1', 'D', 1400000),
+('QD1', 'E', 1600000);
+
+-- Dữ liệu mẫu cho QD2
+INSERT INTO QD_CaDichVu (ID_QuyDinh, SoLuongDichVuToiDa, SoLuongMonAnToiDa) VALUES
+('QD2', 20, 100);
+
+-- Dữ liệu mẫu cho QD4
+INSERT INTO QD_PhatTre (ID_QuyDinh, TyLePhat, ApDung) VALUES
+('QD4', 1.00, true);
+
 INSERT INTO CaTiec (ID_Ca, TenCa) VALUES (1, 'Trưa'), (2, 'Tối');
 
 INSERT INTO LoaiSanh (TenLoai, GiaBanToiThieu)

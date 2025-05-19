@@ -35,8 +35,17 @@ function BookingHeader() {
             <Nav.Link as={NavLink} to="/booking/new">
               Đặt tiệc
             </Nav.Link>
+            <Nav.Link as={NavLink} to="/booking/lookup">
+              Tra cứu tiệc cưới
+            </Nav.Link>
             <Nav.Link as={NavLink} to="/booking/list">
               Quản lý đặt tiệc
+            </Nav.Link>
+            <Nav.Link as={NavLink} to="/booking/regulations">
+              Quy định
+            </Nav.Link>
+            <Nav.Link as={NavLink} to="/booking/regulations/manage">
+              Quản lý quy định
             </Nav.Link>
           </Nav>
         </Navbar.Collapse>

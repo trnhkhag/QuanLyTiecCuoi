@@ -51,7 +51,7 @@ export function EmptyState({ message = 'Không có dữ liệu', icon }) {
 export function FormattedPrice({ amount, currency = 'VNĐ' }) {
   if (amount === undefined || amount === null) return <span>-</span>;
   
-  const formattedAmount = amount?.toLocaleString('vi-VN') || '0';
+  const formattedAmount = Math.round(Number(amount)).toLocaleString('vi-VN');
   return <span>{formattedAmount} {currency}</span>;
 }
 
