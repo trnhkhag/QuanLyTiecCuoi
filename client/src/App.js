@@ -1,38 +1,22 @@
-//Main App component
-import React, { useState, useEffect } from 'react';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import { ToastContainer } from 'react-toastify';
+import { useState, useEffect } from 'react';
+import { BrowserRouter, Routes, Route, Link } from 'react-router-dom';
 import axios from 'axios';
-import 'bootstrap/dist/css/bootstrap.min.css';
-import 'react-toastify/dist/ReactToastify.css';
 import './App.css';
 
-// Layouts
-import DashboardLayout from './components/DashboardLayout';
-
-// Auth Pages
-import LoginPage from './pages/auth/LoginPage';
-import RegisterPage from './pages/auth/RegisterPage';
-
-// Dashboard Pages
-import DashboardPage from './pages/dashboard/DashboardPage';
-import InvoicesPage from './pages/invoice/InvoicesPage';
-import InvoiceInformationPage from './pages/invoice/InvoiceInformationPage';
-import MonthlyReportPage from './pages/report/MonthlyReportPage';
-
-// Admin Routes
-import AdminRoutes from './main/Admin/AdminRoutes';
-
-// Booking Routes
-import BookingRoutes from './main/Booking/BookingRoutes';
+// Import Booking Module
+import BookingRoutes from './Booking';
+// Import Lobby Module
+import HallManagementPage from './Lobby/pages/HallManagementPage';
 
 function App() {
   const [apiStatus, setApiStatus] = useState('Loading...');
+  const [halls, setHalls] = useState([]);
+  const [foods, setFoods] = useState([]);
+  const [services, setServices] = useState([]);
 
   useEffect(() => {
     // Test API connection
-    const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:3001/api';
-    axios.get(`${API_URL}/test`)
+    axios.get('http://localhost:5000/api/test')
       .then(response => {
         setApiStatus(response.data.message);
       })
@@ -42,27 +26,76 @@ function App() {
       });
   }, []);
 
+  // Fetch wedding halls data
+  const fetchHalls = () => {
+    axios.get('http://localhost:5000/api/halls')
+      .then(response => {
+        setHalls(response.data);
+      })
+      .catch(error => {
+        console.error('Error fetching halls:', error);
+      });
+  };
+
+  // Fetch foods data
+  const fetchFoods = () => {
+    axios.get('http://localhost:5000/api/foods')
+      .then(response => {
+        setFoods(response.data);
+      })
+      .catch(error => {
+        console.error('Error fetching foods:', error);
+      });
+  };
+
+  // Fetch services data
+  const fetchServices = () => {
+    axios.get('http://localhost:5000/api/services')
+      .then(response => {
+        setServices(response.data);
+      })
+      .catch(error => {
+        console.error('Error fetching services:', error);
+      });
+  };
+
+  // Load initial data
+  useEffect(() => {
+    fetchHalls();
+  }, []);
+
   return (
     <BrowserRouter>
       <Routes>
-        {/* Auth Routes */}
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/register" element={<RegisterPage />} />
+        {/* Booking Routes - Completely separate UI */}
+        <Route path="/booking/*" element={<BookingRoutes />} />
         
-        {/* Dashboard Layout Routes */}
-        <Route element={<DashboardLayout />}>
-          <Route path="/dashboard" element={<DashboardPage />} />
-          <Route path="/invoices" element={<InvoicesPage />} />
-          <Route path="/invoice/:id" element={<InvoiceInformationPage />} />
-          <Route path="/reports" element={<MonthlyReportPage />} />
-          <Route path="/admin/*" element={<AdminRoutes />} />
-          <Route path="/booking/*" element={<BookingRoutes />} />
-        </Route>
-
-        {/* Redirect root to dashboard */}
-        <Route path="/" element={<Navigate to="/dashboard" replace />} />
+        {/* Management Routes */}
+        <Route path="/lobby/halls" element={<HallManagementPage />} />
+        
+        {/* Main App Routes */}
+        <Route path="/*" element={
+          <div className="App">
+            <header className="App-header">
+              <h1>Hệ Thống Quản Lý Tiệc Cưới</h1>
+              <p>Trạng thái API: {apiStatus}</p>
+              
+              <div className="navigation">
+                <Link to="/" className="nav-link">Trang chủ</Link>
+                <Link to="/booking" className="nav-link">Đặt tiệc</Link>
+                <Link to="/lobby/halls" className="nav-link">Quản lý sảnh</Link>
+                <Link to="/halls" className="nav-link" onClick={fetchHalls}>Sảnh cưới</Link>
+                <Link to="/foods" className="nav-link" onClick={fetchFoods}>Món ăn</Link>
+                <Link to="/services" className="nav-link" onClick={fetchServices}>Dịch vụ</Link>
+              </div>
+            </header>
+            
+            <footer className="App-footer">
+              <p>© 2025 Hệ thống Quản lý Tiệc Cưới</p>
+            </footer>
+          </div>
+        } />
       </Routes>
-      <ToastContainer position="top-right" autoClose={3000} />
     </BrowserRouter>
   );
 }

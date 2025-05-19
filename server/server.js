@@ -30,6 +30,7 @@ const hallRoutes = require('./DatTiec/hallRoutes');
 const serviceRoutes = require('./DatTiec/serviceRoutes');
 const regulationRoutes = require('./QuyDinh/regulationRoutes');
 const weddingLookupRoutes = require('./TraCuu/WeddingLookupRoutes');
+const hallManagementRoutes = require('./Lobby/hallManagementRoutes');
 // Thêm các routes khác khi cần
 // const hallRoutes = require('./routes/hallRoutes');
 // const foodRoutes = require('./routes/foodRoutes');
@@ -41,6 +42,7 @@ app.use('/api/halls', hallRoutes);
 app.use('/api/services', serviceRoutes);
 app.use('/api/regulations', regulationRoutes);
 app.use('/api/lookup', weddingLookupRoutes);
+app.use('/api/lobby', hallManagementRoutes);
 // Thêm các routes khác khi cần
 // app.use('/api/halls', hallRoutes);
 // app.use('/api/foods', foodRoutes);

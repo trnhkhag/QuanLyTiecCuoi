@@ -27,39 +27,6 @@ class ServiceService {
       throw error;
     }
   }
-  
-  // Tạo dịch vụ mới (Admin)
-  async createService(serviceData) {
-    try {
-      const response = await axios.post(`${API_URL}/services`, serviceData);
-      return response.data;
-    } catch (error) {
-      console.error('Error creating service:', error);
-      throw error;
-    }
-  }
-  
-  // Cập nhật dịch vụ (Admin)
-  async updateService(id, serviceData) {
-    try {
-      const response = await axios.put(`${API_URL}/services/${id}`, serviceData);
-      return response.data;
-    } catch (error) {
-      console.error(`Error updating service ${id}:`, error);
-      throw error;
-    }
-  }
-  
-  // Xóa dịch vụ (Admin)
-  async deleteService(id) {
-    try {
-      const response = await axios.delete(`${API_URL}/services/${id}`);
-      return response.data;
-    } catch (error) {
-      console.error(`Error deleting service ${id}:`, error);
-      throw error;
-    }
-  }
 }
 
 export default new ServiceService();
