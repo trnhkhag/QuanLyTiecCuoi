@@ -25,7 +25,8 @@ pool.getConnection()
   });
 
 // Import routes
-const weddingBookingRoutes = require('./routes/weddingBookingRoutes');
+const weddingBookingRoutes = require('./DatTiec/weddingBookingRoutes');
+const hallRoutes = require('./DatTiec/hallRoutes');
 // Thêm các routes khác khi cần
 // const hallRoutes = require('./routes/hallRoutes');
 // const foodRoutes = require('./routes/foodRoutes');
@@ -33,6 +34,7 @@ const weddingBookingRoutes = require('./routes/weddingBookingRoutes');
 
 // Register routes
 app.use('/api/bookings', weddingBookingRoutes);
+app.use('/api/halls', hallRoutes);
 // Thêm các routes khác khi cần
 // app.use('/api/halls', hallRoutes);
 // app.use('/api/foods', foodRoutes);
