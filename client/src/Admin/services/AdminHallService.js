@@ -1,8 +1,8 @@
 import axios from 'axios';
 
-const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:3001/api';
+const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
 
-class HallManagementService {
+class AdminHallService {
   // API quản lý sảnh
   getAllHalls() {
     return axios.get(`${API_URL}/lobby/halls`);
@@ -13,11 +13,19 @@ class HallManagementService {
   }
 
   createHall(hallData) {
-    return axios.post(`${API_URL}/lobby/halls`, hallData);
+    return axios.post(`${API_URL}/lobby/halls`, hallData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
   }
 
-  updateHall(id, hallData) {
-    return axios.put(`${API_URL}/lobby/halls/${id}`, hallData);
+  updateHall(id, data) {
+    const headers = data instanceof FormData 
+      ? { 'Content-Type': 'multipart/form-data' }
+      : { 'Content-Type': 'application/json' };
+    
+    return axios.put(`${API_URL}/lobby/halls/${id}`, data, { headers });
   }
 
   deleteHall(id) {
@@ -42,4 +50,4 @@ class HallManagementService {
   }
 }
 
-export default new HallManagementService();
+export default new AdminHallService();

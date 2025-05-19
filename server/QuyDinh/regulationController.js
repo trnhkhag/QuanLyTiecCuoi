@@ -55,46 +55,12 @@ class RegulationController {
             const updateData = req.body;
 
             // Validate dữ liệu cơ bản
-            if (!updateData.description) {
+            if (!updateData.TenQuyDinh || !updateData.MoTa) {
                 return res.status(400).json({
                     success: false,
-                    message: 'Thiếu thông tin mô tả',
-                    error: 'Description is required'
+                    message: 'Thiếu thông tin tên hoặc mô tả quy định',
+                    error: 'Name and description are required'
                 });
-            }
-
-            // Validate chi tiết dựa vào loại quy định
-            switch (regulationId) {
-                case 'QD1':
-                    if (!updateData.details?.halls || !Array.isArray(updateData.details.halls)) {
-                        return res.status(400).json({
-                            success: false,
-                            message: 'Thiếu thông tin cấu hình sảnh',
-                            error: 'Hall configuration is required'
-                        });
-                    }
-                    break;
-
-                case 'QD2':
-                    if (!updateData.details?.maxServices || !updateData.details?.maxDishes) {
-                        return res.status(400).json({
-                            success: false,
-                            message: 'Thiếu thông tin cấu hình dịch vụ/món ăn',
-                            error: 'Service/dish configuration is required'
-                        });
-                    }
-                    break;
-
-                case 'QD4':
-                    if (updateData.details?.lateFeePercentage === undefined || 
-                        updateData.details?.enabled === undefined) {
-                        return res.status(400).json({
-                            success: false,
-                            message: 'Thiếu thông tin cấu hình phạt',
-                            error: 'Penalty configuration is required'
-                        });
-                    }
-                    break;
             }
 
             const result = await regulationService.updateRegulation(regulationId, updateData);
@@ -108,6 +74,45 @@ class RegulationController {
             return res.status(500).json({
                 success: false,
                 message: 'Lỗi khi cập nhật quy định',
+                error: error.message
+            });
+        }
+    }
+
+    // Thêm mới quy định
+    async createRegulation(req, res) {
+        try {
+            const newRegulation = req.body;
+            const result = await regulationService.createRegulation(newRegulation);
+            return res.status(201).json({
+                success: true,
+                message: 'Thêm mới quy định thành công',
+                data: result
+            });
+        } catch (error) {
+            console.error('Create regulation error:', error);
+            return res.status(500).json({
+                success: false,
+                message: 'Lỗi khi thêm mới quy định',
+                error: error.message
+            });
+        }
+    }
+
+    // Xóa quy định
+    async deleteRegulation(req, res) {
+        try {
+            const regulationId = req.params.id;
+            await regulationService.deleteRegulation(regulationId);
+            return res.status(200).json({
+                success: true,
+                message: 'Xóa quy định thành công'
+            });
+        } catch (error) {
+            console.error('Delete regulation error:', error);
+            return res.status(500).json({
+                success: false,
+                message: 'Lỗi khi xóa quy định',
                 error: error.message
             });
         }

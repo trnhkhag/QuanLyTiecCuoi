@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const pool = require('./config/db');
+const path = require('path');
 require('dotenv').config();
 
 const mockData = require('./data/mockData');
@@ -12,6 +13,9 @@ const PORT = process.env.PORT || 5000;
 app.use(cors());
 app.use(express.json());
 app.locals.mockData = mockData;
+
+// Phục vụ static files từ thư mục uploads
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Kiểm tra kết nối database
 pool.getConnection()

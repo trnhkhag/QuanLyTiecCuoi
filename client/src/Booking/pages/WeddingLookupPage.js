@@ -1,153 +1,214 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Card, Table, Form, Row, Col, Button, Alert } from 'react-bootstrap';
-import { searchWeddings } from '../services/WeddingLookupService';
-import BookingLayout from '../components/layout/BookingLayout';
+import React, { useState } from 'react';
+import {
+  Form,
+  Input,
+  Button,
+  Card,
+  Typography,
+  Alert,
+  Timeline,
+  Tag,
+  Descriptions,
+  Divider,
+} from 'antd';
+import {
+  SearchOutlined,
+  PhoneOutlined,
+  IdcardOutlined,
+  CheckCircleOutlined,
+  ClockCircleOutlined,
+} from '@ant-design/icons';
+import UserLayout from '../components/layout/UserLayout';
+import { LoadingSpinner, FormattedPrice, FormattedDate } from '../components/common/StatusComponents';
+import { getWeddingById } from '../services/WeddingLookupService';
 
-function WeddingLookupPage() {
-  const [filters, setFilters] = useState({
-    customerName: '',
-    date: '',
-    hallName: ''
-  });
-  const [results, setResults] = useState([]);
-  const [error, setError] = useState(null);
+const { Title, Text } = Typography;
+
+const WeddingLookupPage = () => {
+  const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [booking, setBooking] = useState(null);
 
-  const navigate = useNavigate();
-
-  const handleChange = (e) => {
-    setFilters({ ...filters, [e.target.name]: e.target.value });
-  };
-
-  const handleSearch = async () => {
-    setLoading(true);
-    setError(null);
+  const handleSearch = async (values) => {
     try {
-      const data = await searchWeddings(filters);
-      setResults(data);
+      setLoading(true);
+      setError(null);
+      const response = await getWeddingById(values.bookingId);
+      
+      if (response.success) {
+        setBooking(response.data);
+      } else {
+        setError(response.message || 'Không tìm thấy thông tin tiệc cưới');
+      }
     } catch (err) {
-      setError(err.message || 'Lỗi khi gọi API');
-      setResults([]);
+      console.error('Error looking up booking:', err);
+      setError('Không thể tra cứu thông tin. Vui lòng thử lại sau.');
     } finally {
       setLoading(false);
     }
   };
 
-  const handleRowClick = (id) => {
-    navigate(`/booking/weddings/${id}`);
-  };
-
-  useEffect(() => {
-    const fetchInitialData = async () => {
-      setLoading(true);
-      try {
-        const data = await searchWeddings({});
-        setResults(data);
-      } catch (err) {
-        setError(err.message || 'Lỗi khi tải dữ liệu ban đầu');
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchInitialData();
-  }, []);
-
   return (
-    <BookingLayout>
-      <h2 className="text-center mb-4">Tra cứu tiệc cưới</h2>
+    <UserLayout>
+      <div style={{ maxWidth: 800, margin: '0 auto' }}>
+        <Title level={2} style={{ textAlign: 'center', marginBottom: 32 }}>
+          Tra cứu tiệc cưới
+        </Title>
 
-      <Card className="mb-4">
-        <Card.Body>
-          <Form>
-            <Row className="g-3">
-              <Col md={4}>
-                <Form.Control
-                  type="text"
-                  name="customerName"
-                  placeholder="Tên khách hàng"
-                  value={filters.customerName}
-                  onChange={handleChange}
-                />
-              </Col>
-              <Col md={3}>
-                <Form.Control
-                  type="date"
-                  name="date"
-                  value={filters.date}
-                  onChange={handleChange}
-                />
-              </Col>
-              <Col md={3}>
-                <Form.Control
-                  type="text"
-                  name="hallName"
-                  placeholder="Tên sảnh"
-                  value={filters.hallName}
-                  onChange={handleChange}
-                />
-              </Col>
-              <Col md={2}>
-                <Button
-                  variant="primary"
-                  onClick={handleSearch}
-                  className="w-100"
-                  disabled={loading}
-                >
-                  {loading ? 'Đang tìm...' : 'Tìm kiếm'}
-                </Button>
-              </Col>
-            </Row>
+        <Card bordered={false}>
+          <Form
+            form={form}
+            layout="vertical"
+            onFinish={handleSearch}
+          >
+            <Form.Item
+              name="bookingId"
+              label="Mã đơn đặt tiệc"
+              rules={[{ required: true, message: 'Vui lòng nhập mã đơn đặt tiệc' }]}
+            >
+              <Input
+                prefix={<IdcardOutlined />}
+                placeholder="Nhập mã đơn đặt tiệc"
+                size="large"
+              />
+            </Form.Item>
+
+            <Form.Item
+              name="phone"
+              label="Số điện thoại"
+              rules={[
+                { required: true, message: 'Vui lòng nhập số điện thoại' },
+                { pattern: /^[0-9]{10}$/, message: 'Số điện thoại không hợp lệ' }
+              ]}
+            >
+              <Input
+                prefix={<PhoneOutlined />}
+                placeholder="Nhập số điện thoại đăng ký"
+                size="large"
+              />
+            </Form.Item>
+
+            <Form.Item>
+              <Button
+                type="primary"
+                htmlType="submit"
+                icon={<SearchOutlined />}
+                loading={loading}
+                size="large"
+                block
+              >
+                Tra cứu
+              </Button>
+            </Form.Item>
           </Form>
-        </Card.Body>
-      </Card>
+        </Card>
 
-      {error && <Alert variant="danger">{error}</Alert>}
+        {error && (
+          <Alert
+            type="error"
+            message="Lỗi tra cứu"
+            description={error}
+            style={{ marginTop: 24 }}
+            closable
+            onClose={() => setError(null)}
+          />
+        )}
 
-      <Card>
-        <Card.Body>
-          <Table bordered hover responsive>
-            <thead className="table-light">
-              <tr>
-                <th>ID</th>
-                <th>Khách hàng</th>
-                <th>Ngày tổ chức</th>
-                <th>Ca</th>
-                <th>Tên sảnh</th>
-                <th>Số bàn</th>
-              </tr>
-            </thead>
-            <tbody>
-              {loading ? (
-                <tr>
-                  <td colSpan="6" className="text-center">Đang tải...</td>
-                </tr>
-              ) : results.length === 0 ? (
-                <tr>
-                  <td colSpan="6" className="text-center">Không có kết quả</td>
-                </tr>
+        {booking && (
+          <Card style={{ marginTop: 24 }} bordered={false}>
+            <Title level={3}>Thông tin đặt tiệc</Title>
+            
+            <Descriptions column={1} bordered style={{ marginTop: 24 }}>
+              <Descriptions.Item label="Mã đơn">
+                {booking.ID_DonDatTiec}
+              </Descriptions.Item>
+              <Descriptions.Item label="Tên khách hàng">
+                {booking.TenKhachHang}
+              </Descriptions.Item>
+              <Descriptions.Item label="Ngày tổ chức">
+                <FormattedDate date={booking.NgayToChuc} />
+              </Descriptions.Item>
+              <Descriptions.Item label="Ca tiệc">
+                {booking.TenCa} ({booking.ThoiGianBatDau} - {booking.ThoiGianKetThuc})
+              </Descriptions.Item>
+              <Descriptions.Item label="Sảnh tiệc">
+                {booking.TenSanh}
+              </Descriptions.Item>
+              <Descriptions.Item label="Số lượng khách">
+                {booking.SoLuongKhach} khách
+              </Descriptions.Item>
+              <Descriptions.Item label="Tổng tiền">
+                <FormattedPrice amount={booking.TongTien} />
+              </Descriptions.Item>
+              <Descriptions.Item label="Trạng thái">
+                <Tag color={booking.TrangThai === 'confirmed' ? 'success' : 'processing'}>
+                  {booking.TrangThai === 'confirmed' ? 'Đã xác nhận' : 'Đang xử lý'}
+                </Tag>
+              </Descriptions.Item>
+            </Descriptions>
+
+            <Divider />
+
+            <Title level={4}>Tiến độ đặt tiệc</Title>
+            <Timeline style={{ marginTop: 24 }}>
+              <Timeline.Item 
+                color="green" 
+                dot={<CheckCircleOutlined />}
+              >
+                Đã tạo đơn đặt tiệc
+                <Text type="secondary" style={{ marginLeft: 8 }}>
+                  <FormattedDate date={booking.NgayDat} />
+                </Text>
+              </Timeline.Item>
+
+              {booking.TrangThai === 'confirmed' ? (
+                <Timeline.Item 
+                  color="green" 
+                  dot={<CheckCircleOutlined />}
+                >
+                  Đã xác nhận đơn
+                  <Text type="secondary" style={{ marginLeft: 8 }}>
+                    <FormattedDate date={booking.NgayXacNhan} />
+                  </Text>
+                </Timeline.Item>
               ) : (
-                results.map((item) => (
-                  <tr
-                    key={item.ID_TiecCuoi}
-                    onClick={() => handleRowClick(item.ID_TiecCuoi)}
-                    style={{ cursor: 'pointer' }}
-                  >
-                    <td>{item.ID_TiecCuoi}</td>
-                    <td>{item.TenKhachHang}</td>
-                    <td>{new Date(item.NgayToChuc).toLocaleDateString('vi-VN')}</td>
-                    <td>{item.TenCa}</td>
-                    <td>{item.TenSanh}</td>
-                    <td>{item.SoLuongBan}</td>
-                  </tr>
-                ))
+                <Timeline.Item 
+                  color="blue" 
+                  dot={<ClockCircleOutlined />}
+                >
+                  Chờ xác nhận
+                </Timeline.Item>
               )}
-            </tbody>
-          </Table>
-        </Card.Body>
-      </Card>
-    </BookingLayout>
+
+              <Timeline.Item 
+                color={booking.TrangThai === 'confirmed' ? 'blue' : 'gray'}
+              >
+                Tổ chức tiệc cưới
+                <Text type="secondary" style={{ marginLeft: 8 }}>
+                  <FormattedDate date={booking.NgayToChuc} />
+                </Text>
+              </Timeline.Item>
+            </Timeline>
+
+            {booking.DichVu && booking.DichVu.length > 0 && (
+              <>
+                <Divider />
+                <Title level={4}>Dịch vụ đi kèm</Title>
+                <ul style={{ paddingLeft: 20 }}>
+                  {booking.DichVu.map((service, index) => (
+                    <li key={index}>
+                      {service.TenDichVu} - <FormattedPrice amount={service.Gia} />
+                    </li>
+                  ))}
+                </ul>
+              </>
+            )}
+          </Card>
+        )}
+      </div>
+    </UserLayout>
   );
-}
+};
 
 export default WeddingLookupPage;

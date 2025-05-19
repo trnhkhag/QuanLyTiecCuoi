@@ -69,6 +69,7 @@ CREATE TABLE SanhTiec (
     TenSanh VARCHAR(100) NOT NULL,
     SucChua INT NOT NULL,
     GiaThue DECIMAL(18,2) NOT NULL,
+    HinhAnh VARCHAR(255),
     ID_LoaiSanh INT NOT NULL,
     FOREIGN KEY (ID_LoaiSanh) REFERENCES LoaiSanh(ID_LoaiSanh)
 );
