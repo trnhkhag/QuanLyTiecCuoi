@@ -5,6 +5,8 @@ import './App.css';
 
 // Import Booking Module
 import BookingRoutes from './Booking';
+// Import Lobby Module
+import HallManagementPage from './Lobby/pages/HallManagementPage';
 
 function App() {
   const [apiStatus, setApiStatus] = useState('Loading...');
@@ -68,6 +70,9 @@ function App() {
         {/* Booking Routes - Completely separate UI */}
         <Route path="/booking/*" element={<BookingRoutes />} />
         
+        {/* Management Routes */}
+        <Route path="/lobby/halls" element={<HallManagementPage />} />
+        
         {/* Main App Routes */}
         <Route path="/*" element={
           <div className="App">
@@ -78,6 +83,7 @@ function App() {
               <div className="navigation">
                 <Link to="/" className="nav-link">Trang chủ</Link>
                 <Link to="/booking" className="nav-link">Đặt tiệc</Link>
+                <Link to="/lobby/halls" className="nav-link">Quản lý sảnh</Link>
                 <Link to="/halls" className="nav-link" onClick={fetchHalls}>Sảnh cưới</Link>
                 <Link to="/foods" className="nav-link" onClick={fetchFoods}>Món ăn</Link>
                 <Link to="/services" className="nav-link" onClick={fetchServices}>Dịch vụ</Link>
