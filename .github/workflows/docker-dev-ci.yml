@@ -63,7 +63,7 @@ jobs:
           echo "IMAGE_TAG=dev-${{ github.sha }}" >> .env.dev
 
       - name: Upload .env as artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: env-dev-file
           path: .env.dev 
