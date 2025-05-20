@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:3001/api';
+const API_URL = 'http://localhost:5000/api';
 
 class RegulationService {
     // Lấy danh sách quy định
@@ -70,5 +70,4 @@ class RegulationService {
     }
 }
 
-const regulationService = new RegulationService();
-export default regulationService;
+export default new RegulationService();

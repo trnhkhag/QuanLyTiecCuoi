@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:3001/api';
+const API_URL = 'http://localhost:5000/api';
 
 /**
  * Service class để tương tác với API liên quan đến sảnh tiệc
@@ -11,7 +11,7 @@ class HallService {
    * @returns {Promise} - Promise that resolves to the API response
    */
   getHalls() {
-    return axios.get(`${API_URL}/v1/halls`)
+    return axios.get(`${API_URL}/halls`)
       .then(response => {
         return { success: true, data: response.data.data || response.data };
       })
@@ -28,7 +28,7 @@ class HallService {
    */
     getHallById(id) {
     console.log('Fetching hall with ID:', id);
-    return axios.get(`${API_URL}/v1/halls/${id}`)
+    return axios.get(`${API_URL}/halls/${id}`)
         .then(response => {
         console.log('Hall response:', response);
         // Kiểm tra cấu trúc dữ liệu trả về
@@ -53,7 +53,7 @@ class HallService {
    * @returns {Promise} - Promise that resolves to the API response
    */
   checkHallAvailability(hallId, date, shiftId) {
-    return axios.get(`${API_URL}/v1/halls/availability`, {
+    return axios.get(`${API_URL}/halls/availability`, {
       params: { hallId, date, shiftId }
     })
       .then(response => {

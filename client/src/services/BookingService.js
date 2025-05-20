@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:3001/api';
+const API_URL = 'http://localhost:5000/api';
 
 /**
  * Service class để tương tác với API liên quan đến đặt tiệc cưới
@@ -134,8 +134,7 @@ class BookingService {
       
       // Should never get here if response is valid
       throw new Error('Phản hồi không hợp lệ từ máy chủ');
-    })
-    .catch(error => {
+    })    .catch(error => {
       console.error('Booking error:', error);
       
       // Handle specific error scenarios
@@ -241,5 +240,4 @@ class BookingService {
   }
 }
 
-const bookingService = new BookingService();
-export default bookingService;
+export default new BookingService();

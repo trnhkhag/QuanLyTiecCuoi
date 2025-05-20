@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:3001/api';
+const API_URL = 'http://localhost:5000/api';
 
 /**
  * Service class để tương tác với API liên quan đến dịch vụ
@@ -43,5 +43,4 @@ class ServiceService {  // Lấy danh sách dịch vụ
   }
 }
 
-const serviceService = new ServiceService();
-export default serviceService;
+export default new ServiceService();

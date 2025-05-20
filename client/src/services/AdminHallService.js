@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:3001/api/v1';
+const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
 
 class AdminHallService {
   // API quản lý sảnh
@@ -50,5 +50,4 @@ class AdminHallService {
   }
 }
 
-const adminHallService = new AdminHallService();
-export default adminHallService;
+export default new AdminHallService();

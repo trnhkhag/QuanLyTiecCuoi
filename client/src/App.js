@@ -4,8 +4,8 @@ import axios from 'axios';
 import './App.css';
 
 // Import Routes
-import BookingRoutes from './Booking';
-import AdminRoutes from './Admin/AdminRoutes';
+import BookingRoutes from './main/Booking/BookingRoutes';
+import AdminRoutes from './main/Admin/AdminRoutes';
 
 function App() {
   const [apiStatus, setApiStatus] = useState('Loading...');
