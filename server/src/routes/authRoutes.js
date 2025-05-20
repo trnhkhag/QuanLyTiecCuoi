@@ -7,16 +7,16 @@ const router = express.Router();
 /**
  * @swagger
  * tags:
- *   name: Authentication
- *   description: User authentication endpoints
+ *   name: Auth Service
+ *   description: Authentication and user management operations
  */
 
 /**
  * @swagger
- * /api/auth/login:
+ * /api/v1/auth-service/login:
  *   post:
  *     summary: Login to the application
- *     tags: [Authentication]
+ *     tags: [Auth Service]
  *     requestBody:
  *       required: true
  *       content:
@@ -47,10 +47,10 @@ router.post('/login', validateLogin, authController.login);
 
 /**
  * @swagger
- * /api/auth/register:
+ * /api/v1/auth-service/register:
  *   post:
  *     summary: Register a new user
- *     tags: [Authentication]
+ *     tags: [Auth Service]
  *     requestBody:
  *       required: true
  *       content:
@@ -72,5 +72,28 @@ router.post('/login', validateLogin, authController.login);
  *               $ref: '#/components/schemas/ErrorResponse'
  */
 router.post('/register', validateRegister, authController.register);
+
+/**
+ * @swagger
+ * /api/v1/auth-service/health:
+ *   get:
+ *     summary: Check Auth Service health
+ *     tags: [Auth Service]
+ *     responses:
+ *       200:
+ *         description: Auth Service is operational
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: OK
+ *                 service:
+ *                   type: string
+ *                   example: auth-service
+ */
+// Health check endpoint is defined in app.js
 
 module.exports = router; 

@@ -1,0 +1,202 @@
+[
+  {
+    "ID_TiecCuoi": 1,
+    "ID_KhachHang": 1,
+    "ID_SanhTiec": 1,
+    "NgayToChuc": "2023-12-15",
+    "ID_Ca": 2,
+    "ThoiDiemDat": "2023-11-01T10:30:00",
+    "SoLuongBan": 20,
+    "SoBanDuTru": 2
+  },
+  {
+    "ID_TiecCuoi": 2,
+    "ID_KhachHang": 2,
+    "ID_SanhTiec": 3,
+    "NgayToChuc": "2024-01-10",
+    "ID_Ca": 1,
+    "ThoiDiemDat": "2023-11-20T14:00:00",
+    "SoLuongBan": 30,
+    "SoBanDuTru": 3
+  },
+  {
+    "ID_TiecCuoi": 3,
+    "ID_KhachHang": 3,
+    "ID_SanhTiec": 2,
+    "NgayToChuc": "2024-01-20",
+    "ID_Ca": 2,
+    "ThoiDiemDat": "2023-12-01T09:15:00",
+    "SoLuongBan": 25,
+    "SoBanDuTru": 2
+  },
+  {
+    "ID_TiecCuoi": 4,
+    "ID_KhachHang": 4,
+    "ID_SanhTiec": 4,
+    "NgayToChuc": "2024-02-05",
+    "ID_Ca": 1,
+    "ThoiDiemDat": "2023-12-05T11:00:00",
+    "SoLuongBan": 35,
+    "SoBanDuTru": 4
+  },
+  {
+    "ID_TiecCuoi": 5,
+    "ID_KhachHang": 5,
+    "ID_SanhTiec": 3,
+    "NgayToChuc": "2023-02-14",
+    "ID_Ca": 2,
+    "ThoiDiemDat": "2023-01-01T08:00:00",
+    "SoLuongBan": 40,
+    "SoBanDuTru": 5
+  },
+  {
+    "ID_TiecCuoi": 6,
+    "ID_KhachHang": 6,
+    "ID_SanhTiec": 2,
+    "NgayToChuc": "2024-03-20",
+    "ID_Ca": 1,
+    "ThoiDiemDat": "2024-01-15T13:45:00",
+    "SoLuongBan": 50,
+    "SoBanDuTru": 5
+  },
+  {
+    "ID_TiecCuoi": 7,
+    "ID_KhachHang": 7,
+    "ID_SanhTiec": 1,
+    "NgayToChuc": "2024-04-01",
+    "ID_Ca": 2,
+    "ThoiDiemDat": "2024-01-20T10:00:00",
+    "SoLuongBan": 30,
+    "SoBanDuTru": 3
+  },
+  {
+    "ID_TiecCuoi": 8,
+    "ID_KhachHang": 8,
+    "ID_SanhTiec": 4,
+    "NgayToChuc": "2024-04-10",
+    "ID_Ca": 1,
+    "ThoiDiemDat": "2024-01-25T11:30:00",
+    "SoLuongBan": 45,
+    "SoBanDuTru": 4
+  },
+  {
+    "ID_TiecCuoi": 9,
+    "ID_KhachHang": 9,
+    "ID_SanhTiec": 3,
+    "NgayToChuc": "2024-03-08",
+    "ID_Ca": 2,
+    "ThoiDiemDat": "2024-01-05T16:20:00",
+    "SoLuongBan": 35,
+    "SoBanDuTru": 3
+  },
+  {
+    "ID_TiecCuoi": 10,
+    "ID_KhachHang": 10,
+    "ID_SanhTiec": 5,
+    "NgayToChuc": "2024-05-15",
+    "ID_Ca": 1,
+    "ThoiDiemDat": "2024-02-01T09:45:00",
+    "SoLuongBan": 60,
+    "SoBanDuTru": 6
+  },
+  {
+    "ID_TiecCuoi": 11,
+    "ID_KhachHang": 11,
+    "ID_SanhTiec": 2,
+    "NgayToChuc": "2024-05-20",
+    "ID_Ca": 2,
+    "ThoiDiemDat": "2024-02-05T14:30:00",
+    "SoLuongBan": 40,
+    "SoBanDuTru": 4
+  },
+  {
+    "ID_TiecCuoi": 12,
+    "ID_KhachHang": 12,
+    "ID_SanhTiec": 3,
+    "NgayToChuc": "2024-06-01",
+    "ID_Ca": 1,
+    "ThoiDiemDat": "2024-02-10T10:15:00",
+    "SoLuongBan": 50,
+    "SoBanDuTru": 5
+  },
+  {
+    "ID_TiecCuoi": 13,
+    "ID_KhachHang": 13,
+    "ID_SanhTiec": 4,
+    "NgayToChuc": "2024-06-10",
+    "ID_Ca": 2,
+    "ThoiDiemDat": "2024-02-15T11:45:00",
+    "SoLuongBan": 35,
+    "SoBanDuTru": 3
+  },
+  {
+    "ID_TiecCuoi": 14,
+    "ID_KhachHang": 14,
+    "ID_SanhTiec": 1,
+    "NgayToChuc": "2024-06-15",
+    "ID_Ca": 1,
+    "ThoiDiemDat": "2024-02-20T09:00:00",
+    "SoLuongBan": 25,
+    "SoBanDuTru": 2
+  },
+  {
+    "ID_TiecCuoi": 15,
+    "ID_KhachHang": 15,
+    "ID_SanhTiec": 5,
+    "NgayToChuc": "2024-07-01",
+    "ID_Ca": 2,
+    "ThoiDiemDat": "2024-02-25T15:30:00",
+    "SoLuongBan": 55,
+    "SoBanDuTru": 5
+  },
+  {
+    "ID_TiecCuoi": 16,
+    "ID_KhachHang": 16,
+    "ID_SanhTiec": 2,
+    "NgayToChuc": "2024-07-10",
+    "ID_Ca": 1,
+    "ThoiDiemDat": "2024-03-01T13:00:00",
+    "SoLuongBan": 45,
+    "SoBanDuTru": 4
+  },
+  {
+    "ID_TiecCuoi": 17,
+    "ID_KhachHang": 17,
+    "ID_SanhTiec": 3,
+    "NgayToChuc": "2024-07-15",
+    "ID_Ca": 2,
+    "ThoiDiemDat": "2024-03-05T10:45:00",
+    "SoLuongBan": 30,
+    "SoBanDuTru": 3
+  },
+  {
+    "ID_TiecCuoi": 18,
+    "ID_KhachHang": 18,
+    "ID_SanhTiec": 4,
+    "NgayToChuc": "2024-08-01",
+    "ID_Ca": 1,
+    "ThoiDiemDat": "2024-03-10T11:15:00",
+    "SoLuongBan": 40,
+    "SoBanDuTru": 4
+  },
+  {
+    "ID_TiecCuoi": 19,
+    "ID_KhachHang": 19,
+    "ID_SanhTiec": 1,
+    "NgayToChuc": "2024-08-10",
+    "ID_Ca": 2,
+    "ThoiDiemDat": "2024-03-15T14:00:00",
+    "SoLuongBan": 35,
+    "SoBanDuTru": 3
+  },
+  {
+    "ID_TiecCuoi": 20,
+    "ID_KhachHang": 20,
+    "ID_SanhTiec": 5,
+    "NgayToChuc": "2024-08-15",
+    "ID_Ca": 1,
+    "ThoiDiemDat": "2024-03-20T09:30:00",
+    "SoLuongBan": 60,
+    "SoBanDuTru": 6
+  }
+] 

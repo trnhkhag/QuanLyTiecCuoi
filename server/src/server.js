@@ -12,4 +12,9 @@ app.listen(PORT, () => {
   console.log(`🔹 API endpoints:`);
   console.log(`   POST http://localhost:${PORT}/api/auth/login`);
   console.log(`   POST http://localhost:${PORT}/api/auth/register`);
+  console.log(`   GET http://localhost:${PORT}/api/invoices`);
+  console.log(`   GET http://localhost:${PORT}/api/invoices/:id`);
+  console.log(`   POST http://localhost:${PORT}/api/invoices`);
+  console.log(`   PUT http://localhost:${PORT}/api/invoices/:id`);
+  console.log(`   DELETE http://localhost:${PORT}/api/invoices/:id`);
 }); 

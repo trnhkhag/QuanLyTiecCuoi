@@ -11,10 +11,16 @@
   --border-color: #f0f0f0;
 }
 
-.dashboard-container {
+/* App container with navbar */
+.app-container {
+  display: flex;
   min-height: 100vh;
-  background: var(--bg-gradient);
+}
+
+.content-container {
+  flex: 1;
   padding: 20px;
+  background: var(--bg-gradient);
 }
 
 .dashboard-header {

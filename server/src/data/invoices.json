@@ -1,0 +1,272 @@
+[
+  {
+    "ID_HoaDon": 1,
+    "ID_TiecCuoi": 1,
+    "NgayLap": "2023-11-15",
+    "TongTien": 25000000,
+    "TienThanhToan": 5000000,
+    "LoaiHoaDon": "Thanh toán đặt cọc",
+    "GhiChu": "Đặt cọc tiệc cưới ngày 15/12/2023"
+  },
+  {
+    "ID_HoaDon": 2,
+    "ID_TiecCuoi": 1,
+    "NgayLap": "2023-12-10",
+    "TongTien": 25000000,
+    "TienThanhToan": 20000000,
+    "LoaiHoaDon": "Thanh toán còn lại",
+    "GhiChu": "Thanh toán phần còn lại cho tiệc cưới ngày 15/12/2023"
+  },
+  {
+    "ID_HoaDon": 3,
+    "ID_TiecCuoi": 2,
+    "NgayLap": "2023-12-01",
+    "TongTien": 35000000,
+    "TienThanhToan": 7000000,
+    "LoaiHoaDon": "Thanh toán đặt cọc",
+    "GhiChu": "Đặt cọc tiệc cưới ngày 10/01/2024"
+  },
+  {
+    "ID_HoaDon": 4,
+    "ID_TiecCuoi": 3,
+    "NgayLap": "2023-12-05",
+    "TongTien": 28000000,
+    "TienThanhToan": 5600000,
+    "LoaiHoaDon": "Thanh toán đặt cọc",
+    "GhiChu": "Đặt cọc tiệc cưới ngày 20/01/2024"
+  },
+  {
+    "ID_HoaDon": 5,
+    "ID_TiecCuoi": 4,
+    "NgayLap": "2023-12-10",
+    "TongTien": 40000000,
+    "TienThanhToan": 8000000,
+    "LoaiHoaDon": "Thanh toán đặt cọc",
+    "GhiChu": "Đặt cọc tiệc cưới ngày 05/02/2024"
+  },
+  {
+    "ID_HoaDon": 6,
+    "ID_TiecCuoi": 2,
+    "NgayLap": "2024-01-15",
+    "TongTien": 35000000,
+    "TienThanhToan": 28000000,
+    "LoaiHoaDon": "Thanh toán còn lại",
+    "GhiChu": "Thanh toán số tiền còn lại cho tiệc cưới #2"
+  },
+  {
+    "ID_HoaDon": 7,
+    "ID_TiecCuoi": 5,
+    "NgayLap": "2023-01-10",
+    "TongTien": 50000000,
+    "TienThanhToan": 10000000,
+    "LoaiHoaDon": "Thanh toán đặt cọc",
+    "GhiChu": "Đặt cọc tiệc cưới cách đây rất lâu - sẽ có phạt trễ hạn"
+  },
+  {
+    "ID_HoaDon": 8,
+    "ID_TiecCuoi": 6,
+    "NgayLap": "2024-01-15",
+    "TongTien": 60000000,
+    "TienThanhToan": 12000000,
+    "LoaiHoaDon": "Thanh toán đặt cọc",
+    "GhiChu": "Đặt cọc tiệc cưới ngày 20/03/2024"
+  },
+  {
+    "ID_HoaDon": 9,
+    "ID_TiecCuoi": 7,
+    "NgayLap": "2024-01-20",
+    "TongTien": 45000000,
+    "TienThanhToan": 9000000,
+    "LoaiHoaDon": "Thanh toán đặt cọc",
+    "GhiChu": "Đặt cọc tiệc cưới ngày 01/04/2024"
+  },
+  {
+    "ID_HoaDon": 10,
+    "ID_TiecCuoi": 8,
+    "NgayLap": "2024-01-25",
+    "TongTien": 55000000,
+    "TienThanhToan": 11000000,
+    "LoaiHoaDon": "Thanh toán đặt cọc",
+    "GhiChu": "Đặt cọc tiệc cưới ngày 10/04/2024"
+  },
+  {
+    "ID_HoaDon": 11,
+    "ID_TiecCuoi": 9,
+    "NgayLap": "2024-01-05",
+    "TongTien": 48000000,
+    "TienThanhToan": 9600000,
+    "LoaiHoaDon": "Thanh toán đặt cọc",
+    "GhiChu": "Đặt cọc tiệc cưới ngày 08/03/2024"
+  },
+  {
+    "ID_HoaDon": 12,
+    "ID_TiecCuoi": 10,
+    "NgayLap": "2024-02-01",
+    "TongTien": 70000000,
+    "TienThanhToan": 14000000,
+    "LoaiHoaDon": "Thanh toán đặt cọc",
+    "GhiChu": "Đặt cọc tiệc cưới ngày 15/05/2024"
+  },
+  {
+    "ID_HoaDon": 13,
+    "ID_TiecCuoi": 3,
+    "NgayLap": "2024-01-15",
+    "TongTien": 28000000,
+    "TienThanhToan": 22400000,
+    "LoaiHoaDon": "Thanh toán còn lại",
+    "GhiChu": "Thanh toán số tiền còn lại cho tiệc cưới #3"
+  },
+  {
+    "ID_HoaDon": 14,
+    "ID_TiecCuoi": 9,
+    "NgayLap": "2024-02-20",
+    "TongTien": 48000000,
+    "TienThanhToan": 38400000,
+    "LoaiHoaDon": "Thanh toán còn lại",
+    "GhiChu": "Thanh toán số tiền còn lại cho tiệc cưới #9"
+  },
+  {
+    "ID_HoaDon": 15,
+    "ID_TiecCuoi": 5,
+    "NgayLap": "2023-02-10",
+    "TongTien": 50000000,
+    "TienThanhToan": 40000000,
+    "LoaiHoaDon": "Thanh toán còn lại",
+    "GhiChu": "Thanh toán số tiền còn lại cho tiệc cưới #5 - đã trễ hạn"
+  },
+  {
+    "ID_HoaDon": 16,
+    "ID_TiecCuoi": 11,
+    "NgayLap": "2024-02-05",
+    "TongTien": 45000000,
+    "TienThanhToan": 9000000,
+    "LoaiHoaDon": "Thanh toán đặt cọc",
+    "GhiChu": "Đặt cọc tiệc cưới ngày 20/05/2024"
+  },
+  {
+    "ID_HoaDon": 17,
+    "ID_TiecCuoi": 12,
+    "NgayLap": "2024-02-10",
+    "TongTien": 55000000,
+    "TienThanhToan": 11000000,
+    "LoaiHoaDon": "Thanh toán đặt cọc",
+    "GhiChu": "Đặt cọc tiệc cưới ngày 01/06/2024"
+  },
+  {
+    "ID_HoaDon": 18,
+    "ID_TiecCuoi": 13,
+    "NgayLap": "2024-02-15",
+    "TongTien": 48000000,
+    "TienThanhToan": 9600000,
+    "LoaiHoaDon": "Thanh toán đặt cọc",
+    "GhiChu": "Đặt cọc tiệc cưới ngày 10/06/2024"
+  },
+  {
+    "ID_HoaDon": 19,
+    "ID_TiecCuoi": 14,
+    "NgayLap": "2024-02-20",
+    "TongTien": 35000000,
+    "TienThanhToan": 7000000,
+    "LoaiHoaDon": "Thanh toán đặt cọc",
+    "GhiChu": "Đặt cọc tiệc cưới ngày 15/06/2024"
+  },
+  {
+    "ID_HoaDon": 20,
+    "ID_TiecCuoi": 15,
+    "NgayLap": "2024-02-25",
+    "TongTien": 65000000,
+    "TienThanhToan": 13000000,
+    "LoaiHoaDon": "Thanh toán đặt cọc",
+    "GhiChu": "Đặt cọc tiệc cưới ngày 01/07/2024"
+  },
+  {
+    "ID_HoaDon": 21,
+    "ID_TiecCuoi": 16,
+    "NgayLap": "2024-03-01",
+    "TongTien": 52000000,
+    "TienThanhToan": 10400000,
+    "LoaiHoaDon": "Thanh toán đặt cọc",
+    "GhiChu": "Đặt cọc tiệc cưới ngày 10/07/2024"
+  },
+  {
+    "ID_HoaDon": 22,
+    "ID_TiecCuoi": 17,
+    "NgayLap": "2024-03-05",
+    "TongTien": 42000000,
+    "TienThanhToan": 8400000,
+    "LoaiHoaDon": "Thanh toán đặt cọc",
+    "GhiChu": "Đặt cọc tiệc cưới ngày 15/07/2024"
+  },
+  {
+    "ID_HoaDon": 23,
+    "ID_TiecCuoi": 18,
+    "NgayLap": "2024-03-10",
+    "TongTien": 50000000,
+    "TienThanhToan": 10000000,
+    "LoaiHoaDon": "Thanh toán đặt cọc",
+    "GhiChu": "Đặt cọc tiệc cưới ngày 01/08/2024"
+  },
+  {
+    "ID_HoaDon": 24,
+    "ID_TiecCuoi": 19,
+    "NgayLap": "2024-03-15",
+    "TongTien": 45000000,
+    "TienThanhToan": 9000000,
+    "LoaiHoaDon": "Thanh toán đặt cọc",
+    "GhiChu": "Đặt cọc tiệc cưới ngày 10/08/2024"
+  },
+  {
+    "ID_HoaDon": 25,
+    "ID_TiecCuoi": 20,
+    "NgayLap": "2024-03-20",
+    "TongTien": 70000000,
+    "TienThanhToan": 14000000,
+    "LoaiHoaDon": "Thanh toán đặt cọc",
+    "GhiChu": "Đặt cọc tiệc cưới ngày 15/08/2024"
+  },
+  {
+    "ID_HoaDon": 26,
+    "ID_TiecCuoi": 4,
+    "NgayLap": "2024-01-20",
+    "TongTien": 40000000,
+    "TienThanhToan": 32000000,
+    "LoaiHoaDon": "Thanh toán còn lại",
+    "GhiChu": "Thanh toán số tiền còn lại cho tiệc cưới #4"
+  },
+  {
+    "ID_HoaDon": 27,
+    "ID_TiecCuoi": 7,
+    "NgayLap": "2024-03-15",
+    "TongTien": 45000000,
+    "TienThanhToan": 36000000,
+    "LoaiHoaDon": "Thanh toán còn lại",
+    "GhiChu": "Thanh toán số tiền còn lại cho tiệc cưới #7"
+  },
+  {
+    "ID_HoaDon": 28,
+    "ID_TiecCuoi": 8,
+    "NgayLap": "2024-03-20",
+    "TongTien": 55000000,
+    "TienThanhToan": 44000000,
+    "LoaiHoaDon": "Thanh toán còn lại",
+    "GhiChu": "Thanh toán số tiền còn lại cho tiệc cưới #8"
+  },
+  {
+    "ID_HoaDon": 29,
+    "ID_TiecCuoi": 10,
+    "NgayLap": "2024-04-01",
+    "TongTien": 70000000,
+    "TienThanhToan": 56000000,
+    "LoaiHoaDon": "Thanh toán còn lại",
+    "GhiChu": "Thanh toán số tiền còn lại cho tiệc cưới #10"
+  },
+  {
+    "ID_HoaDon": 30,
+    "ID_TiecCuoi": 11,
+    "NgayLap": "2024-04-10",
+    "TongTien": 45000000,
+    "TienThanhToan": 36000000,
+    "LoaiHoaDon": "Thanh toán còn lại",
+    "GhiChu": "Thanh toán số tiền còn lại cho tiệc cưới #11"
+  }
+]

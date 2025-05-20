@@ -1,0 +1,64 @@
+version: '3.8'
+
+services:
+  qltc-client:
+    restart: always
+    # No build context in production - use pre-built images
+    build: {}
+    environment:
+      - REACT_APP_API_URL=${API_URL:-http://localhost:3001}
+    # Add health check
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:80"]
+      interval: 1m
+      timeout: 10s
+      retries: 3
+
+  qltc-server:
+    restart: always
+    # No build context in production - use pre-built images
+    build: {}
+    environment:
+      - NODE_ENV=production
+      - PORT=3001
+      # Add secure environment variables - use .env file or secrets
+      - JWT_SECRET=${JWT_SECRET}
+      - DB_HOST=${DB_HOST}
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_NAME=${DB_NAME}
+    # Add health check
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3001/health"]
+      interval: 1m
+      timeout: 10s
+      retries: 3
+    # Resource limits
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 1G
+
+  # Add a database service for production
+  qltc-db:
+    image: mcr.microsoft.com/mssql/server:2019-latest
+    restart: always
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=${DB_PASSWORD}
+      - MSSQL_PID=Express
+    volumes:
+      - qltc-db-data:/var/opt/mssql
+    networks:
+      - qltc-network
+    # Resource limits
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 2G
+
+volumes:
+  qltc-db-data:
+    driver: local 

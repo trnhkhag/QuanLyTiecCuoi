@@ -1,6 +1,7 @@
 import axios from 'axios';
+import { AUTH_ENDPOINTS } from '../globals/api.global';
 
-const API_URL = 'http://localhost:3001/api/auth';
+const API_URL = AUTH_ENDPOINTS.BASE;
 
 /**
  * Authentication service for handling auth-related API requests
@@ -19,6 +20,8 @@ class AuthService {
       
       if (response.data.token) {
         localStorage.setItem('user', JSON.stringify(response.data));
+        // Set the token for all future axios requests
+        axios.defaults.headers.common['Authorization'] = `Bearer ${response.data.token}`;
       }
       
       return response.data;
@@ -39,6 +42,8 @@ class AuthService {
       
       if (response.data.token) {
         localStorage.setItem('user', JSON.stringify(response.data));
+        // Set the token for all future axios requests
+        axios.defaults.headers.common['Authorization'] = `Bearer ${response.data.token}`;
       }
       
       return response.data;
@@ -52,6 +57,8 @@ class AuthService {
    */
   logout() {
     localStorage.removeItem('user');
+    // Remove the token from axios headers
+    delete axios.defaults.headers.common['Authorization'];
   }
 
   /**
@@ -68,7 +75,8 @@ class AuthService {
    * @returns {boolean} True if user is logged in
    */
   isLoggedIn() {
-    return !!this.getCurrentUser();
+    const user = this.getCurrentUser();
+    return !!user && !!user.token;
   }
 
   /**
@@ -93,5 +101,19 @@ class AuthService {
     }
   }
 }
+
+// Set the authorization header if the user is already logged in
+const setAuthHeader = () => {
+  const userJson = localStorage.getItem('user');
+  if (userJson) {
+    const user = JSON.parse(userJson);
+    if (user && user.token) {
+      axios.defaults.headers.common['Authorization'] = `Bearer ${user.token}`;
+    }
+  }
+};
+
+// Initialize auth headers
+setAuthHeader();
 
 export default new AuthService(); 

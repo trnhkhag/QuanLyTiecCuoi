@@ -61,7 +61,7 @@ CREATE TABLE LoaiSanh (
 
 CREATE TABLE CaTiec (
     ID_Ca INT PRIMARY KEY,
-    TenCa VARCHAR(20) UNIQUE NOT NULL
+    TenCa VARCHAR(20) UNIQUE NOT NULL //Chi có 2 ca là trưa và tối
 );
 
 CREATE TABLE SanhTiec (
@@ -78,7 +78,7 @@ CREATE TABLE TiecCuoi (
     ID_KhachHang INT NOT NULL,
     ID_SanhTiec INT NOT NULL,
     NgayToChuc DATE NOT NULL,
-    ID_Ca INT NOT NULL,
+    ID_Ca INT NOT NULL, 
     ThoiDiemDat DATETIME NOT NULL,
     SoLuongBan INT NOT NULL,
     SoBanDuTru INT,
@@ -87,14 +87,19 @@ CREATE TABLE TiecCuoi (
     FOREIGN KEY (ID_Ca) REFERENCES CaTiec(ID_Ca)
 );
 
-CREATE TABLE HoaDon (
-    ID_HoaDon INT PRIMARY KEY AUTO_INCREMENT,
+CREATE TABLE HoaDon ( // Sau khi có hóa đơn là thanh toán đặt cọc thì sẽ tạo hóa đơn thanh toán còn lại song song (Hóa đơn ảo, Không thể xóa,chỉ xóa khi đã xóa hóa đơn Thanh toán đặt cọc, chỉ tồn tại trên UI) sau đó nếu xác nhận thanh toán thì sẽ lưu hóa đơn vào database và hiển thị trạng thái đã thanh toán
+    //Hóa đơn được xác nhận thì sẽ insert phần lớn dữ liệu hiện tại của hóa đơn ảo
+    ID_HoaDon INT PRIMARY KEY AUTO_INCREMENT, //Nếu là hóa đơn ảo thì để là "Chưa cấp"
     ID_TiecCuoi INT NOT NULL,
-    NgayLap DATE NOT NULL,
-    TongTien DECIMAL(18,2) NOT NULL,
-    TienThanhToan DECIMAL(18,2) NOT NULL,
-    LoaiHoaDon VARCHAR(50) NOT NULL,
-    GhiChu VARCHAR(255),
+    NgayLap DATE NOT NULL, 
+    //Nếu là hóa đơn ảo thì NgayLap = NgayLap của hóa đơn thanh toán đặt cọc tương ứng
+    // Nếu là hóa đơn thanh toán còn lại đã xác nhận thì NgayLap = Date.Now
+    TongTien DECIMAL(18,2) NOT NULL, 
+    //Với hóa đơn ảo tổng tiền = Tổng tiền của hóa đơn thanh toán đặt cọc tương ứng + tiền phạt
+    // Tiền phạt sẽ tính bằng cách lấy Ngày trễ hạn = ( Date.Now - (Table)TiecCuoi.ThoiDiemDat)) > 0 tương ứng cho phạt 1%/ngày. Nếu Ngày trễ hạn < 0 thì không phạt
+    TienThanhToan DECIMAL(18,2) NOT NULL, // Với hóa đơn ảo có tiền thanh toán = Tổng tiền hóa đơn ảo - Tiền thanh toán của hóa đơn đặt cọc tương ứng
+    LoaiHoaDon VARCHAR(50) NOT NULL, //chỉ có 2 loại hóa đơn là thanh toán còn lại và thanh toán đặt cọc
+    GhiChu VARCHAR(255),  //ghi chú về hóa đơn
     FOREIGN KEY (ID_TiecCuoi) REFERENCES TiecCuoi(ID_TiecCuoi)
 );
 

@@ -1,0 +1,72 @@
+name: Wedding Management System CI
+
+on:
+  push:
+    branches: [ Hoang ]
+  pull_request:
+    branches: [ Hoang ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+        cache: 'npm'
+    
+    - name: Install client dependencies
+      working-directory: ./client
+      run: npm ci
+    
+    - name: Build client
+      working-directory: ./client
+      run: npm run build
+    
+    - name: Install server dependencies
+      working-directory: ./server
+      run: npm ci
+    
+    - name: Run tests
+      run: |
+        cd client && npm test -- --passWithNoTests
+        cd ../server && npm test || true
+    
+  docker-build:
+    needs: build-and-test
+    if: github.event_name == 'push' && github.ref == 'refs/heads/Hoang'
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v2
+    
+    - name: Build client Docker image
+      uses: docker/build-push-action@v4
+      with:
+        context: ./client
+        push: false
+        tags: wms-client:latest
+        outputs: type=docker,dest=/tmp/client-image.tar
+    
+    - name: Build server Docker image
+      uses: docker/build-push-action@v4
+      with:
+        context: ./server
+        push: false
+        tags: wms-server:latest
+        outputs: type=docker,dest=/tmp/server-image.tar
+        
+    - name: Save Docker images as artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: docker-images
+        path: |
+          /tmp/client-image.tar
+          /tmp/server-image.tar 

@@ -1,0 +1,133 @@
+/* Report Page Styles */
+.report-header {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 20px;
+}
+
+.report-header h2 {
+  margin-bottom: 15px;
+  color: #333;
+}
+
+.report-filters {
+  background-color: #f8f9fa;
+  padding: 15px;
+  border-radius: 5px;
+  margin-bottom: 20px;
+}
+
+/* Summary Cards */
+.report-summary {
+  margin-bottom: 25px;
+}
+
+.summary-card {
+  text-align: center;
+  height: 100%;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s;
+  border: none;
+  border-left: 4px solid #4c6fff;
+}
+
+.summary-card:hover {
+  transform: translateY(-5px);
+}
+
+.summary-card .card-title {
+  font-size: 0.9rem;
+  color: #666;
+  font-weight: 500;
+}
+
+.stat-value {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-top: 10px;
+  color: #333;
+}
+
+.stat-value.positive {
+  color: #28a745;
+}
+
+.stat-value.negative {
+  color: #dc3545;
+}
+
+/* Charts */
+.chart-card {
+  margin-bottom: 20px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  border: none;
+}
+
+.chart-card .card-header {
+  background-color: #f8f9fa;
+  font-weight: 600;
+  color: #495057;
+  border-bottom: 1px solid #dee2e6;
+}
+
+/* Trend Statistics */
+.trend-stat {
+  text-align: center;
+  padding: 10px;
+  background-color: #f8f9fa;
+  border-radius: 5px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.trend-stat-label {
+  font-size: 0.85rem;
+  color: #666;
+  margin-bottom: 5px;
+}
+
+.trend-stat-value {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #4c6fff;
+}
+
+.no-data-message {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 300px;
+  color: #6c757d;
+  font-style: italic;
+}
+
+/* Decision Support Section */
+.decision-support .card {
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  border: none;
+}
+
+.decision-support h5 {
+  color: #495057;
+  font-weight: 600;
+  margin-bottom: 15px;
+}
+
+.decision-list {
+  padding-left: 20px;
+}
+
+.decision-list li {
+  margin-bottom: 8px;
+  color: #555;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .report-header {
+    flex-direction: column;
+  }
+  
+  .stat-value {
+    font-size: 1.2rem;
+  }
+} 

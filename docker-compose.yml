@@ -1,0 +1,54 @@
+version: '3.8'
+
+services:
+  # Frontend React application - Development
+  qltc-client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile.dev
+    image: ${DOCKER_USERNAME:-qltc}/qltc-client-dev:${IMAGE_TAG:-latest}
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./client:/app
+      - /app/node_modules
+    depends_on:
+      - qltc-server
+    networks:
+      - qltc-network
+    restart: unless-stopped
+    environment:
+      - NODE_ENV=development
+    env_file:
+      - ./client/.env.development
+
+  # Backend Node.js server - Development
+  qltc-server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile.dev
+    image: ${DOCKER_USERNAME:-qltc}/qltc-server-dev:${IMAGE_TAG:-latest}
+    ports:
+      - "3001:3001"
+    volumes:
+      - ./server:/app
+      - /app/node_modules
+    environment:
+      - NODE_ENV=development
+    env_file:
+      - ./server/.env.development
+    networks:
+      - qltc-network
+    restart: unless-stopped
+    # Add a volume for persistence if needed
+    # volumes:
+    #   - ./server/data:/app/data
+
+# Volumes for data persistence
+volumes:
+  wedding-db-data:
+
+# Networks for service communication
+networks:
+  qltc-network:
+    driver: bridge 

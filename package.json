@@ -1,8 +1,21 @@
 {
-  "dependencies": {
-    "bootstrap": "^5.3.6",
-    "react-router-dom": "^7.6.0",
-    "react-social-login-buttons": "^4.1.1",
-    "reactstrap": "^9.2.3"
-  }
+  "name": "wedding-management-system",
+  "version": "1.0.0",
+  "description": "Wedding Management System - Full Stack Application",
+  "main": "start-dev.js",
+  "scripts": {
+    "start": "node start-dev.js",
+    "start:server": "cd server && npm run dev",
+    "start:client": "cd client && npm start",
+    "install:all": "npm install && cd client && npm install && cd ../server && npm install"
+  },
+  "keywords": [
+    "wedding",
+    "management",
+    "react",
+    "node",
+    "express"
+  ],
+  "author": "",
+  "license": "ISC"
 }

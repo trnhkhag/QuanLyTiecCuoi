@@ -1,0 +1,136 @@
+/* Dashboard Navigation Bar styling */
+:root {
+  --primary-color: #ff7eb9;
+  --secondary-color: #ff69b4;
+  --primary-dark: #d64f93;
+  --text-color: #333;
+  --light-color: #fff;
+  --shadow-color: rgba(255, 126, 185, 0.2);
+  --nav-bg: #fff;
+  --nav-text: #666;
+  --nav-active: #fff0f6;
+  --nav-hover: #ffeef7;
+}
+
+.dashboard-nav {
+  width: 250px;
+  background-color: var(--nav-bg);
+  box-shadow: 2px 0 10px var(--shadow-color);
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  position: sticky;
+  top: 0;
+}
+
+.nav-logo {
+  padding: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.nav-logo h1 {
+  color: var(--primary-dark);
+  margin: 0;
+  font-size: 24px;
+  letter-spacing: 2px;
+}
+
+.nav-links {
+  list-style: none;
+  padding: 0;
+  margin: 20px 0 0 0;
+  flex-grow: 1;
+}
+
+.nav-links li {
+  margin: 5px 10px;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.nav-links li a {
+  display: flex;
+  align-items: center;
+  padding: 12px 15px;
+  text-decoration: none;
+  color: var(--nav-text);
+  transition: all 0.3s;
+  font-weight: 500;
+}
+
+.nav-links li a i {
+  margin-right: 12px;
+  font-size: 18px;
+  width: 20px;
+  text-align: center;
+}
+
+.nav-links li:hover a {
+  background-color: var(--nav-hover);
+  color: var(--primary-dark);
+}
+
+.nav-links li.active {
+  background-color: var(--nav-active);
+}
+
+.nav-links li.active a {
+  color: var(--primary-dark);
+  font-weight: 600;
+}
+
+.nav-footer {
+  padding: 20px;
+  border-top: 1px solid #f0f0f0;
+}
+
+.nav-profile {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  color: var(--nav-text);
+  transition: color 0.3s;
+  padding: 10px;
+  border-radius: 8px;
+}
+
+.nav-profile:hover {
+  color: var(--primary-dark);
+  background-color: var(--nav-hover);
+}
+
+.nav-profile i {
+  font-size: 20px;
+  margin-right: 10px;
+}
+
+/* Media query for smaller screens */
+@media (max-width: 768px) {
+  .dashboard-nav {
+    width: 60px;
+  }
+  
+  .nav-logo h1 {
+    display: none;
+  }
+  
+  .nav-links li a span,
+  .nav-profile span {
+    display: none;
+  }
+  
+  .nav-links li a i {
+    margin-right: 0;
+  }
+  
+  .nav-profile {
+    justify-content: center;
+  }
+  
+  .nav-profile i {
+    margin-right: 0;
+  }
+} 
