@@ -57,5 +57,4 @@ coverage
 Thumbs.db
 ehthumbs.db
 Desktop.ini
-.github/workflows/docker-dev-ci.yml
 .github/workflows/docker-ci.yml
