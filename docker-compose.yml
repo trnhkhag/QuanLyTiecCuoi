@@ -40,9 +40,23 @@ services:
     networks:
       - qltc-network
     restart: unless-stopped
-    # Add a volume for persistence if needed
-    # volumes:
-    #   - ./server/data:/app/data
+    depends_on:
+      - sqlserver
+
+  # SQL Server
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2019-latest
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=YourStrong@Passw0rd
+      - MSSQL_PID=Express
+    ports:
+      - "1433:1433"
+    volumes:
+      - wedding-db-data:/var/opt/mssql
+    networks:
+      - qltc-network
+    restart: unless-stopped
 
 # Volumes for data persistence
 volumes:
