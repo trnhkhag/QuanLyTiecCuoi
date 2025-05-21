@@ -116,4 +116,5 @@ const setAuthHeader = () => {
 // Initialize auth headers
 setAuthHeader();
 
-export default new AuthService(); 
+const authServiceInstance = new AuthService();
+export default authServiceInstance; 

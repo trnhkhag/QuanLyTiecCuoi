@@ -39,7 +39,7 @@ const MonthlyReportPage = () => {
     
     // Fetch report data when year or month changes
     fetchReportData();
-  }, [year, month, dispatch, navigate]);
+  }, [year, month, dispatch, navigate, fetchReportData]);
   
   const fetchReportData = () => {
     dispatch(fetchMonthlyReport({ year, month }));

@@ -21,7 +21,7 @@ const InvoiceInformationPage = () => {
     }
     
     fetchInvoiceDetails();
-  }, [id, navigate]);
+  }, [id, navigate, fetchInvoiceDetails]);
   
   const fetchInvoiceDetails = async () => {
     try {

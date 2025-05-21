@@ -51,7 +51,7 @@ const InvoicesPage = () => {
     }
     
     fetchInvoices();
-  }, [navigate, pagination.page, pagination.limit, sorting.sortBy, sorting.sortOrder, filters.loaiHoaDon]);
+  }, [navigate, pagination.page, pagination.limit, sorting.sortBy, sorting.sortOrder, filters.loaiHoaDon, fetchInvoices]);
   
   // Combine real and virtual invoices whenever either changes
   useEffect(() => {

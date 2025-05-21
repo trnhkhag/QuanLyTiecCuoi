@@ -29,11 +29,6 @@ const DashboardPage = () => {
     navigate('/login');
   };
 
-  // Helper function to check if user has specific permission
-  const hasPermission = (permissionBit) => {
-    return user && user.user && user.user.permissions && (user.user.permissions & permissionBit) !== 0;
-  };
-
   return (
     <div className="app-container">
       <DashboardNavbar />
