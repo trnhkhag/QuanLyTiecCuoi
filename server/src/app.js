@@ -15,6 +15,27 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+// Health check endpoints for each service
+app.get('/health', (req, res) => {
+  res.status(200).json({ status: 'OK', message: 'API Gateway is operational' });
+});
+
+app.get('/api/v1/auth-service/health', (req, res) => {
+  res.status(200).json({ status: 'OK', service: 'auth-service' });
+});
+
+app.get('/api/v1/invoice-service/health', (req, res) => {
+  res.status(200).json({ status: 'OK', service: 'invoice-service' });
+});
+
+app.get('/api/v1/wedding-service/health', (req, res) => {
+  res.status(200).json({ status: 'OK', service: 'wedding-service' });
+});
+
+app.get('/api/v1/report-service/health', (req, res) => {
+  res.status(200).json({ status: 'OK', service: 'report-service' });
+});
+
 // Swagger UI setup
 app.get('/api-docs/swagger.json', (req, res) => {
   res.setHeader('Content-Type', 'application/json');
@@ -41,26 +62,9 @@ app.use('/api/v1/wedding-service/tiec-cuoi', tiecCuoiRoutes);
 app.use('/api/v1/wedding-service/ca-tiec', caTiecRoutes);
 app.use('/api/v1/report-service', reportRoutes);
 
-// Health check endpoints for each service
-app.get('/health', (req, res) => {
-  res.status(200).json({ status: 'OK', message: 'API Gateway is operational' });
-});
-
-app.get('/api/v1/auth-service/health', (req, res) => {
-  res.status(200).json({ status: 'OK', service: 'auth-service' });
-});
-
-app.get('/api/v1/invoice-service/health', (req, res) => {
-  res.status(200).json({ status: 'OK', service: 'invoice-service' });
-});
-
-app.get('/api/v1/wedding-service/health', (req, res) => {
-  res.status(200).json({ status: 'OK', service: 'wedding-service' });
-});
-
-app.get('/api/v1/report-service/health', (req, res) => {
-  res.status(200).json({ status: 'OK', service: 'report-service' });
-});
+// Legacy routes for backward compatibility - TO BE REMOVED IN FUTURE
+app.use('/api/auth', authRoutes);  
+app.use('/api/invoices', invoiceRoutes);
 
 // Not found handler
 app.use((req, res) => {

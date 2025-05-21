@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import DashboardNavbar from '../../components/DashboardNavbar';
 import InvoiceList from '../../components/invoice/InvoiceList';
@@ -42,78 +42,7 @@ const InvoicesPage = () => {
       maximumFractionDigits: 0 
     }).format(amount);
   };
-  
-  useEffect(() => {
-    // If not logged in, redirect to login
-    if (!authService.isLoggedIn()) {
-      navigate('/login');
-      return;
-    }
-    
-    fetchInvoices();
-  }, [navigate, pagination.page, pagination.limit, sorting.sortBy, sorting.sortOrder, filters.loaiHoaDon, fetchInvoices]);
-  
-  // Combine real and virtual invoices whenever either changes
-  useEffect(() => {
-    const combined = [...invoices, ...virtualInvoices];
-    // Sort by ID in descending order (newest first)
-    combined.sort((a, b) => b.ID_HoaDon - a.ID_HoaDon);
-    setAllInvoices(combined);
-  }, [invoices, virtualInvoices]);
-  
-  const fetchInvoices = async () => {
-    try {
-      setLoading(true);
-      
-      // Prepare API parameters
-      const params = {
-        page: pagination.page,
-        limit: pagination.limit,
-        sortBy: sorting.sortBy,
-        sortOrder: sorting.sortOrder
-      };
-      
-      // Add filter by invoice type if not "All"
-      if (filters.loaiHoaDon.length > 0) {
-        params.loaiHoaDon = filters.loaiHoaDon;
-      }
-      
-      const response = await invoiceService.getAllInvoices(params);
-      
-      // Check if the data property exists
-      if (response && response.data) {
-        const realInvoices = response.data;
-        setInvoices(realInvoices);
-        
-        // Update pagination metadata
-        if (response.pagination) {
-          setPagination(response.pagination);
-        }
-        
-        // Generate virtual invoices for deposit payments
-        generateVirtualInvoices(realInvoices);
-        
-        setError(null);
-      } else {
-        console.error('Invalid response format:', response);
-        setError('Định dạng dữ liệu không hợp lệ. Vui lòng kiểm tra API.');
-      }
-    } catch (err) {
-      console.error('Error fetching invoices:', err);
-      
-      // More specific error messages based on the error type
-      if (err.code === 'ECONNREFUSED' || err.message.includes('Network Error')) {
-        setError('Không thể kết nối đến máy chủ. Vui lòng kiểm tra kết nối mạng hoặc đảm bảo server đang chạy.');
-      } else if (err.response) {
-        setError(`Lỗi từ máy chủ: ${err.response.status} - ${err.response.statusText}`);
-      } else {
-        setError('Không thể tải dữ liệu hóa đơn. Vui lòng thử lại sau.');
-      }
-    } finally {
-      setLoading(false);
-    }
-  };
-  
+
   // Function to generate virtual invoices for deposit payments
   const generateVirtualInvoices = (realInvoices) => {
     // Filter for deposit payments
@@ -175,6 +104,77 @@ const InvoicesPage = () => {
     
     setVirtualInvoices(virtuals);
   };
+  
+  const fetchInvoices = useCallback(async () => {
+    try {
+      setLoading(true);
+      
+      // Prepare API parameters
+      const params = {
+        page: pagination.page,
+        limit: pagination.limit,
+        sortBy: sorting.sortBy,
+        sortOrder: sorting.sortOrder
+      };
+      
+      // Add filter by invoice type if not "All"
+      if (filters.loaiHoaDon.length > 0) {
+        params.loaiHoaDon = filters.loaiHoaDon;
+      }
+      
+      const response = await invoiceService.getAllInvoices(params);
+      
+      // Check if the data property exists
+      if (response && response.data) {
+        const realInvoices = response.data;
+        setInvoices(realInvoices);
+        
+        // Update pagination metadata
+        if (response.pagination) {
+          setPagination(response.pagination);
+        }
+        
+        // Generate virtual invoices for deposit payments
+        generateVirtualInvoices(realInvoices);
+        
+        setError(null);
+      } else {
+        console.error('Invalid response format:', response);
+        setError('Định dạng dữ liệu không hợp lệ. Vui lòng kiểm tra API.');
+      }
+    } catch (err) {
+      console.error('Error fetching invoices:', err);
+      
+      // More specific error messages based on the error type
+      if (err.code === 'ECONNREFUSED' || err.message.includes('Network Error')) {
+        setError('Không thể kết nối đến máy chủ. Vui lòng kiểm tra kết nối mạng hoặc đảm bảo server đang chạy.');
+      } else if (err.response) {
+        setError(`Lỗi từ máy chủ: ${err.response.status} - ${err.response.statusText}`);
+      } else {
+        setError('Không thể tải dữ liệu hóa đơn. Vui lòng thử lại sau.');
+      }
+    } finally {
+      setLoading(false);
+    }
+  }, [pagination.page, pagination.limit, sorting.sortBy, sorting.sortOrder, filters.loaiHoaDon]);
+  
+  useEffect(() => {
+    // If not logged in, redirect to login
+    if (!authService.isLoggedIn()) {
+      navigate('/login');
+      return;
+    }
+    
+    fetchInvoices();
+  }, [navigate, fetchInvoices]);
+  
+  // Combine real and virtual invoices whenever either changes
+  useEffect(() => {
+    const combined = [...invoices, ...virtualInvoices];
+    // Sort by ID in descending order (newest first)
+    combined.sort((a, b) => b.ID_HoaDon - a.ID_HoaDon);
+    setAllInvoices(combined);
+  }, [invoices, virtualInvoices]);
   
   const handleDeleteInvoice = async (id) => {
     // Check if this is a virtual invoice

@@ -1,52 +1,53 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const { pool, sql } = require('../config/db');
+const { pool, execute } = require('../config/db');
 
 /**
- * SQL Server implementation of the user repository that works with
- * the TaiKhoan, VaiTro, Quyen schema structure
+ * Implementation of UserRepository for MySQL database
  */
 class SqlUserRepository {
   /**
    * Find a user by email
-   * @param {string} email - The email to search for
-   * @returns {Promise<object|null>} The user object or null if not found
+   * @param {string} email - The email address to search for
+   * @returns {Promise<Object|null>} User object if found, null otherwise
    */
   async findByEmail(email) {
     try {
-      await pool.connect();
+      console.log(`Finding user by email: ${email}`);
       
-      // Query to find a user by email from either KhachHang or NhanVien
       const query = `
         SELECT 
           tk.ID_TaiKhoan,
           tk.Username,
-          tk.PasswordHash as Password,
+          tk.PasswordHash,
           COALESCE(kh.HoTen, nv.HoTen) as HoTen,
           COALESCE(kh.Email, '') as Email,
+          COALESCE(kh.ID_KhachHang, 0) as ID_KhachHang,
+          COALESCE(nv.ID_NhanVien, 0) as ID_NhanVien,
           vt.ID_VaiTro,
           vt.TenVaiTro
         FROM TaiKhoan tk
-        LEFT JOIN KhachHang kh ON kh.ID_TaiKhoan = tk.ID_TaiKhoan AND kh.Email = @email
+        LEFT JOIN KhachHang kh ON kh.ID_TaiKhoan = tk.ID_TaiKhoan
         LEFT JOIN NhanVien nv ON nv.ID_TaiKhoan = tk.ID_TaiKhoan
         LEFT JOIN TaiKhoan_VaiTro tvt ON tvt.ID_TaiKhoan = tk.ID_TaiKhoan
         LEFT JOIN VaiTro vt ON vt.ID_VaiTro = tvt.ID_VaiTro
-        WHERE kh.Email = @email
+        WHERE kh.Email = ? OR tk.Username = ?
       `;
       
-      console.log(`Finding user by email: ${email}`);
+      const result = await execute(query, [email, email]);
       
-      const result = await pool.request()
-        .input('email', sql.NVarChar, email)
-        .query(query);
-      
-      if (result.recordset.length === 0) {
-        console.log(`No user found with email: ${email}`);
+      if (result.length === 0) {
         return null;
       }
       
-      console.log(`User found with email: ${email}, ID: ${result.recordset[0].ID_TaiKhoan}`);
-      return result.recordset[0];
+      return {
+        id: result[0].ID_TaiKhoan,
+        username: result[0].Username,
+        password: result[0].PasswordHash,
+        name: result[0].HoTen,
+        email: result[0].Email,
+        role: result[0].TenVaiTro || 'user'
+      };
     } catch (error) {
       console.error('Error finding user by email:', error);
       throw error;
@@ -55,88 +56,71 @@ class SqlUserRepository {
   
   /**
    * Create a new user
-   * @param {object} user - The user data
-   * @returns {Promise<object>} The created user
+   * @param {Object} user - User object with name, email, and password
+   * @returns {Promise<Object>} Newly created user
    */
   async create(user) {
     try {
-      await pool.connect();
+      console.log(`Creating new user: ${user.email}`);
+      
+      // Hash password
+      const salt = await bcrypt.genSalt(10);
+      const hashedPassword = await bcrypt.hash(user.password, salt);
       
       // Start transaction
-      const transaction = new sql.Transaction(pool);
-      await transaction.begin();
-      
+      const connection = await pool.getConnection();
       try {
-        // Check if user with this email already exists
-        const existingUser = await this.findByEmail(user.email);
-        if (existingUser) {
-          console.error(`Registration failed: User with email ${user.email} already exists`);
-          throw new Error('User with this email already exists');
-        }
-        
-        // Hash the password
-        const salt = await bcrypt.genSalt(10);
-        const hashedPassword = await bcrypt.hash(user.password, salt);
+        await connection.beginTransaction();
         
         // 1. Create TaiKhoan record
         const createTaiKhoanQuery = `
           INSERT INTO TaiKhoan (Username, PasswordHash)
-          OUTPUT INSERTED.ID_TaiKhoan
-          VALUES (@username, @passwordHash)
+          VALUES (?, ?)
         `;
         
         const username = user.email; // Use email as username
-        const taiKhoanResult = await new sql.Request(transaction)
-          .input('username', sql.NVarChar, username)
-          .input('passwordHash', sql.NVarChar, hashedPassword)
-          .query(createTaiKhoanQuery);
+        const [taiKhoanResult] = await connection.execute(createTaiKhoanQuery, [username, hashedPassword]);
         
-        if (taiKhoanResult.recordset.length === 0) {
+        if (!taiKhoanResult.insertId) {
           throw new Error('Failed to create account');
         }
         
-        const taiKhoanId = taiKhoanResult.recordset[0].ID_TaiKhoan;
+        const taiKhoanId = taiKhoanResult.insertId;
         
         // 2. Assign default role (assuming roleId 2 is for regular users)
         const defaultRoleId = 2; // Regular user role
         
         const assignRoleQuery = `
           INSERT INTO TaiKhoan_VaiTro (ID_TaiKhoan, ID_VaiTro)
-          VALUES (@taiKhoanId, @roleId)
+          VALUES (?, ?)
         `;
         
-        await new sql.Request(transaction)
-          .input('taiKhoanId', sql.Int, taiKhoanId)
-          .input('roleId', sql.Int, defaultRoleId)
-          .query(assignRoleQuery);
+        await connection.execute(assignRoleQuery, [taiKhoanId, defaultRoleId]);
         
         // 3. Create KhachHang record
         const createKhachHangQuery = `
           INSERT INTO KhachHang (HoTen, SoDienThoai, Email, ID_TaiKhoan)
-          OUTPUT INSERTED.*
-          VALUES (@name, @phone, @email, @taiKhoanId)
+          VALUES (?, ?, ?, ?)
         `;
         
         // Generate a random phone number for now (since it's required)
         const randomPhone = `0${Math.floor(100000000 + Math.random() * 900000000)}`;
         
-        const khachHangResult = await new sql.Request(transaction)
-          .input('name', sql.NVarChar, user.name)
-          .input('phone', sql.VarChar, randomPhone)
-          .input('email', sql.NVarChar, user.email)
-          .input('taiKhoanId', sql.Int, taiKhoanId)
-          .query(createKhachHangQuery);
+        const [khachHangResult] = await connection.execute(
+          createKhachHangQuery, 
+          [user.name, randomPhone, user.email, taiKhoanId]
+        );
         
-        if (khachHangResult.recordset.length === 0) {
+        if (!khachHangResult.insertId) {
           throw new Error('Failed to create customer record');
         }
         
         // Commit transaction
-        await transaction.commit();
+        await connection.commit();
         
         // Prepare response
         const newUser = {
-          ID_KhachHang: khachHangResult.recordset[0].ID_KhachHang,
+          ID_KhachHang: khachHangResult.insertId,
           ID_TaiKhoan: taiKhoanId,
           HoTen: user.name,
           Email: user.email,
@@ -147,13 +131,15 @@ class SqlUserRepository {
         return newUser;
       } catch (error) {
         // Rollback in case of error
-        await transaction.rollback();
+        await connection.rollback();
         throw error;
+      } finally {
+        connection.release();
       }
     } catch (error) {
       console.error('Error creating user:', error);
-      // Check for SQL Server unique constraint violation
-      if (error.number === 2627 || error.number === 2601) {
+      // Check for MySQL duplicate entry error
+      if (error.code === 'ER_DUP_ENTRY') {
         throw new Error('User with this email or phone number already exists');
       }
       throw error;
@@ -187,15 +173,12 @@ class SqlUserRepository {
         LEFT JOIN NhanVien nv ON nv.ID_TaiKhoan = tk.ID_TaiKhoan
         LEFT JOIN TaiKhoan_VaiTro tvt ON tvt.ID_TaiKhoan = tk.ID_TaiKhoan
         LEFT JOIN VaiTro vt ON vt.ID_VaiTro = tvt.ID_VaiTro
-        WHERE kh.Email = @email OR tk.Username = @email
+        WHERE kh.Email = ? OR tk.Username = ?
       `;
       
-      await pool.connect();
-      const result = await pool.request()
-        .input('email', sql.NVarChar, email)
-        .query(query);
+      const result = await execute(query, [email, email]);
       
-      if (result.recordset.length === 0) {
+      if (result.length === 0) {
         console.log(`Authentication failed: No user found with email ${email}`);
         return {
           success: false,
@@ -203,7 +186,7 @@ class SqlUserRepository {
         };
       }
       
-      const user = result.recordset[0];
+      const user = result[0];
       
       // Compare passwords
       console.log(`Comparing password for account ID: ${user.ID_TaiKhoan}`);
@@ -222,15 +205,13 @@ class SqlUserRepository {
         SELECT q.Ten_Quyen, q.GiaTri
         FROM VaiTro_Quyen vq
         JOIN Quyen q ON q.ID_Quyen = vq.ID_Quyen
-        WHERE vq.ID_VaiTro = @roleId
+        WHERE vq.ID_VaiTro = ?
       `;
       
       const roleId = user.ID_VaiTro || 2; // Default to regular user if not found
       console.log(`Fetching permissions for account ID: ${user.ID_TaiKhoan}, role ID: ${roleId}`);
       
-      const permissionsResult = await pool.request()
-        .input('roleId', sql.Int, roleId)
-        .query(permissionsQuery);
+      const permissionsResult = await execute(permissionsQuery, [roleId]);
       
       // Create user profile with permissions
       const userProfile = {
@@ -240,7 +221,7 @@ class SqlUserRepository {
         name: user.HoTen,
         email: user.Email,
         role: user.TenVaiTro || 'user',
-        permissions: permissionsResult.recordset.map(p => ({
+        permissions: permissionsResult.map(p => ({
           name: p.Ten_Quyen,
           value: p.GiaTri
         }))

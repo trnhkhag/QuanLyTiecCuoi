@@ -2,20 +2,15 @@ FROM node:18-alpine
 
 WORKDIR /app
 
-# Copy package files
 COPY package*.json ./
 
-# Install dependencies including development dependencies
 RUN npm install
+RUN npm install mysql2 --save
 
-# Copy the rest of the application code
 COPY . .
 
-# Expose development server port
 EXPOSE 3001
 
-# Install nodemon for development
 RUN npm install -g nodemon
 
-# Start development server with nodemon for auto-reload
 CMD ["nodemon", "src/index.js"] 

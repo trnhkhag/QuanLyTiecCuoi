@@ -10,8 +10,8 @@ export const SERVICES = {
   // Auth Service - handles user authentication and management
   AUTH: {
     name: 'auth-service',
-    basePath: '/api/v1/auth-service',
-    fullUrl: `${API_URL}/api/v1/auth-service`,
+    basePath: '/v1/auth-service',
+    fullUrl: `${API_URL}/v1/auth-service`,
     description: 'Authentication and user management',
     endpoints: {
       LOGIN: '/login',
@@ -25,17 +25,17 @@ export const SERVICES = {
   // Wedding Service - handles wedding management
   WEDDING: {
     name: 'wedding-service',
-    basePath: '/api/v1/wedding-service',
-    fullUrl: `${API_URL}/api/v1/wedding-service`,
+    basePath: '/v1/wedding-service',
+    fullUrl: `${API_URL}/v1/wedding-service`,
     description: 'Wedding management',
     modules: {
       TIEC_CUOI: {
         path: '/tiec-cuoi',
-        fullUrl: `${API_URL}/api/v1/wedding-service/tiec-cuoi`,
+        fullUrl: `${API_URL}/v1/wedding-service/tiec-cuoi`,
       },
       CA_TIEC: {
         path: '/ca-tiec',
-        fullUrl: `${API_URL}/api/v1/wedding-service/ca-tiec`,
+        fullUrl: `${API_URL}/v1/wedding-service/ca-tiec`,
       }
     },
     endpoints: {
@@ -46,8 +46,8 @@ export const SERVICES = {
   // Invoice Service - handles invoices and payments
   INVOICE: {
     name: 'invoice-service',
-    basePath: '/api/v1/invoice-service',
-    fullUrl: `${API_URL}/api/v1/invoice-service`,
+    basePath: '/v1/invoice-service',
+    fullUrl: `${API_URL}/v1/invoice-service`,
     description: 'Invoice and payment management',
     endpoints: {
       HEALTH: '/health'
@@ -57,8 +57,8 @@ export const SERVICES = {
   // Report Service - handles reporting and analytics
   REPORT: {
     name: 'report-service',
-    basePath: '/api/v1/report-service',
-    fullUrl: `${API_URL}/api/v1/report-service`,
+    basePath: '/v1/report-service',
+    fullUrl: `${API_URL}/v1/report-service`,
     description: 'Reporting and analytics',
     endpoints: {
       MONTHLY: '/monthly',

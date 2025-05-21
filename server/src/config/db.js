@@ -1,30 +1,46 @@
 // config/db.js
-const sql = require('mssql');
+const mysql = require('mysql2/promise');
 require('dotenv').config();
 
-const config = {
-  server: process.env.DB_SERVER || 'localhost',
-  port: parseInt(process.env.DB_PORT) || 1433,
-  database: process.env.DB_DATABASE || 'TiecCuoiDB',
-  user: process.env.DB_USER || 'sa',
-  password: process.env.DB_PASSWORD || '123',
-  options: {
-    encrypt: false, // For local development, disable encryption
-    trustServerCertificate: true // Accept self-signed certificates
-  }
-};
-
-// Create a pool to be reused for all queries
-const pool = new sql.ConnectionPool(config);
-const poolConnect = pool.connect();
-
-// Handle connection errors
-pool.on('error', err => {
-  console.error('SQL Server connection error:', err);
+console.log('DB Config:', {
+  host: process.env.DB_HOST,
+  port: parseInt(process.env.DB_PORT) || 3306,
+  database: process.env.DB_DATABASE,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD ? '***' : undefined
 });
+
+// Tạo pool connection để tái sử dụng
+const pool = mysql.createPool({
+  host: process.env.DB_HOST || 'localhost',
+  port: parseInt(process.env.DB_PORT) || 3306,
+  database: process.env.DB_DATABASE || 'TiecCuoiDB',
+  user: process.env.DB_USER || 'root',
+  password: process.env.DB_PASSWORD || 'Admin12345',
+  waitForConnections: true,
+  connectionLimit: 10,
+  queueLimit: 0
+});
+
+// Kiểm tra kết nối
+pool.getConnection()
+  .then(connection => {
+    console.log('Kết nối MySQL thành công');
+    connection.release();
+  })
+  .catch(err => {
+    console.error('Không thể kết nối với MySQL:', err);
+  });
 
 module.exports = {
   pool,
-  poolConnect,
-  sql
+  execute: async (sql, params) => {
+    try {
+      const [results] = await pool.execute(sql, params);
+      return results;
+    } catch (error) {
+      console.error('Lỗi thực thi truy vấn:', error);
+      throw error;
+    }
+  }
 };

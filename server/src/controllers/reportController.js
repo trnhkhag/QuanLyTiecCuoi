@@ -1,4 +1,4 @@
-const { pool, sql } = require('../config/db');
+const { pool, execute } = require('../config/db');
 const { format, parseISO, startOfMonth, endOfMonth, subMonths } = require('date-fns');
 
 // Get monthly report data
@@ -7,9 +7,6 @@ exports.getMonthlyReport = async (req, res) => {
     const { year, month } = req.query;
     const currentYear = parseInt(year) || new Date().getFullYear();
     const currentMonth = parseInt(month) || new Date().getMonth() + 1;
-    
-    // Connect to database
-    await pool.connect();
     
     // Create date range for the specified month
     const startDate = startOfMonth(new Date(currentYear, currentMonth - 1));
@@ -27,13 +24,10 @@ exports.getMonthlyReport = async (req, res) => {
         END AS averageRevenue
       FROM TiecCuoi TC
       JOIN HoaDon HD ON TC.ID_TiecCuoi = HD.ID_TiecCuoi
-      WHERE TC.NgayToChuc BETWEEN @startDate AND @endDate
+      WHERE TC.NgayToChuc BETWEEN ? AND ?
     `;
     
-    const result = await pool.request()
-      .input('startDate', sql.Date, startDate)
-      .input('endDate', sql.Date, endDate)
-      .query(query);
+    const result = await execute(query, [startDate, endDate]);
     
     // Get revenue breakdown by venue type
     const venueQuery = `
@@ -45,15 +39,12 @@ exports.getMonthlyReport = async (req, res) => {
       JOIN HoaDon HD ON TC.ID_TiecCuoi = HD.ID_TiecCuoi
       JOIN SanhTiec ST ON TC.ID_SanhTiec = ST.ID_SanhTiec
       JOIN LoaiSanh LS ON ST.ID_LoaiSanh = LS.ID_LoaiSanh
-      WHERE TC.NgayToChuc BETWEEN @startDate AND @endDate
+      WHERE TC.NgayToChuc BETWEEN ? AND ?
       GROUP BY LS.TenLoai
       ORDER BY revenue DESC
     `;
     
-    const venueResult = await pool.request()
-      .input('startDate', sql.Date, startDate)
-      .input('endDate', sql.Date, endDate)
-      .query(venueQuery);
+    const venueResult = await execute(venueQuery, [startDate, endDate]);
     
     // Get service usage statistics
     const serviceQuery = `
@@ -64,25 +55,19 @@ exports.getMonthlyReport = async (req, res) => {
       FROM TiecCuoi TC
       JOIN Tiec_DichVu TD ON TC.ID_TiecCuoi = TD.ID_TiecCuoi
       JOIN DichVu DV ON TD.ID_DichVu = DV.ID_DichVu
-      WHERE TC.NgayToChuc BETWEEN @startDate AND @endDate
+      WHERE TC.NgayToChuc BETWEEN ? AND ?
       GROUP BY DV.TenDichVu
       ORDER BY revenue DESC
     `;
     
-    const serviceResult = await pool.request()
-      .input('startDate', sql.Date, startDate)
-      .input('endDate', sql.Date, endDate)
-      .query(serviceQuery);
+    const serviceResult = await execute(serviceQuery, [startDate, endDate]);
     
     // Extract data from results
-    const stats = result.recordset[0] || {
+    const stats = result[0] || {
       totalWeddings: 0,
       totalRevenue: 0,
       averageRevenue: 0
     };
-    
-    const venueBreakdown = venueResult.recordset;
-    const serviceBreakdown = serviceResult.recordset;
     
     res.status(200).json({
       year: currentYear,
@@ -90,8 +75,8 @@ exports.getMonthlyReport = async (req, res) => {
       totalRevenue: stats.totalRevenue || 0,
       totalWeddings: stats.totalWeddings || 0,
       averageRevenue: stats.averageRevenue || 0,
-      venueBreakdown,
-      serviceBreakdown
+      venueBreakdown: venueResult,
+      serviceBreakdown: serviceResult
     });
   } catch (error) {
     console.error('Error generating monthly report:', error);
@@ -109,9 +94,6 @@ exports.getYearlyReport = async (req, res) => {
     const { year } = req.query;
     const currentYear = parseInt(year) || new Date().getFullYear();
     
-    // Connect to database
-    await pool.connect();
-    
     // Query to get yearly statistics
     const query = `
       SELECT 
@@ -124,12 +106,10 @@ exports.getYearlyReport = async (req, res) => {
         END AS averageRevenue
       FROM TiecCuoi TC
       JOIN HoaDon HD ON TC.ID_TiecCuoi = HD.ID_TiecCuoi
-      WHERE YEAR(TC.NgayToChuc) = @year
+      WHERE YEAR(TC.NgayToChuc) = ?
     `;
     
-    const result = await pool.request()
-      .input('year', sql.Int, currentYear)
-      .query(query);
+    const result = await execute(query, [currentYear]);
     
     // Query to get monthly breakdown for the year
     const monthlyQuery = `
@@ -139,14 +119,12 @@ exports.getYearlyReport = async (req, res) => {
         SUM(HD.TienThanhToan) AS revenue
       FROM TiecCuoi TC
       JOIN HoaDon HD ON TC.ID_TiecCuoi = HD.ID_TiecCuoi
-      WHERE YEAR(TC.NgayToChuc) = @year
+      WHERE YEAR(TC.NgayToChuc) = ?
       GROUP BY MONTH(TC.NgayToChuc)
       ORDER BY month
     `;
     
-    const monthlyResult = await pool.request()
-      .input('year', sql.Int, currentYear)
-      .query(monthlyQuery);
+    const monthlyResult = await execute(monthlyQuery, [currentYear]);
     
     // Get venue type breakdown
     const venueQuery = `
@@ -158,17 +136,15 @@ exports.getYearlyReport = async (req, res) => {
       JOIN HoaDon HD ON TC.ID_TiecCuoi = HD.ID_TiecCuoi
       JOIN SanhTiec ST ON TC.ID_SanhTiec = ST.ID_SanhTiec
       JOIN LoaiSanh LS ON ST.ID_LoaiSanh = LS.ID_LoaiSanh
-      WHERE YEAR(TC.NgayToChuc) = @year
+      WHERE YEAR(TC.NgayToChuc) = ?
       GROUP BY LS.TenLoai
       ORDER BY revenue DESC
     `;
     
-    const venueResult = await pool.request()
-      .input('year', sql.Int, currentYear)
-      .query(venueQuery);
+    const venueResult = await execute(venueQuery, [currentYear]);
     
     // Extract data from results
-    const stats = result.recordset[0] || {
+    const stats = result[0] || {
       totalWeddings: 0,
       totalRevenue: 0,
       averageRevenue: 0
@@ -182,7 +158,7 @@ exports.getYearlyReport = async (req, res) => {
     }));
     
     // Fill in the data from the query
-    monthlyResult.recordset.forEach(record => {
+    monthlyResult.forEach(record => {
       allMonths[record.month - 1] = record;
     });
     
@@ -192,7 +168,7 @@ exports.getYearlyReport = async (req, res) => {
       totalWeddings: stats.totalWeddings || 0,
       averageRevenue: stats.averageRevenue || 0,
       monthlyBreakdown: allMonths,
-      venueBreakdown: venueResult.recordset
+      venueBreakdown: venueResult
     });
   } catch (error) {
     console.error('Error generating yearly report:', error);
@@ -210,9 +186,6 @@ exports.getRevenueTrend = async (req, res) => {
     const { months } = req.query;
     const numberOfMonths = parseInt(months) || 6; // Default to 6 months if not specified
     
-    // Connect to database
-    await pool.connect();
-    
     // Calculate the date range (current month and past N months)
     const currentDate = new Date();
     const endDate = endOfMonth(currentDate);
@@ -227,15 +200,12 @@ exports.getRevenueTrend = async (req, res) => {
         SUM(HD.TienThanhToan) AS revenue
       FROM TiecCuoi TC
       JOIN HoaDon HD ON TC.ID_TiecCuoi = HD.ID_TiecCuoi
-      WHERE TC.NgayToChuc BETWEEN @startDate AND @endDate
+      WHERE TC.NgayToChuc BETWEEN ? AND ?
       GROUP BY YEAR(TC.NgayToChuc), MONTH(TC.NgayToChuc)
       ORDER BY YEAR(TC.NgayToChuc), MONTH(TC.NgayToChuc)
     `;
     
-    const revenueResult = await pool.request()
-      .input('startDate', sql.Date, startDate)
-      .input('endDate', sql.Date, endDate)
-      .query(revenueQuery);
+    const revenueResult = await execute(revenueQuery, [startDate, endDate]);
     
     // Create array for all requested months with proper labels
     const allMonths = [];
@@ -251,7 +221,7 @@ exports.getRevenueTrend = async (req, res) => {
     }
     
     // Fill in the data from the query
-    revenueResult.recordset.forEach(record => {
+    revenueResult.forEach(record => {
       const index = allMonths.findIndex(
         m => m.year === record.year && m.month === record.month
       );

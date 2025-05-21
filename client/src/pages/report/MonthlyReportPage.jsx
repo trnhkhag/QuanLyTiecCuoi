@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { Form, Row, Col, Card, Button } from 'react-bootstrap';
@@ -30,6 +30,11 @@ const MonthlyReportPage = () => {
     error 
   } = useSelector(state => state.reports);
   
+  const fetchReportData = useCallback(() => {
+    dispatch(fetchMonthlyReport({ year, month }));
+    dispatch(fetchRevenueTrend(6)); // Get 6 months of data
+  }, [year, month, dispatch]);
+  
   useEffect(() => {
     // Redirect to login if not authenticated
     if (!authService.isLoggedIn()) {
@@ -39,12 +44,7 @@ const MonthlyReportPage = () => {
     
     // Fetch report data when year or month changes
     fetchReportData();
-  }, [year, month, dispatch, navigate, fetchReportData]);
-  
-  const fetchReportData = () => {
-    dispatch(fetchMonthlyReport({ year, month }));
-    dispatch(fetchRevenueTrend(6)); // Get 6 months of data
-  };
+  }, [year, month, navigate, fetchReportData]);
   
   // Generate year options for the last 5 years and next year
   const yearOptions = [];

@@ -1,4 +1,4 @@
-const { pool, sql } = require('../config/db');
+const { pool, execute } = require('../config/db');
 
 // Get all invoices with additional details
 exports.getAllInvoices = async (req, res) => {
@@ -9,9 +9,6 @@ exports.getAllInvoices = async (req, res) => {
     const sortBy = req.query.sortBy || 'NgayLap';
     const sortOrder = req.query.sortOrder || 'desc';
     
-    // Connect to database
-    await pool.connect();
-    
     // Calculate offset for pagination
     const offset = (page - 1) * limit;
     
@@ -20,14 +17,13 @@ exports.getAllInvoices = async (req, res) => {
     
     // Build type filter condition if provided
     let typeFilterCondition = '';
-    let typeFilterParams = {};
+    let typeFilterParams = [];
     
     if (invoiceTypes.length > 0) {
       typeFilterCondition = 'AND HD.LoaiHoaDon IN (';
       invoiceTypes.forEach((type, index) => {
-        const paramName = `type${index}`;
-        typeFilterCondition += index === 0 ? `@${paramName}` : `, @${paramName}`;
-        typeFilterParams[paramName] = type;
+        typeFilterCondition += index === 0 ? '?' : ', ?';
+        typeFilterParams.push(type);
       });
       typeFilterCondition += ')';
     }
@@ -38,13 +34,13 @@ exports.getAllInvoices = async (req, res) => {
              TC.NgayToChuc,
              CT.TenCa,
              CASE 
-               WHEN DATEDIFF(day, TC.ThoiDiemDat, GETDATE()) > 0 
-               THEN DATEDIFF(day, TC.ThoiDiemDat, GETDATE()) 
+               WHEN DATEDIFF(CURDATE(), TC.ThoiDiemDat) > 0 
+               THEN DATEDIFF(CURDATE(), TC.ThoiDiemDat) 
                ELSE 0 
              END as SoNgayTreHan,
              CASE 
-               WHEN DATEDIFF(day, TC.ThoiDiemDat, GETDATE()) > 0 
-               THEN HD.TongTien * 0.01 * DATEDIFF(day, TC.ThoiDiemDat, GETDATE()) 
+               WHEN DATEDIFF(CURDATE(), TC.ThoiDiemDat) > 0 
+               THEN HD.TongTien * 0.01 * DATEDIFF(CURDATE(), TC.ThoiDiemDat) 
                ELSE 0 
              END as TienPhat
       FROM HoaDon HD
@@ -56,8 +52,7 @@ exports.getAllInvoices = async (req, res) => {
                 : sortBy === 'NgayToChuc' 
                   ? 'TC.NgayToChuc' 
                   : 'HD.ID_HoaDon'} ${sortOrder === 'desc' ? 'DESC' : 'ASC'}
-      OFFSET ${offset} ROWS
-      FETCH NEXT ${limit} ROWS ONLY
+      LIMIT ${limit} OFFSET ${offset}
     `;
     
     // Get count of total items for pagination metadata
@@ -67,21 +62,15 @@ exports.getAllInvoices = async (req, res) => {
       WHERE 1=1 ${typeFilterCondition}
     `;
     
-    // Create request with type filter parameters if any
-    let request = pool.request();
+    // Execute both queries with parameters
+    const params = [...typeFilterParams];
+    const countParams = [...typeFilterParams];
     
-    // Add type parameters if filtering by invoice types
-    for (const [paramName, paramValue] of Object.entries(typeFilterParams)) {
-      request = request.input(paramName, sql.NVarChar, paramValue);
-    }
-    
-    // Execute both queries
-    const result = await request.query(query);
-    const countResult = await request.query(countQuery);
+    const invoices = await execute(query, params);
+    const countResult = await execute(countQuery, countParams);
     
     // Extract data from results
-    const invoices = result.recordset;
-    const totalItems = countResult.recordset[0].totalCount;
+    const totalItems = countResult[0].totalCount;
     const totalPages = Math.ceil(totalItems / limit);
     
     res.status(200).json({
@@ -118,36 +107,31 @@ exports.getInvoiceById = async (req, res) => {
   try {
     const { id } = req.params;
     
-    // Connect to database
-    await pool.connect();
-    
     // Prepare and execute query with joins to get invoice with related details
     const query = `
       SELECT HD.*,
              TC.NgayToChuc,
              CT.TenCa,
              CASE 
-               WHEN DATEDIFF(day, TC.ThoiDiemDat, GETDATE()) > 0 
-               THEN DATEDIFF(day, TC.ThoiDiemDat, GETDATE()) 
+               WHEN DATEDIFF(CURDATE(), TC.ThoiDiemDat) > 0 
+               THEN DATEDIFF(CURDATE(), TC.ThoiDiemDat) 
                ELSE 0 
              END as SoNgayTreHan,
              CASE 
-               WHEN DATEDIFF(day, TC.ThoiDiemDat, GETDATE()) > 0 
-               THEN HD.TongTien * 0.01 * DATEDIFF(day, TC.ThoiDiemDat, GETDATE()) 
+               WHEN DATEDIFF(CURDATE(), TC.ThoiDiemDat) > 0 
+               THEN HD.TongTien * 0.01 * DATEDIFF(CURDATE(), TC.ThoiDiemDat) 
                ELSE 0 
              END as TienPhat
       FROM HoaDon HD
       LEFT JOIN TiecCuoi TC ON HD.ID_TiecCuoi = TC.ID_TiecCuoi
       LEFT JOIN CaTiec CT ON TC.ID_Ca = CT.ID_Ca
-      WHERE HD.ID_HoaDon = @id
+      WHERE HD.ID_HoaDon = ?
     `;
     
-    const result = await pool.request()
-      .input('id', sql.Int, parseInt(id))
-      .query(query);
+    const result = await execute(query, [parseInt(id)]);
     
     // Check if invoice exists
-    if (result.recordset.length === 0) {
+    if (result.length === 0) {
       return res.status(404).json({
         success: false,
         message: `Invoice with ID ${id} not found`
@@ -156,7 +140,7 @@ exports.getInvoiceById = async (req, res) => {
     
     res.status(200).json({
       success: true,
-      data: result.recordset[0]
+      data: result[0]
     });
   } catch (error) {
     console.error('Error fetching invoice:', error);
@@ -173,59 +157,54 @@ exports.createInvoice = async (req, res) => {
   try {
     const newInvoice = req.body;
     
-    // Connect to database
-    await pool.connect();
-    
     // Prepare and execute query
     const query = `
       INSERT INTO HoaDon (
         ID_TiecCuoi, NgayLap, TongTien, TienThanhToan, LoaiHoaDon, GhiChu
       )
-      OUTPUT INSERTED.*
       VALUES (
-        @ID_TiecCuoi, @NgayLap, @TongTien, @TienThanhToan, @LoaiHoaDon, @GhiChu
+        ?, ?, ?, ?, ?, ?
       )
     `;
     
-    const result = await pool.request()
-      .input('ID_TiecCuoi', sql.Int, newInvoice.ID_TiecCuoi)
-      .input('NgayLap', sql.Date, new Date(newInvoice.NgayLap || new Date()))
-      .input('TongTien', sql.Decimal(18, 2), newInvoice.TongTien)
-      .input('TienThanhToan', sql.Decimal(18, 2), newInvoice.TienThanhToan)
-      .input('LoaiHoaDon', sql.NVarChar(50), newInvoice.LoaiHoaDon)
-      .input('GhiChu', sql.NVarChar(255), newInvoice.GhiChu || null)
-      .query(query);
+    const params = [
+      newInvoice.ID_TiecCuoi,
+      new Date(newInvoice.NgayLap || new Date()),
+      newInvoice.TongTien,
+      newInvoice.TienThanhToan,
+      newInvoice.LoaiHoaDon,
+      newInvoice.GhiChu || null
+    ];
+    
+    const result = await execute(query, params);
     
     // Get the inserted invoice with additional details
-    const insertedInvoice = result.recordset[0];
     const enrichedQuery = `
       SELECT HD.*,
              TC.NgayToChuc,
              CT.TenCa,
              CASE 
-               WHEN DATEDIFF(day, TC.ThoiDiemDat, GETDATE()) > 0 
-               THEN DATEDIFF(day, TC.ThoiDiemDat, GETDATE()) 
+               WHEN DATEDIFF(CURDATE(), TC.ThoiDiemDat) > 0 
+               THEN DATEDIFF(CURDATE(), TC.ThoiDiemDat) 
                ELSE 0 
              END as SoNgayTreHan,
              CASE 
-               WHEN DATEDIFF(day, TC.ThoiDiemDat, GETDATE()) > 0 
-               THEN HD.TongTien * 0.01 * DATEDIFF(day, TC.ThoiDiemDat, GETDATE()) 
+               WHEN DATEDIFF(CURDATE(), TC.ThoiDiemDat) > 0 
+               THEN HD.TongTien * 0.01 * DATEDIFF(CURDATE(), TC.ThoiDiemDat) 
                ELSE 0 
              END as TienPhat
       FROM HoaDon HD
       LEFT JOIN TiecCuoi TC ON HD.ID_TiecCuoi = TC.ID_TiecCuoi
       LEFT JOIN CaTiec CT ON TC.ID_Ca = CT.ID_Ca
-      WHERE HD.ID_HoaDon = @id
+      WHERE HD.ID_HoaDon = ?
     `;
     
-    const enrichedResult = await pool.request()
-      .input('id', sql.Int, insertedInvoice.ID_HoaDon)
-      .query(enrichedQuery);
+    const enrichedResult = await execute(enrichedQuery, [result.insertId]);
     
     res.status(201).json({
       success: true,
       message: 'Invoice created successfully',
-      data: enrichedResult.recordset[0]
+      data: enrichedResult[0]
     });
   } catch (error) {
     console.error('Error creating invoice:', error);
@@ -243,16 +222,11 @@ exports.updateInvoice = async (req, res) => {
     const { id } = req.params;
     const updatedData = req.body;
     
-    // Connect to database
-    await pool.connect();
-    
     // Check if invoice exists
-    const checkQuery = `SELECT COUNT(*) AS count FROM HoaDon WHERE ID_HoaDon = @id`;
-    const checkResult = await pool.request()
-      .input('id', sql.Int, parseInt(id))
-      .query(checkQuery);
+    const checkQuery = `SELECT COUNT(*) AS count FROM HoaDon WHERE ID_HoaDon = ?`;
+    const checkResult = await execute(checkQuery, [parseInt(id)]);
     
-    if (checkResult.recordset[0].count === 0) {
+    if (checkResult[0].count === 0) {
       return res.status(404).json({
         success: false,
         message: `Invoice with ID ${id} not found`
@@ -263,54 +237,54 @@ exports.updateInvoice = async (req, res) => {
     const query = `
       UPDATE HoaDon
       SET
-        NgayLap = @NgayLap,
-        TongTien = @TongTien,
-        LoaiHoaDon = @LoaiHoaDon,
-        ID_TiecCuoi = @ID_TiecCuoi,
-        ID_NguoiDung = @ID_NguoiDung
-      OUTPUT INSERTED.*
-      WHERE ID_HoaDon = @id
+        NgayLap = ?,
+        TongTien = ?,
+        TienThanhToan = ?,
+        LoaiHoaDon = ?,
+        GhiChu = ?,
+        ID_TiecCuoi = ?
+      WHERE ID_HoaDon = ?
     `;
     
-    const result = await pool.request()
-      .input('id', sql.Int, parseInt(id))
-      .input('NgayLap', sql.DateTime, new Date(updatedData.NgayLap))
-      .input('TongTien', sql.Decimal(18, 2), updatedData.TongTien)
-      .input('LoaiHoaDon', sql.NVarChar, updatedData.LoaiHoaDon)
-      .input('ID_TiecCuoi', sql.Int, updatedData.ID_TiecCuoi)
-      .input('ID_NguoiDung', sql.Int, updatedData.ID_NguoiDung)
-      .query(query);
+    const params = [
+      new Date(updatedData.NgayLap),
+      updatedData.TongTien,
+      updatedData.TienThanhToan,
+      updatedData.LoaiHoaDon,
+      updatedData.GhiChu,
+      updatedData.ID_TiecCuoi,
+      parseInt(id)
+    ];
+    
+    await execute(query, params);
     
     // Get the updated invoice with additional details
-    const updatedInvoice = result.recordset[0];
     const enrichedQuery = `
       SELECT HD.*,
              TC.NgayToChuc,
              CT.TenCa,
              CASE 
-               WHEN DATEDIFF(day, TC.ThoiDiemDat, GETDATE()) > 0 
-               THEN DATEDIFF(day, TC.ThoiDiemDat, GETDATE()) 
+               WHEN DATEDIFF(CURDATE(), TC.ThoiDiemDat) > 0 
+               THEN DATEDIFF(CURDATE(), TC.ThoiDiemDat) 
                ELSE 0 
              END as SoNgayTreHan,
              CASE 
-               WHEN DATEDIFF(day, TC.ThoiDiemDat, GETDATE()) > 0 
-               THEN HD.TongTien * 0.01 * DATEDIFF(day, TC.ThoiDiemDat, GETDATE()) 
+               WHEN DATEDIFF(CURDATE(), TC.ThoiDiemDat) > 0 
+               THEN HD.TongTien * 0.01 * DATEDIFF(CURDATE(), TC.ThoiDiemDat) 
                ELSE 0 
              END as TienPhat
       FROM HoaDon HD
       LEFT JOIN TiecCuoi TC ON HD.ID_TiecCuoi = TC.ID_TiecCuoi
       LEFT JOIN CaTiec CT ON TC.ID_Ca = CT.ID_Ca
-      WHERE HD.ID_HoaDon = @id
+      WHERE HD.ID_HoaDon = ?
     `;
     
-    const enrichedResult = await pool.request()
-      .input('id', sql.Int, updatedInvoice.ID_HoaDon)
-      .query(enrichedQuery);
+    const enrichedResult = await execute(enrichedQuery, [parseInt(id)]);
     
     res.status(200).json({
       success: true,
       message: 'Invoice updated successfully',
-      data: enrichedResult.recordset[0]
+      data: enrichedResult[0]
     });
   } catch (error) {
     console.error('Error updating invoice:', error);
@@ -327,16 +301,11 @@ exports.deleteInvoice = async (req, res) => {
   try {
     const { id } = req.params;
     
-    // Connect to database
-    await pool.connect();
-    
     // Check if invoice exists
-    const checkQuery = `SELECT COUNT(*) AS count FROM HoaDon WHERE ID_HoaDon = @id`;
-    const checkResult = await pool.request()
-      .input('id', sql.Int, parseInt(id))
-      .query(checkQuery);
+    const checkQuery = `SELECT COUNT(*) AS count FROM HoaDon WHERE ID_HoaDon = ?`;
+    const checkResult = await execute(checkQuery, [parseInt(id)]);
     
-    if (checkResult.recordset[0].count === 0) {
+    if (checkResult[0].count === 0) {
       return res.status(404).json({
         success: false,
         message: `Invoice with ID ${id} not found`
@@ -344,10 +313,8 @@ exports.deleteInvoice = async (req, res) => {
     }
     
     // Prepare and execute delete query
-    const query = `DELETE FROM HoaDon WHERE ID_HoaDon = @id`;
-    await pool.request()
-      .input('id', sql.Int, parseInt(id))
-      .query(query);
+    const query = `DELETE FROM HoaDon WHERE ID_HoaDon = ?`;
+    await execute(query, [parseInt(id)]);
     
     res.status(200).json({
       success: true,

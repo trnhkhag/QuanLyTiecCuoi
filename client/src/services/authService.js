@@ -1,7 +1,27 @@
 import axios from 'axios';
-import { AUTH_ENDPOINTS } from '../globals/api.global';
 
-const API_URL = AUTH_ENDPOINTS.BASE;
+// Create a dedicated axios instance for auth requests with direct base URL
+const authAxios = axios.create({
+  baseURL: 'http://localhost:3001'
+});
+
+// Debug logging for auth requests
+authAxios.interceptors.request.use(
+  config => {
+    console.log('Auth API Request:', { 
+      url: config.url,
+      method: config.method,
+      data: config.data,
+      baseURL: config.baseURL,
+      fullUrl: config.baseURL + config.url
+    });
+    return config;
+  },
+  error => {
+    console.error('Auth API Request Error:', error);
+    return Promise.reject(error);
+  }
+);
 
 /**
  * Authentication service for handling auth-related API requests
@@ -16,7 +36,14 @@ class AuthService {
    */
   async register(name, email, password) {
     try {
-      const response = await axios.post(`${API_URL}/register`, { name, email, password });
+      console.log('Attempting to register...');
+      
+      // Use authAxios with direct route path
+      const response = await authAxios.post('/api/auth/register', {
+        name,
+        email,
+        password
+      });
       
       if (response.data.token) {
         localStorage.setItem('user', JSON.stringify(response.data));
@@ -26,6 +53,7 @@ class AuthService {
       
       return response.data;
     } catch (error) {
+      console.error('Registration error:', error.response || error);
       throw this._handleError(error);
     }
   }
@@ -38,7 +66,14 @@ class AuthService {
    */
   async login(email, password) {
     try {
-      const response = await axios.post(`${API_URL}/login`, { email, password });
+      console.log('Attempting to login...');
+      console.log('Login payload:', { email, password });
+      
+      // Use authAxios with direct route path
+      const response = await authAxios.post('/api/auth/login', {
+        email,
+        password
+      });
       
       if (response.data.token) {
         localStorage.setItem('user', JSON.stringify(response.data));
@@ -48,6 +83,7 @@ class AuthService {
       
       return response.data;
     } catch (error) {
+      console.error('Login error:', error.response || error);
       throw this._handleError(error);
     }
   }
@@ -109,6 +145,7 @@ const setAuthHeader = () => {
     const user = JSON.parse(userJson);
     if (user && user.token) {
       axios.defaults.headers.common['Authorization'] = `Bearer ${user.token}`;
+      authAxios.defaults.headers.common['Authorization'] = `Bearer ${user.token}`;
     }
   }
 };

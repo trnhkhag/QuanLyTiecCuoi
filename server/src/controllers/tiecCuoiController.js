@@ -1,4 +1,4 @@
-const { pool, sql } = require('../config/db');
+const { pool, execute } = require('../config/db');
 
 // Get all wedding parties
 exports.getAllTiecCuoi = async (req, res) => {
@@ -8,9 +8,6 @@ exports.getAllTiecCuoi = async (req, res) => {
     const limit = parseInt(req.query.limit) || 10;
     const sortBy = req.query.sortBy || 'NgayToChuc';
     const sortOrder = req.query.sortOrder || 'desc';
-    
-    // Connect to database
-    await pool.connect();
     
     // Calculate offset for pagination
     const offset = (page - 1) * limit;
@@ -25,20 +22,18 @@ exports.getAllTiecCuoi = async (req, res) => {
                 : sortBy === 'ThoiDiemDat' 
                   ? 'TC.ThoiDiemDat' 
                   : 'TC.ID_TiecCuoi'} ${sortOrder === 'desc' ? 'DESC' : 'ASC'}
-      OFFSET ${offset} ROWS
-      FETCH NEXT ${limit} ROWS ONLY
+      LIMIT ${limit} OFFSET ${offset}
     `;
     
     // Get count of total items for pagination metadata
     const countQuery = `SELECT COUNT(*) AS totalCount FROM TiecCuoi`;
     
     // Execute both queries
-    const result = await pool.request().query(query);
-    const countResult = await pool.request().query(countQuery);
+    const tiecCuoiList = await execute(query, []);
+    const countResult = await execute(countQuery, []);
     
     // Extract data from results
-    const tiecCuoiList = result.recordset;
-    const totalItems = countResult.recordset[0].totalCount;
+    const totalItems = countResult[0].totalCount;
     const totalPages = Math.ceil(totalItems / limit);
     
     res.status(200).json({
@@ -72,23 +67,18 @@ exports.getTiecCuoiById = async (req, res) => {
   try {
     const { id } = req.params;
     
-    // Connect to database
-    await pool.connect();
-    
     // Prepare and execute query with join to get CaTiec details
     const query = `
       SELECT TC.*, CT.TenCa
       FROM TiecCuoi TC
       LEFT JOIN CaTiec CT ON TC.ID_Ca = CT.ID_Ca
-      WHERE TC.ID_TiecCuoi = @id
+      WHERE TC.ID_TiecCuoi = ?
     `;
     
-    const result = await pool.request()
-      .input('id', sql.Int, parseInt(id))
-      .query(query);
+    const result = await execute(query, [parseInt(id)]);
     
     // Check if wedding party exists
-    if (result.recordset.length === 0) {
+    if (result.length === 0) {
       return res.status(404).json({
         success: false,
         message: `Wedding party with ID ${id} not found`
@@ -97,7 +87,7 @@ exports.getTiecCuoiById = async (req, res) => {
     
     res.status(200).json({
       success: true,
-      data: result.recordset[0]
+      data: result[0]
     });
   } catch (error) {
     console.error('Error fetching wedding party:', error);
@@ -114,36 +104,35 @@ exports.createTiecCuoi = async (req, res) => {
   try {
     const newTiecCuoi = req.body;
     
-    // Connect to database
-    await pool.connect();
-    
     // Prepare and execute query
     const query = `
       INSERT INTO TiecCuoi (
         ID_KhachHang, ID_SanhTiec, NgayToChuc, ID_Ca, 
         ThoiDiemDat, SoLuongBan, SoBanDuTru
       )
-      OUTPUT INSERTED.*
-      VALUES (
-        @ID_KhachHang, @ID_SanhTiec, @NgayToChuc, @ID_Ca, 
-        @ThoiDiemDat, @SoLuongBan, @SoBanDuTru
-      )
+      VALUES (?, ?, ?, ?, ?, ?, ?)
     `;
     
-    const result = await pool.request()
-      .input('ID_KhachHang', sql.Int, newTiecCuoi.ID_KhachHang)
-      .input('ID_SanhTiec', sql.Int, newTiecCuoi.ID_SanhTiec)
-      .input('NgayToChuc', sql.Date, new Date(newTiecCuoi.NgayToChuc))
-      .input('ID_Ca', sql.Int, newTiecCuoi.ID_Ca)
-      .input('ThoiDiemDat', sql.DateTime, new Date(newTiecCuoi.ThoiDiemDat))
-      .input('SoLuongBan', sql.Int, newTiecCuoi.SoLuongBan)
-      .input('SoBanDuTru', sql.Int, newTiecCuoi.SoBanDuTru)
-      .query(query);
+    const params = [
+      newTiecCuoi.ID_KhachHang,
+      newTiecCuoi.ID_SanhTiec,
+      new Date(newTiecCuoi.NgayToChuc),
+      newTiecCuoi.ID_Ca,
+      new Date(newTiecCuoi.ThoiDiemDat),
+      newTiecCuoi.SoLuongBan,
+      newTiecCuoi.SoBanDuTru
+    ];
+    
+    const result = await execute(query, params);
+    
+    // Get the newly created record
+    const newRecordQuery = `SELECT * FROM TiecCuoi WHERE ID_TiecCuoi = ?`;
+    const newRecord = await execute(newRecordQuery, [result.insertId]);
     
     res.status(201).json({
       success: true,
       message: 'Wedding party created successfully',
-      data: result.recordset[0]
+      data: newRecord[0]
     });
   } catch (error) {
     console.error('Error creating wedding party:', error);
@@ -161,16 +150,11 @@ exports.updateTiecCuoi = async (req, res) => {
     const { id } = req.params;
     const updatedData = req.body;
     
-    // Connect to database
-    await pool.connect();
-    
     // Check if wedding party exists
-    const checkQuery = `SELECT COUNT(*) AS count FROM TiecCuoi WHERE ID_TiecCuoi = @id`;
-    const checkResult = await pool.request()
-      .input('id', sql.Int, parseInt(id))
-      .query(checkQuery);
+    const checkQuery = `SELECT COUNT(*) AS count FROM TiecCuoi WHERE ID_TiecCuoi = ?`;
+    const checkResult = await execute(checkQuery, [parseInt(id)]);
     
-    if (checkResult.recordset[0].count === 0) {
+    if (checkResult[0].count === 0) {
       return res.status(404).json({
         success: false,
         message: `Wedding party with ID ${id} not found`
@@ -181,32 +165,37 @@ exports.updateTiecCuoi = async (req, res) => {
     const query = `
       UPDATE TiecCuoi
       SET
-        ID_KhachHang = @ID_KhachHang,
-        ID_SanhTiec = @ID_SanhTiec,
-        NgayToChuc = @NgayToChuc,
-        ID_Ca = @ID_Ca,
-        ThoiDiemDat = @ThoiDiemDat,
-        SoLuongBan = @SoLuongBan,
-        SoBanDuTru = @SoBanDuTru
-      OUTPUT INSERTED.*
-      WHERE ID_TiecCuoi = @id
+        ID_KhachHang = ?,
+        ID_SanhTiec = ?,
+        NgayToChuc = ?,
+        ID_Ca = ?,
+        ThoiDiemDat = ?,
+        SoLuongBan = ?,
+        SoBanDuTru = ?
+      WHERE ID_TiecCuoi = ?
     `;
     
-    const result = await pool.request()
-      .input('id', sql.Int, parseInt(id))
-      .input('ID_KhachHang', sql.Int, updatedData.ID_KhachHang)
-      .input('ID_SanhTiec', sql.Int, updatedData.ID_SanhTiec)
-      .input('NgayToChuc', sql.Date, new Date(updatedData.NgayToChuc))
-      .input('ID_Ca', sql.Int, updatedData.ID_Ca)
-      .input('ThoiDiemDat', sql.DateTime, new Date(updatedData.ThoiDiemDat))
-      .input('SoLuongBan', sql.Int, updatedData.SoLuongBan)
-      .input('SoBanDuTru', sql.Int, updatedData.SoBanDuTru)
-      .query(query);
+    const params = [
+      updatedData.ID_KhachHang,
+      updatedData.ID_SanhTiec,
+      new Date(updatedData.NgayToChuc),
+      updatedData.ID_Ca,
+      new Date(updatedData.ThoiDiemDat),
+      updatedData.SoLuongBan,
+      updatedData.SoBanDuTru,
+      parseInt(id)
+    ];
+    
+    await execute(query, params);
+    
+    // Get the updated record
+    const updatedRecordQuery = `SELECT * FROM TiecCuoi WHERE ID_TiecCuoi = ?`;
+    const updatedRecord = await execute(updatedRecordQuery, [parseInt(id)]);
     
     res.status(200).json({
       success: true,
       message: 'Wedding party updated successfully',
-      data: result.recordset[0]
+      data: updatedRecord[0]
     });
   } catch (error) {
     console.error('Error updating wedding party:', error);
@@ -223,16 +212,11 @@ exports.deleteTiecCuoi = async (req, res) => {
   try {
     const { id } = req.params;
     
-    // Connect to database
-    await pool.connect();
-    
     // Check if wedding party exists
-    const checkQuery = `SELECT COUNT(*) AS count FROM TiecCuoi WHERE ID_TiecCuoi = @id`;
-    const checkResult = await pool.request()
-      .input('id', sql.Int, parseInt(id))
-      .query(checkQuery);
+    const checkQuery = `SELECT COUNT(*) AS count FROM TiecCuoi WHERE ID_TiecCuoi = ?`;
+    const checkResult = await execute(checkQuery, [parseInt(id)]);
     
-    if (checkResult.recordset[0].count === 0) {
+    if (checkResult[0].count === 0) {
       return res.status(404).json({
         success: false,
         message: `Wedding party with ID ${id} not found`
@@ -240,10 +224,8 @@ exports.deleteTiecCuoi = async (req, res) => {
     }
     
     // Prepare and execute delete query
-    const query = `DELETE FROM TiecCuoi WHERE ID_TiecCuoi = @id`;
-    await pool.request()
-      .input('id', sql.Int, parseInt(id))
-      .query(query);
+    const query = `DELETE FROM TiecCuoi WHERE ID_TiecCuoi = ?`;
+    await execute(query, [parseInt(id)]);
     
     res.status(200).json({
       success: true,

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import DashboardNavbar from '../../components/DashboardNavbar';
 import InvoiceDetail from '../../components/invoice/InvoiceDetail';
@@ -13,17 +13,7 @@ const InvoiceInformationPage = () => {
   const [error, setError] = useState(null);
   const navigate = useNavigate();
   
-  useEffect(() => {
-    // If not logged in, redirect to login
-    if (!authService.isLoggedIn()) {
-      navigate('/login');
-      return;
-    }
-    
-    fetchInvoiceDetails();
-  }, [id, navigate, fetchInvoiceDetails]);
-  
-  const fetchInvoiceDetails = async () => {
+  const fetchInvoiceDetails = useCallback(async () => {
     try {
       setLoading(true);
       const response = await invoiceService.getInvoiceById(id);
@@ -52,8 +42,18 @@ const InvoiceInformationPage = () => {
     } finally {
       setLoading(false);
     }
-  };
-
+  }, [id]);
+  
+  useEffect(() => {
+    // If not logged in, redirect to login
+    if (!authService.isLoggedIn()) {
+      navigate('/login');
+      return;
+    }
+    
+    fetchInvoiceDetails();
+  }, [navigate, fetchInvoiceDetails]);
+  
   const handleRetry = () => {
     fetchInvoiceDetails();
   };

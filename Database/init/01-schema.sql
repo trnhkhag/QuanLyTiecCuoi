@@ -126,29 +126,27 @@ CREATE TABLE Tiec_DichVu (
 );
 
 -- Insert sample data
-INSERT INTO CaTiec (ID_Ca, TenCa) VALUES (1, 'Trưa'), (2, 'Tối');
+INSERT INTO CaTiec (ID_Ca, TenCa) VALUES (1, N'Trưa'), (2, N'Tối');
 
 INSERT INTO LoaiSanh (TenLoai, GiaBanToiThieu)
 VALUES ('A', 1000000), ('B', 1100000), ('C', 1200000), ('D', 1400000), ('E', 1600000);
 
 -- Insert roles
 INSERT INTO VaiTro (TenVaiTro, MoTa) 
-VALUES ('administrator', 'Quản trị viên hệ thống'), 
-       ('user', 'Người dùng thông thường');
+VALUES ('administrator', N'Quản trị viên hệ thống'), 
+       ('user', N'Người dùng thông thường');
 
 -- Insert permissions
 INSERT INTO Quyen (Ten_Quyen, MoTa, GiaTri)
 VALUES 
-('view_customers', 'Xem thông tin khách hàng', 1),
-('edit_customers', 'Chỉnh sửa thông tin khách hàng', 2),
-('view_weddings', 'Xem tiệc cưới', 4),
-('create_weddings', 'Tạo tiệc cưới', 8),
-('manage_invoices', 'Quản lý hóa đơn', 16),
-('manage_system', 'Quản lý hệ thống', 32);
+('view_customers', N'Xem thông tin khách hàng', 1),
+('edit_customers', N'Chỉnh sửa thông tin khách hàng', 2),
+('view_weddings', N'Xem tiệc cưới', 4),
+('create_weddings', N'Tạo tiệc cưới', 8),
+('manage_invoices', N'Quản lý hóa đơn', 16),
+('manage_system', N'Quản lý hệ thống', 32);
 
 -- Create admin account
--- trinhhoang@gmail.com: password123
--- trinhhoang2525@gmail.com: password123
 INSERT INTO TaiKhoan (Username, PasswordHash)
 VALUES ('admin@example.com', '$2a$10$gYfELbVDT3m3AbP3R2RQSODTjCFhzBn9i7n3jnGHJm.tFcXfPAU8u'), -- 'admin123' hashed
 ('trinhhoang@gmail.com', '$2a$10$Z..kHQ/9renYhfzEwxUps.t0g23z7lZMrRdY8PASbV4HXpigL83e.'), -- 'password123' hashed
@@ -165,7 +163,7 @@ VALUES (1, 1);  -- Admin account gets admin role
 
 -- Create admin as staff
 INSERT INTO NhanVien (HoTen, ChucVu, ID_TaiKhoan)
-VALUES ('Administrator', 'Quản trị viên', 1);
+VALUES (N'Administrator', N'Quản trị viên', 1);
 
 
 -- Assign 'user' role (ID_VaiTro = 2) to the user accounts

@@ -9,10 +9,10 @@ import reportWebVitals from './reportWebVitals';
 
 // Configure axios defaults (if needed)
 import axios from 'axios';
-import { BASE_API_URL } from './globals/api.global';
+import { API_URL } from './utils/env';
 
 // Set default base URL for axios requests
-axios.defaults.baseURL = BASE_API_URL;
+axios.defaults.baseURL = API_URL;
 
 // Add request interceptor to include auth token
 axios.interceptors.request.use(
