@@ -5,6 +5,10 @@ Hệ thống quản lý tiệc cưới được xây dựng với React, Node.js
 ## Cài đặt và Chạy
 
 Có 2 cách để chạy project:
+### Cách 0: chạy scripts ngay project tổng:
+```bash
+QuanLyTiecCuoi> npm run start
+```
 
 ### Cách 1: Clone từ GitHub và sử dụng Docker Compose
 
@@ -18,6 +22,14 @@ cd QuanLyTiecCuoi
 
 3. Chạy project bằng Docker Compose:
 ```bash
+# Chạy lại từ trước
+docker-compose up
+
+# Build lại thì chạy (thiếu depenency)
+docker-compose down -v; docker-compose build --no-cache ; docker-compose up 
+#hoặc test thử lệnh này xem đc k:
+docker-compose down -v; docker-compose up --build --no-cache
+
 # Build và chạy tất cả services
 docker-compose up -d
 
@@ -83,67 +95,3 @@ docker run -d \
   -e REACT_APP_API_URL=http://localhost:3001/api \
   qltc/qltc-client-dev:latest
 ```
-
-## Các lệnh Docker hữu ích
-
-### Docker Compose
-```bash
-# Xem logs
-docker-compose logs -f
-
-# Dừng tất cả services
-docker-compose down
-
-# Restart một service
-docker-compose restart qltc-server
-
-# Xem trạng thái
-docker-compose ps
-```
-
-### Docker Run
-```bash
-# Xem logs của container
-docker logs -f qltc-server
-
-# Dừng container
-docker stop qltc-server
-
-# Xóa container
-docker rm qltc-server
-
-# Xem trạng thái containers
-docker ps
-```
-
-## Troubleshooting
-
-1. Kiểm tra network:
-```bash
-docker network ls
-docker network inspect qltc-network
-```
-
-2. Kiểm tra volumes:
-```bash
-docker volume ls
-docker volume inspect mysql-data
-```
-
-3. Xem logs chi tiết:
-```bash
-# Với Docker Compose
-docker-compose logs -f
-
-# Với Docker Run
-docker logs -f mysql
-docker logs -f qltc-server
-docker logs -f qltc-client
-```
-
-## Lưu ý
-
-- Đảm bảo ports 3000, 3001, 3306 không bị sử dụng
-- Đảm bảo Docker Desktop đang chạy
-- Đảm bảo có đủ quyền truy cập vào thư mục project
-- Với cách 2, cần đảm bảo thứ tự chạy: MySQL -> Backend -> Frontend
