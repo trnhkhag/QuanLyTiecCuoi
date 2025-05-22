@@ -14,7 +14,7 @@ QuanLyTiecCuoi> npm run start
 
 1. Clone repository:
 ```bash
-git clone https://github.com/your-username/QuanLyTiecCuoi.git
+git clone https://github.com/quanlytieccuoi-team/QuanLyTiecCuoi.git
 cd QuanLyTiecCuoi
 ```
 
