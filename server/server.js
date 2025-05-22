@@ -29,12 +29,12 @@ pool.getConnection()
   });
 
 // Import routes
-const weddingBookingRoutes = require('./DatTiec/weddingBookingRoutes');
-const hallRoutes = require('./DatTiec/hallRoutes');
-const serviceRoutes = require('./DatTiec/serviceRoutes');
-const regulationRoutes = require('./QuyDinh/regulationRoutes');
-const weddingLookupRoutes = require('./TraCuu/WeddingLookupRoutes');
-const hallManagementRoutes = require('./Lobby/hallManagementRoutes');
+const weddingBookingRoutes = require('./routes/weddingBookingRoutes');
+const hallRoutes = require('./routes/hallRoutes');
+const serviceRoutes = require('./routes/serviceRoutes');
+const regulationRoutes = require('./routes/regulationRoutes');
+const weddingLookupRoutes = require('./routes/WeddingLookupRoutes');
+const hallManagementRoutes = require('./routes/hallManagementRoutes');
 // Thêm các routes khác khi cần
 // const hallRoutes = require('./routes/hallRoutes');
 // const foodRoutes = require('./routes/foodRoutes');
