@@ -1,4 +1,9 @@
-﻿CREATE DATABASE IF NOT EXISTS TiecCuoiDB CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+﻿SET NAMES utf8mb4;
+SET CHARACTER SET utf8mb4;
+SET character_set_connection=utf8mb4;
+
+DROP DATABASE IF EXISTS TiecCuoiDB;
+CREATE DATABASE TiecCuoiDB CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 USE TiecCuoiDB;
 
 CREATE TABLE TaiKhoan (

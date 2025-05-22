@@ -34,7 +34,7 @@ const tiecCuoiService = {
   // Get wedding party by ID
   getTiecCuoiById: async (id) => {
     try {
-      const response = await axios.get(`${API_URL}/${id}`);
+      const response = await axios.get(`${API_URL}/v1/${id}`);
       return response.data;
     } catch (error) {
       console.error(`Error fetching wedding party ${id}:`, error);
@@ -56,7 +56,7 @@ const tiecCuoiService = {
   // Update a wedding party
   updateTiecCuoi: async (id, tiecCuoiData) => {
     try {
-      const response = await axios.put(`${API_URL}/${id}`, tiecCuoiData);
+      const response = await axios.put(`${API_URL}/v1/${id}`, tiecCuoiData);
       return response.data;
     } catch (error) {
       console.error(`Error updating wedding party ${id}:`, error);
@@ -67,7 +67,7 @@ const tiecCuoiService = {
   // Delete a wedding party
   deleteTiecCuoi: async (id) => {
     try {
-      const response = await axios.delete(`${API_URL}/${id}`);
+      const response = await axios.delete(`${API_URL}/v1/${id}`);
       return response.data;
     } catch (error) {
       console.error(`Error deleting wedding party ${id}:`, error);

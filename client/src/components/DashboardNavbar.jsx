@@ -1,14 +1,51 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { 
+  faHome,
+  faCalendarAlt,
+  faFileInvoiceDollar,
+  faChartBar,
+  faCog,
+  faUserCircle,
+  faSignOutAlt
+} from '@fortawesome/free-solid-svg-icons';
 import '../styles/navbar.css';
 
 const DashboardNavbar = () => {
   const location = useLocation();
   
-  // Check if the current path matches the given path
   const isActive = (path) => {
-    return location.pathname === path;
+    return location.pathname.startsWith(path);
   };
+
+  const menuItems = [
+    {
+      path: '/dashboard',
+      icon: <FontAwesomeIcon icon={faHome} />,
+      label: 'Tổng quan'
+    },
+    {
+      path: '/booking',
+      icon: <FontAwesomeIcon icon={faCalendarAlt} />,
+      label: 'Đặt tiệc'
+    },
+    {
+      path: '/invoices',
+      icon: <FontAwesomeIcon icon={faFileInvoiceDollar} />,
+      label: 'Hóa đơn'
+    },
+    {
+      path: '/reports',
+      icon: <FontAwesomeIcon icon={faChartBar} />,
+      label: 'Báo cáo'
+    },
+    {
+      path: '/admin',
+      icon: <FontAwesomeIcon icon={faCog} />,
+      label: 'Quản trị'
+    }
+  ];
 
   return (
     <nav className="dashboard-nav">
@@ -17,32 +54,24 @@ const DashboardNavbar = () => {
       </div>
       
       <ul className="nav-links">
-        <li className={isActive('/dashboard') ? 'active' : ''}>
-          <Link to="/dashboard">
-            <i className="fas fa-home"></i>
-            <span>Tổng quan</span>
-          </Link>
-        </li>
-        <li className={isActive('/invoices') ? 'active' : ''}>
-          <Link to="/invoices">
-            <i className="fas fa-file-invoice-dollar"></i>
-            <span>Hóa đơn</span>
-          </Link>
-        </li>
-
-        <li className={isActive('/reports/monthly') ? 'active' : ''}>
-          <Link to="/reports/monthly">
-            <i className="fas fa-chart-bar"></i>
-            <span>Báo cáo tháng</span>
-          </Link>
-        </li>
-        {/* Add more menu items here */}
+        {menuItems.map((item) => (
+          <li key={item.path} className={isActive(item.path) ? 'active' : ''}>
+            <Link to={item.path}>
+              <span className="nav-icon">{item.icon}</span>
+              <span className="nav-label">{item.label}</span>
+            </Link>
+          </li>
+        ))}
       </ul>
       
       <div className="nav-footer">
         <Link to="/profile" className="nav-profile">
-          <i className="fas fa-user-circle"></i>
-          <span>Tài khoản</span>
+          <span className="nav-icon"><FontAwesomeIcon icon={faUserCircle} /></span>
+          <span className="nav-label">Tài khoản</span>
+        </Link>
+        <Link to="/logout" className="nav-logout">
+          <span className="nav-icon"><FontAwesomeIcon icon={faSignOutAlt} /></span>
+          <span className="nav-label">Đăng xuất</span>
         </Link>
       </div>
     </nav>

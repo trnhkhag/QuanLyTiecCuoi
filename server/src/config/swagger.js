@@ -35,6 +35,18 @@ const options = {
       {
         name: 'Report Service',
         description: 'Reporting and analytics operations'
+      },
+      {
+        name: 'Hall Management',
+        description: 'Wedding hall and hall type management'
+      },
+      {
+        name: 'Service Management',
+        description: 'Wedding service management'
+      },
+      {
+        name: 'Regulation Management',
+        description: 'System regulations management'
       }
     ],
     components: {
@@ -122,7 +134,51 @@ const options = {
                 role: {
                   type: 'string',
                   description: 'User role',
-                  example: 'user'
+                  example: 'user',
+                  enum: ['admin', 'manager', 'user']
+                },
+                customerId: {
+                  type: 'integer',
+                  description: 'Customer ID if user is a customer',
+                  example: 1,
+                  nullable: true
+                },
+                employeeId: {
+                  type: 'integer',
+                  description: 'Employee ID if user is an employee',
+                  example: 1,
+                  nullable: true
+                },
+                permissions: {
+                  type: 'array',
+                  description: 'List of user permissions',
+                  items: {
+                    type: 'object',
+                    properties: {
+                      name: {
+                        type: 'string',
+                        description: 'Permission name',
+                        example: 'VIEW_DASHBOARD',
+                        enum: [
+                          'VIEW_DASHBOARD',
+                          'MANAGE_PROFILE',
+                          'VIEW_WEDDINGS',
+                          'CREATE_WEDDING',
+                          'EDIT_WEDDING',
+                          'DELETE_WEDDING',
+                          'VIEW_PAYMENTS',
+                          'MANAGE_PAYMENTS',
+                          'MANAGE_USERS',
+                          'SYSTEM_SETTINGS'
+                        ]
+                      },
+                      value: {
+                        type: 'integer',
+                        description: 'Permission value (bitwise flag)',
+                        example: 1
+                      }
+                    }
+                  }
                 }
               }
             }
@@ -174,48 +230,54 @@ const options = {
         Wedding: {
           type: 'object',
           properties: {
-            id: {
-              type: 'integer',
-              description: 'Wedding ID',
-              example: 1
-            },
-            customerId: {
-              type: 'integer',
-              description: 'Customer ID',
-              example: 1
-            },
-            venueId: {
-              type: 'integer', 
-              description: 'Venue ID',
-              example: 1
-            },
-            date: {
-              type: 'string',
-              format: 'date',
-              description: 'Wedding date',
-              example: '2023-09-15'
-            },
-            shiftId: {
-              type: 'integer',
-              description: 'Shift ID (1: Trưa, 2: Tối)',
-              example: 1
-            },
-            bookingDate: {
-              type: 'string',
-              format: 'date-time',
-              description: 'Booking date and time',
-              example: '2023-08-01T09:30:00'
-            },
-            tables: {
-              type: 'integer',
-              description: 'Number of tables',
-              example: 30
-            },
-            reserveTables: {
-              type: 'integer',
-              description: 'Number of reserve tables',
-              example: 3
-            }
+            id: { type: 'integer' },
+            name: { type: 'string' },
+            date: { type: 'string', format: 'date' },
+            hallId: { type: 'integer' },
+            serviceId: { type: 'integer' },
+            status: { type: 'string' },
+            createdAt: { type: 'string', format: 'date-time' },
+            updatedAt: { type: 'string', format: 'date-time' }
+          }
+        },
+        Hall: {
+          type: 'object',
+          properties: {
+            id: { type: 'integer' },
+            name: { type: 'string' },
+            type: { type: 'string' },
+            capacity: { type: 'integer' },
+            price: { type: 'number' },
+            image: { type: 'string' },
+            status: { type: 'string' }
+          }
+        },
+        HallType: {
+          type: 'object',
+          properties: {
+            id: { type: 'integer' },
+            name: { type: 'string' },
+            description: { type: 'string' }
+          }
+        },
+        Service: {
+          type: 'object',
+          properties: {
+            id: { type: 'integer' },
+            name: { type: 'string' },
+            description: { type: 'string' },
+            price: { type: 'number' },
+            status: { type: 'string' }
+          }
+        },
+        Regulation: {
+          type: 'object',
+          properties: {
+            id: { type: 'integer' },
+            name: { type: 'string' },
+            content: { type: 'string' },
+            type: { type: 'string' },
+            status: { type: 'string' }
           }
         },
         // Report Service Schemas
@@ -257,9 +319,12 @@ const options = {
       }
     }
   },
-  apis: [path.resolve(__dirname, '../routes/*.js')] // Path to the API routes
+  apis: [
+    path.join(__dirname, '../routes/*.js'),
+    path.join(__dirname, '../controllers/*.js')
+  ]
 };
 
-const specs = swaggerJsdoc(options);
+const swaggerSpecs = swaggerJsdoc(options);
 
-module.exports = specs; 
+module.exports = swaggerSpecs; 
