@@ -1,11 +1,13 @@
 const express = require('express');
+const cors = require('cors');
 const app = require('./app');
 const path = require('path');
 require('dotenv').config();
 
 // Set port
 const PORT = process.env.PORT || 3001;
-
+app.use(cors());
+app.use(express.json());
 // Phục vụ static files từ thư mục uploads
 app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 
@@ -48,3 +50,5 @@ app.listen(PORT, () => {
   console.log(`   GET http://localhost:${PORT}/api/v1/wedding-service/lookup`);
   console.log(`   GET http://localhost:${PORT}/api/v1/wedding-service/lobby`);
 }); 
+
+module.exports = app;

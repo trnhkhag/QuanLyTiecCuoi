@@ -13,4 +13,4 @@ EXPOSE 3001
 
 RUN npm install -g nodemon
 
-CMD ["nodemon", "src/index.js"] 
+CMD ["nodemon", "src/server.js"] 

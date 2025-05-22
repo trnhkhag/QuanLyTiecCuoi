@@ -221,7 +221,7 @@ class WeddingBookingController {
         error: error.message 
       });
     }
-
+  }
   /**
    * Cập nhật thông tin đặt tiệc
    * PUT /api/bookings/:id
@@ -271,6 +271,7 @@ class WeddingBookingController {
         error: error.message 
       });
     }
+  }
 
   /**
    * Hủy đặt tiệc
@@ -311,7 +312,7 @@ class WeddingBookingController {
         error: error.message 
       });
     }
-  }
-}
+  }}
+
 
 module.exports = new WeddingBookingController();

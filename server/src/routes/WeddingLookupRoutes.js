@@ -4,14 +4,14 @@ const router = express.Router();
 const weddingLookupController = require('../controllers/WeddingLookupController');
 
 /**
- * @swagger
+//  * @swagger
  * tags:
  *   name: Wedding Lookup
  *   description: Wedding search and lookup functionality
  */
 
 /**
- * @swagger
+//  * @swagger
  * /api/v1/wedding-service/lookup:
  *   get:
  *     summary: Search weddings
@@ -49,10 +49,10 @@ const weddingLookupController = require('../controllers/WeddingLookupController'
  *                   items:
  *                     $ref: '#/components/schemas/Wedding'
  */
-router.get('/', weddingLookupController.searchWeddings);
+router.get('/', weddingLookupController.searchBookings);
 
 /**
- * @swagger
+//  * @swagger
  * /api/v1/wedding-service/lookup/{id}:
  *   get:
  *     summary: Get wedding details
@@ -76,6 +76,6 @@ router.get('/', weddingLookupController.searchWeddings);
  *                 data:
  *                   $ref: '#/components/schemas/Wedding'
  */
-router.get('/:id', weddingLookupController.getWeddingDetails);
+router.get('/:id', weddingLookupController.getBookingDetail);
 
 module.exports = router;

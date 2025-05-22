@@ -129,3 +129,18 @@ CREATE TABLE Tiec_DichVu (
     FOREIGN KEY (ID_TiecCuoi) REFERENCES TiecCuoi(ID_TiecCuoi),
     FOREIGN KEY (ID_DichVu) REFERENCES DichVu(ID_DichVu)
 );
+
+CREATE TABLE MonAn (
+    ID_MonAn INT AUTO_INCREMENT PRIMARY KEY,
+    TenMonAn NVARCHAR(100) NOT NULL,
+    DonGia DECIMAL(18,2) NOT NULL
+);
+
+CREATE TABLE Tiec_MonAn (
+    ID_TiecCuoi INT,
+    ID_MonAn INT,
+    DonGia DECIMAL(18,2) NOT NULL,
+    PRIMARY KEY (ID_TiecCuoi, ID_MonAn),
+    FOREIGN KEY (ID_TiecCuoi) REFERENCES TiecCuoi(ID_TiecCuoi),
+    FOREIGN KEY (ID_MonAn) REFERENCES MonAn(ID_MonAn)
+);

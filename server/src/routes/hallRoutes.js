@@ -8,13 +8,16 @@ router.get('/', hallController.getAllHalls);
 // Get hall by ID
 router.get('/:id', hallController.getHallById);
 
+
+router.get("/check-availability", hallController.checkHallAvailability);
+
 // Create new hall
-router.post('/', hallController.createHall);
+// router.post('/', hallController.createHall);
 
-// Update hall
-router.put('/:id', hallController.updateHall);
+// // Update hall
+// router.put('/:id', hallController.updateHall);
 
-// Delete hall
-router.delete('/:id', hallController.deleteHall);
+// // Delete hall
+// router.delete('/:id', hallController.deleteHall);
 
 module.exports = router;
