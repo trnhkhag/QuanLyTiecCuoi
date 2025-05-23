@@ -8,6 +8,17 @@ exports.getMonthlyReport = async (req, res) => {
     const currentYear = parseInt(year) || new Date().getFullYear();
     const currentMonth = parseInt(month) || new Date().getMonth() + 1;
     
+    // Validate month parameter
+    if (month !== undefined) {
+      const monthNum = parseInt(month);
+      if (isNaN(monthNum) || monthNum < 1 || monthNum > 12) {
+        return res.status(400).json({
+          success: false,
+          message: 'Tháng phải từ 1 đến 12'
+        });
+      }
+    }
+    
     // Create date range for the specified month
     const startDate = startOfMonth(new Date(currentYear, currentMonth - 1));
     const endDate = endOfMonth(new Date(currentYear, currentMonth - 1));
@@ -70,13 +81,16 @@ exports.getMonthlyReport = async (req, res) => {
     };
     
     res.status(200).json({
-      year: currentYear,
-      month: currentMonth,
-      totalRevenue: stats.totalRevenue || 0,
-      totalWeddings: stats.totalWeddings || 0,
-      averageRevenue: stats.averageRevenue || 0,
-      venueBreakdown: venueResult,
-      serviceBreakdown: serviceResult
+      success: true,
+      data: {
+        year: currentYear,
+        month: currentMonth,
+        totalRevenue: stats.totalRevenue || 0,
+        totalWeddings: stats.totalWeddings || 0,
+        averageRevenue: stats.averageRevenue || 0,
+        venueBreakdown: venueResult,
+        serviceBreakdown: serviceResult
+      }
     });
   } catch (error) {
     console.error('Error generating monthly report:', error);
@@ -163,12 +177,15 @@ exports.getYearlyReport = async (req, res) => {
     });
     
     res.status(200).json({
-      year: currentYear,
-      totalRevenue: stats.totalRevenue || 0,
-      totalWeddings: stats.totalWeddings || 0,
-      averageRevenue: stats.averageRevenue || 0,
-      monthlyBreakdown: allMonths,
-      venueBreakdown: venueResult
+      success: true,
+      data: {
+        year: currentYear,
+        totalRevenue: stats.totalRevenue || 0,
+        totalWeddings: stats.totalWeddings || 0,
+        averageRevenue: stats.averageRevenue || 0,
+        monthlyBreakdown: allMonths,
+        venueBreakdown: venueResult
+      }
     });
   } catch (error) {
     console.error('Error generating yearly report:', error);
@@ -184,7 +201,18 @@ exports.getYearlyReport = async (req, res) => {
 exports.getRevenueTrend = async (req, res) => {
   try {
     const { months, month, year } = req.query;
-    const numberOfMonths = parseInt(months) || 6; // Default to 6 months if not specified
+    
+    // Parse and validate numberOfMonths parameter
+    let numberOfMonths = 6; // Default value
+    if (months !== undefined) {
+      numberOfMonths = parseInt(months);
+      if (isNaN(numberOfMonths) || numberOfMonths <= 0) {
+        return res.status(400).json({
+          success: false,
+          message: 'Số tháng phải lớn hơn 0'
+        });
+      }
+    }
     
     // Calculate the date range based on the specified month and year, or use current date
     let currentDate;
@@ -233,23 +261,26 @@ exports.getRevenueTrend = async (req, res) => {
       );
       if (index !== -1) {
         allMonths[index].weddingCount = record.weddingCount;
-        allMonths[index].revenue = record.revenue;
+        allMonths[index].revenue = record.revenue || 0;
       }
     });
     
     // Calculate additional analytics
     const totalRevenue = allMonths.reduce((sum, month) => sum + (month.revenue || 0), 0);
     const totalWeddings = allMonths.reduce((sum, month) => sum + (month.weddingCount || 0), 0);
-    const averageMonthlyRevenue = totalWeddings > 0 ? totalRevenue / numberOfMonths : 0;
+    const averageMonthlyRevenue = numberOfMonths > 0 ? totalRevenue / numberOfMonths : 0;
     
     res.status(200).json({
-      numberOfMonths,
-      startDate: format(startDate, 'yyyy-MM-dd'),
-      endDate: format(endDate, 'yyyy-MM-dd'),
-      totalRevenue,
-      totalWeddings,
-      averageMonthlyRevenue,
-      trend: allMonths
+      success: true,
+      data: {
+        numberOfMonths,
+        startDate: format(startDate, 'yyyy-MM-dd'),
+        endDate: format(endDate, 'yyyy-MM-dd'),
+        totalRevenue,
+        totalWeddings,
+        averageMonthlyRevenue,
+        trend: allMonths
+      }
     });
   } catch (error) {
     console.error('Error generating revenue trend:', error);
