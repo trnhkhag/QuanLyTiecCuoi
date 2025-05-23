@@ -6,40 +6,90 @@ export const BASE_API_URL = API_URL;
 // Debug the base URL
 console.log('API_GLOBAL: Raw API_URL value:', API_URL);
 
-// Auth service endpoints with explicit URLs
+// Helper function to create URL with query parameters
+export const createUrlWithParams = (baseUrl, params = {}) => {
+  const queryParams = new URLSearchParams();
+  Object.entries(params).forEach(([key, value]) => {
+    if (value !== undefined && value !== null) {
+      queryParams.append(key, value);
+    }
+  });
+  return queryParams.toString() ? `${baseUrl}?${queryParams.toString()}` : baseUrl;
+};
+
+// Auth service endpoints
 export const AUTH_ENDPOINTS = {
-  // Legacy paths - explicitly set full URLs
-  BASE: 'http://localhost:3001/api/auth',
-  LOGIN: 'http://localhost:3001/api/auth/login',
-  REGISTER: 'http://localhost:3001/api/auth/register',
-  LOGOUT: 'http://localhost:3001/api/auth/logout',
-  PROFILE: 'http://localhost:3001/api/auth/profile',
-  HEALTH: 'http://localhost:3001/api/auth/health',
-  
-  // Microservice paths (not used by default)
-  MS_BASE: 'http://localhost:3001/api/v1/auth-service',
-  MS_LOGIN: 'http://localhost:3001/api/v1/auth-service/login',
-  MS_REGISTER: 'http://localhost:3001/api/v1/auth-service/register',
-  MS_LOGOUT: 'http://localhost:3001/api/v1/auth-service/logout',
-  MS_PROFILE: 'http://localhost:3001/api/v1/auth-service/profile',
-  MS_HEALTH: 'http://localhost:3001/api/v1/auth-service/health',
+  BASE: `${API_URL}/v1/auth-service`,
+  LOGIN: `${API_URL}/v1/auth-service/login`,
+  HEALTH: `${API_URL}/v1/auth-service/health`
 };
 
-// Wedding service endpoints - removed /api prefix to avoid duplication
+// Wedding service endpoints
 export const WEDDING_ENDPOINTS = {
-  BASE: `${API_URL}/v1/wedding-service/tiec-cuoi`,
-  GET_ALL: `${API_URL}/v1/wedding-service/tiec-cuoi`,
-  GET_BY_ID: (id) => `${API_URL}/v1/wedding-service/tiec-cuoi/${id}`,
-  CREATE: `${API_URL}/v1/wedding-service/tiec-cuoi`,
-  UPDATE: (id) => `${API_URL}/v1/wedding-service/tiec-cuoi/${id}`,
-  DELETE: (id) => `${API_URL}/v1/wedding-service/tiec-cuoi/${id}`,
-  HEALTH: `${API_URL}/v1/wedding-service/health`,
+  BASE: `${API_URL}/v1/wedding-service`,
+  CA_TIEC: {
+    BASE: `${API_URL}/v1/wedding-service/ca-tiec`,
+    GET_ALL: `${API_URL}/v1/wedding-service/ca-tiec`,
+    GET_BY_ID: (id) => `${API_URL}/v1/wedding-service/ca-tiec/${id}`,
+  },  FOOD: {
+    BASE: `${API_URL}/v1/wedding-service/mon-an`,
+    GET_ALL: `${API_URL}/v1/wedding-service/mon-an`,
+    GET_BY_ID: (id) => `${API_URL}/v1/wedding-service/mon-an/${id}`,
+  },
+  BOOKING: {
+    BASE: `${API_URL}/v1/wedding-service/bookings`,
+    GET_ALL: `${API_URL}/v1/wedding-service/bookings`,
+    GET_BY_ID: (id) => `${API_URL}/v1/wedding-service/bookings/${id}`,
+    CREATE: `${API_URL}/v1/wedding-service/bookings`,
+    UPDATE: (id) => `${API_URL}/v1/wedding-service/bookings/${id}`,
+    DELETE: (id) => `${API_URL}/v1/wedding-service/bookings/${id}`
+  },
+  HALL: {
+    BASE: `${API_URL}/v1/wedding-service/lobby/halls`,
+    GET_ALL: `${API_URL}/v1/wedding-service/lobby/halls`,
+    GET_BY_ID: (id) => `${API_URL}/v1/wedding-service/lobby/halls/${id}`,
+    CREATE: `${API_URL}/v1/wedding-service/lobby/halls`,
+    UPDATE: (id) => `${API_URL}/v1/wedding-service/lobby/halls/${id}`,
+    DELETE: (id) => `${API_URL}/v1/wedding-service/lobby/halls/${id}`
+  },
+  HALL_TYPE: {
+    BASE: `${API_URL}/v1/wedding-service/lobby/hall-types`,
+    GET_ALL: `${API_URL}/v1/wedding-service/lobby/hall-types`,
+    CREATE: `${API_URL}/v1/wedding-service/lobby/hall-types`,
+    UPDATE: (id) => `${API_URL}/v1/wedding-service/lobby/hall-types/${id}`,
+    DELETE: (id) => `${API_URL}/v1/wedding-service/lobby/hall-types/${id}`
+  },
+  REGULATION: {
+    BASE: `${API_URL}/v1/wedding-service/regulations`,
+    GET_ALL: `${API_URL}/v1/wedding-service/regulations`,
+    GET_BY_ID: (id) => `${API_URL}/v1/wedding-service/regulations/${id}`,
+    CREATE: `${API_URL}/v1/wedding-service/regulations`,
+    UPDATE: (id) => `${API_URL}/v1/wedding-service/regulations/${id}`,
+    DELETE: (id) => `${API_URL}/v1/wedding-service/regulations/${id}`
+  },
+  SERVICE: {
+    BASE: `${API_URL}/v1/wedding-service/services`,
+    GET_ALL: `${API_URL}/v1/wedding-service/services`,
+    GET_BY_ID: (id) => `${API_URL}/v1/wedding-service/services/${id}`,
+    CREATE: `${API_URL}/v1/wedding-service/services`,
+    UPDATE: (id) => `${API_URL}/v1/wedding-service/services/${id}`,
+    DELETE: (id) => `${API_URL}/v1/wedding-service/services/${id}`
+  },  LOOKUP: {
+    BASE: `${API_URL}/v1/wedding-service/lookup`,
+    SEARCH: `${API_URL}/v1/wedding-service/lookup`,
+    GET_BY_ID: (id) => `${API_URL}/v1/wedding-service/lookup/${id}`,
+    SHIFTS: `${API_URL}/v1/wedding-service/lookup/shifts`,
+    FOODS: `${API_URL}/v1/wedding-service/lookup/foods`
+  }
 };
 
-// Ca Tiec endpoints (part of Wedding service) - removed /api prefix
-export const CA_TIEC_ENDPOINTS = {
-  BASE: `${API_URL}/v1/wedding-service/ca-tiec`,
-  GET_ALL: `${API_URL}/v1/wedding-service/ca-tiec`,
+// Report service endpoints
+export const REPORT_ENDPOINTS = {
+  BASE: `${API_URL}/v1/report-service`,
+  MONTHLY: `${API_URL}/v1/report-service/monthly`,
+  YEARLY: `${API_URL}/v1/report-service/yearly`,
+  REVENUE_TREND: `${API_URL}/v1/report-service/revenue-trend`,
+  HEALTH: `${API_URL}/v1/report-service/health`
 };
 
 // Invoice service endpoints - removed /api prefix
@@ -52,26 +102,3 @@ export const INVOICE_ENDPOINTS = {
   DELETE: (id) => `${API_URL}/v1/invoice-service/${id}`,
   HEALTH: `${API_URL}/v1/invoice-service/health`,
 };
-
-// Report service endpoints - removed /api prefix
-export const REPORT_ENDPOINTS = {
-  BASE: `${API_URL}/v1/report-service`,
-  MONTHLY: `${API_URL}/v1/report-service/monthly`,
-  REVENUE_TREND: `${API_URL}/v1/report-service/revenue-trend`,
-  HEALTH: `${API_URL}/v1/report-service/health`,
-};
-
-// Function to create URL with query parameters
-export const createUrlWithParams = (baseUrl, params = {}) => {
-  const queryParams = new URLSearchParams();
-  
-  Object.entries(params).forEach(([key, value]) => {
-    if (value !== undefined && value !== null) {
-      queryParams.append(key, value);
-    }
-  });
-  
-  return queryParams.toString() 
-    ? `${baseUrl}?${queryParams.toString()}` 
-    : baseUrl;
-}; 

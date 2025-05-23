@@ -7,18 +7,18 @@ const upload = require('../middlewares/uploadMiddleware');
  * @swagger
  * tags:
  *   name: Service Management
- *   description: Wedding service management
+ *   description: Quản lý dịch vụ tiệc cưới
  */
 
 /**
  * @swagger
  * /api/v1/wedding-service/services:
  *   get:
- *     summary: Get all services
+ *     summary: Lấy danh sách tất cả dịch vụ
  *     tags: [Service Management]
  *     responses:
  *       200:
- *         description: List of services
+ *         description: Danh sách dịch vụ
  *         content:
  *           application/json:
  *             schema:
@@ -37,7 +37,7 @@ router.get('/', serviceController.getAllServices);
  * @swagger
  * /api/v1/wedding-service/services/{id}:
  *   get:
- *     summary: Get service by ID
+ *     summary: Lấy thông tin dịch vụ theo ID
  *     tags: [Service Management]
  *     parameters:
  *       - in: path
@@ -45,9 +45,10 @@ router.get('/', serviceController.getAllServices);
  *         required: true
  *         schema:
  *           type: integer
+ *         description: ID của dịch vụ
  *     responses:
  *       200:
- *         description: Service details
+ *         description: Thông tin chi tiết dịch vụ
  *         content:
  *           application/json:
  *             schema:
@@ -64,7 +65,7 @@ router.get('/:id', serviceController.getServiceById);
  * @swagger
  * /api/v1/wedding-service/services:
  *   post:
- *     summary: Create new service
+ *     summary: Tạo dịch vụ mới
  *     tags: [Service Management]
  *     requestBody:
  *       required: true
@@ -75,16 +76,20 @@ router.get('/:id', serviceController.getServiceById);
  *             properties:
  *               name:
  *                 type: string
+ *                 description: Tên dịch vụ
  *               description:
  *                 type: string
+ *                 description: Mô tả dịch vụ
  *               price:
  *                 type: number
+ *                 description: Giá dịch vụ
  *               image:
  *                 type: string
  *                 format: binary
+ *                 description: Hình ảnh dịch vụ
  *     responses:
  *       201:
- *         description: Service created successfully
+ *         description: Tạo dịch vụ thành công
  */
 router.post('/', upload.single('image'), serviceController.createService);
 
@@ -92,7 +97,7 @@ router.post('/', upload.single('image'), serviceController.createService);
  * @swagger
  * /api/v1/wedding-service/services/{id}:
  *   put:
- *     summary: Update service
+ *     summary: Cập nhật thông tin dịch vụ
  *     tags: [Service Management]
  *     parameters:
  *       - in: path
@@ -100,6 +105,7 @@ router.post('/', upload.single('image'), serviceController.createService);
  *         required: true
  *         schema:
  *           type: integer
+ *         description: ID của dịch vụ
  *     requestBody:
  *       required: true
  *       content:
@@ -109,16 +115,20 @@ router.post('/', upload.single('image'), serviceController.createService);
  *             properties:
  *               name:
  *                 type: string
+ *                 description: Tên dịch vụ
  *               description:
  *                 type: string
+ *                 description: Mô tả dịch vụ
  *               price:
  *                 type: number
+ *                 description: Giá dịch vụ
  *               image:
  *                 type: string
  *                 format: binary
+ *                 description: Hình ảnh dịch vụ
  *     responses:
  *       200:
- *         description: Service updated successfully
+ *         description: Cập nhật dịch vụ thành công
  */
 router.put('/:id', upload.single('image'), serviceController.updateService);
 
@@ -126,7 +136,7 @@ router.put('/:id', upload.single('image'), serviceController.updateService);
  * @swagger
  * /api/v1/wedding-service/services/{id}:
  *   delete:
- *     summary: Delete service
+ *     summary: Xóa dịch vụ
  *     tags: [Service Management]
  *     parameters:
  *       - in: path
@@ -134,9 +144,10 @@ router.put('/:id', upload.single('image'), serviceController.updateService);
  *         required: true
  *         schema:
  *           type: integer
+ *         description: ID của dịch vụ
  *     responses:
  *       200:
- *         description: Service deleted successfully
+ *         description: Xóa dịch vụ thành công
  */
 router.delete('/:id', serviceController.deleteService);
 

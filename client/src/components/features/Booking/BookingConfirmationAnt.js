@@ -1,21 +1,46 @@
 import React from 'react';
-import { Card, Row, Col, Statistic } from 'antd';
+import { Card, Row, Col, Statistic, Table } from 'antd';
 import { FormattedPrice } from '../../common/FormattedPrice';
 import Title from 'antd/lib/typography/Title';
 
-const BookingConfirmationAnt = ({ form, selectedHall, totalAmount, shifts }) => {
+const BookingConfirmationAnt = ({ form, selectedHall, totalAmount, shifts, foods = [] }) => {
+  const formValues = form.getFieldsValue(true);
+  
+  // Tính toán chi tiết món ăn đã chọn
+  const foodDetails = [];
+  
+  if (formValues.foods && Object.keys(formValues.foods).length > 0 && foods.length > 0) {
+    Object.entries(formValues.foods).forEach(([foodId, quantity]) => {
+      if (!quantity || quantity <= 0) return;
+      
+      const food = foods.find(f => f.ID_MonAn === parseInt(foodId));
+      if (food) {
+        foodDetails.push({
+          key: `food-${foodId}`,
+          name: food.TenMonAn,
+          quantity: quantity,
+          price: food.DonGia,
+          total: food.DonGia * quantity
+        });
+      }
+    });
+  }
+
   return (
-    <Card bordered={false}>
+    <Card variant="outlined">
       <Title level={4}>Thông tin đơn đặt tiệc</Title>
       
       <Row gutter={[16, 16]}>
-        <Col span={12}>          <Card size="small" title="Thông tin sảnh tiệc">
+        <Col span={12}>
+          <Card size="small" title="Thông tin sảnh tiệc">
             {selectedHall ? (
-              <>
-                <p><strong>Sảnh:</strong> {selectedHall.TenSanh}</p>
+              <>                <p><strong>Sảnh:</strong> {selectedHall.TenSanh}</p>
                 <p><strong>Sức chứa:</strong> {selectedHall.SucChua} khách</p>
-                <p><strong>Giá thuê:</strong> <FormattedPrice amount={selectedHall.GiaThue} /></p>
+                <p><strong>Giá thuê sảnh:</strong> <FormattedPrice amount={selectedHall.GiaThue} /></p>
                 <p><strong>Loại sảnh:</strong> {selectedHall.TenLoai || "Chung"}</p>
+                <p><strong>Giá bàn tối thiểu:</strong> <FormattedPrice amount={selectedHall.GiaBanToiThieu} /> / bàn</p>
+                <p><strong>Số lượng bàn:</strong> {form.getFieldValue('tableCount') || 0} bàn</p>
+                <p><strong>Tổng tiền bàn:</strong> <FormattedPrice amount={(form.getFieldValue('tableCount') || 0) * (selectedHall.GiaBanToiThieu || 0)} /></p>
               </>
             ) : (
               <p>
@@ -38,10 +63,13 @@ const BookingConfirmationAnt = ({ form, selectedHall, totalAmount, shifts }) => 
               }
             </p>
             <p><strong>Số lượng khách:</strong> {form.getFieldValue('guestCount') || 0} người</p>
+            <p><strong>Số lượng bàn đặt:</strong> {form.getFieldValue('tableCount') || 0} bàn</p>
+            <p><strong>Số bàn dự phòng:</strong> {Math.ceil((parseInt(form.getFieldValue('tableCount')) || 1) * 0.1)} bàn</p>
           </Card>
         </Col>
       </Row>
       
+      {/* Phần dịch vụ đã chọn */}
       <Card size="small" title="Dịch vụ đã chọn" style={{ marginTop: 16 }}>
         {form.getFieldValue('services') && Object.keys(form.getFieldValue('services')).length > 0 ? (
           <table style={{ width: '100%' }}>
@@ -72,6 +100,24 @@ const BookingConfirmationAnt = ({ form, selectedHall, totalAmount, shifts }) => 
         )}
       </Card>
       
+      {/* Phần món ăn đã chọn - THÊM MỚI */}
+      {foodDetails.length > 0 && (
+        <Card size="small" title="Món ăn đã chọn" style={{ marginTop: 16 }}>
+          <Table
+            dataSource={foodDetails}
+            columns={[
+              { title: 'Tên món', dataIndex: 'name' },
+              { title: 'Số lượng', dataIndex: 'quantity' },
+              { title: 'Đơn giá', dataIndex: 'price', render: price => <FormattedPrice amount={price} /> },
+              { title: 'Thành tiền', dataIndex: 'total', render: total => <FormattedPrice amount={total} /> }
+            ]}
+            pagination={false}
+            rowKey="key"
+          />
+        </Card>
+      )}
+      
+      {/* Phần tổng kết chi phí */}
       <Card size="small" title="Tổng kết chi phí" style={{ marginTop: 16 }}>
         <Row>
           <Col span={12}>

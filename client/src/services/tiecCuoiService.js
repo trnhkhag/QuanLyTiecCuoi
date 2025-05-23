@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { WEDDING_ENDPOINTS } from '../globals/api.global';
 
-const API_URL = WEDDING_ENDPOINTS.BASE;
+const API_URL = WEDDING_ENDPOINTS.CA_TIEC.BASE;
 
 const tiecCuoiService = {
   // Get all wedding parties with pagination, sorting and filtering
@@ -34,7 +34,7 @@ const tiecCuoiService = {
   // Get wedding party by ID
   getTiecCuoiById: async (id) => {
     try {
-      const response = await axios.get(`${API_URL}/v1/${id}`);
+      const response = await axios.get(`${API_URL}/${id}`);
       return response.data;
     } catch (error) {
       console.error(`Error fetching wedding party ${id}:`, error);
@@ -56,7 +56,7 @@ const tiecCuoiService = {
   // Update a wedding party
   updateTiecCuoi: async (id, tiecCuoiData) => {
     try {
-      const response = await axios.put(`${API_URL}/v1/${id}`, tiecCuoiData);
+      const response = await axios.put(`${API_URL}/${id}`, tiecCuoiData);
       return response.data;
     } catch (error) {
       console.error(`Error updating wedding party ${id}:`, error);

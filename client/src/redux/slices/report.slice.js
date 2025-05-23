@@ -18,9 +18,9 @@ export const fetchMonthlyReport = createAsyncThunk(
 
 export const fetchRevenueTrend = createAsyncThunk(
   'reports/fetchRevenueTrend',
-  async (months = 6, { rejectWithValue }) => {
+  async ({ months = 6, month, year }, { rejectWithValue }) => {
     try {
-      const url = createUrlWithParams(REPORT_ENDPOINTS.REVENUE_TREND, { months });
+      const url = createUrlWithParams(REPORT_ENDPOINTS.REVENUE_TREND, { months, month, year });
       const response = await axios.get(url);
       return response.data;
     } catch (error) {

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Card, Row, Col, Statistic, Typography, Space, Progress, Table, Button } from 'antd';
+import { Card, Row, Col, Statistic, Typography, Space, Progress, Table, Button, Alert } from 'antd';
 import {
   UserOutlined,
   ShopOutlined,
@@ -10,6 +10,7 @@ import {
   ArrowDownOutlined,
   CheckCircleOutlined,
   ClockCircleOutlined,
+  BellOutlined,
 } from '@ant-design/icons';
 import authService from '../../services/authService';
 import '../../styles/dashboard.css';
@@ -20,41 +21,44 @@ const DashboardPage = () => {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
   
-  // Sample data for recent bookings
-  const recentBookings = [
+  // Sample data for upcoming events
+  const upcomingEvents = [
     {
-      id: 'BK-20250512',
-      customerName: 'Nguyễn Văn A',
+      id: 'EV-20250512',
+      eventName: 'Tiệc cưới Nguyễn Văn A',
       hallName: 'Diamond',
       date: '28/05/2025',
+      time: '11:00 - 14:00',
       status: 'Đã xác nhận',
     },
     {
-      id: 'BK-20250511',
-      customerName: 'Trần Thị B',
+      id: 'EV-20250511',
+      eventName: 'Tiệc cưới Trần Thị B',
       hallName: 'Platinum',
       date: '05/06/2025',
+      time: '17:00 - 20:00',
       status: 'Chờ xác nhận',
     },
     {
-      id: 'BK-20250510',
-      customerName: 'Lê Văn C',
+      id: 'EV-20250510',
+      eventName: 'Tiệc cưới Lê Văn C',
       hallName: 'Gold',
       date: '10/06/2025',
+      time: '11:00 - 14:00',
       status: 'Đã thanh toán',
     },
   ];
 
   const columns = [
     {
-      title: 'Mã đơn',
+      title: 'Mã sự kiện',
       dataIndex: 'id',
       key: 'id',
     },
     {
-      title: 'Khách hàng',
-      dataIndex: 'customerName',
-      key: 'customerName',
+      title: 'Tên sự kiện',
+      dataIndex: 'eventName',
+      key: 'eventName',
     },
     {
       title: 'Sảnh',
@@ -65,6 +69,11 @@ const DashboardPage = () => {
       title: 'Ngày',
       dataIndex: 'date',
       key: 'date',
+    },
+    {
+      title: 'Thời gian',
+      dataIndex: 'time',
+      key: 'time',
     },
     {
       title: 'Trạng thái',
@@ -125,28 +134,38 @@ const DashboardPage = () => {
             <Button type="default">Tháng này</Button>
           </Space>
         </div>
+
+        {/* Welcome Message */}
+        <Alert
+          message="Chào mừng đến với hệ thống quản lý tiệc cưới"
+          description="Đây là trang tổng quan hiển thị thông tin chung về hệ thống và các sự kiện sắp tới."
+          type="info"
+          showIcon
+          icon={<BellOutlined />}
+          style={{ marginBottom: '24px' }}
+        />
         
         <Row gutter={[16, 16]}>
           <Col xs={24} sm={12} lg={6}>
             <Card hoverable>
               <Statistic
-                title="Tổng số đơn đặt tiệc"
-                value={125}
+                title="Sự kiện sắp tới"
+                value={3}
                 prefix={<CalendarOutlined style={{ color: '#1890ff' }} />}
                 suffix={
                   <Text type="success" style={{ fontSize: '14px' }}>
-                    <ArrowUpOutlined /> 8%
+                    Trong 30 ngày tới
                   </Text>
                 }
               />
-              <Text type="secondary">So với tháng trước</Text>
+              <Text type="secondary">2 sự kiện đã xác nhận</Text>
             </Card>
           </Col>
           <Col xs={24} sm={12} lg={6}>
             <Card hoverable>
               <Statistic
-                title="Số sảnh cưới"
-                value={15}
+                title="Sảnh cưới"
+                value={4}
                 prefix={<ShopOutlined style={{ color: '#722ed1' }} />}
                 suffix={
                   <Text style={{ fontSize: '14px' }}>
@@ -154,50 +173,47 @@ const DashboardPage = () => {
                   </Text>
                 }
               />
-              <Text type="secondary">3 sảnh đang bảo trì</Text>
+              <Text type="secondary">Tất cả sảnh đều sẵn sàng</Text>
             </Card>
           </Col>
           <Col xs={24} sm={12} lg={6}>
             <Card hoverable>
               <Statistic
-                title="Doanh thu tháng"
-                value={25000000}
-                prefix={<DollarOutlined style={{ color: '#52c41a' }} />}
-                suffix={
-                  <>
-                    đ
-                    <Text type="success" style={{ fontSize: '14px', marginLeft: '8px' }}>
-                      <ArrowUpOutlined /> 12%
-                    </Text>
-                  </>
-                }
-              />
-              <Text type="secondary">So với tháng trước</Text>
-            </Card>
-          </Col>
-          <Col xs={24} sm={12} lg={6}>
-            <Card hoverable>
-              <Statistic
-                title="Khách hàng mới"
+                title="Dịch vụ"
                 value={8}
-                prefix={<UserOutlined style={{ color: '#fa8c16' }} />}
+                prefix={<ShopOutlined style={{ color: '#13c2c2' }} />}
                 suffix={
-                  <Text type="success" style={{ fontSize: '14px' }}>
-                    <ArrowUpOutlined /> 5%
+                  <Text style={{ fontSize: '14px' }}>
+                    Đang cung cấp
                   </Text>
                 }
               />
-              <Text type="secondary">Trong tháng này</Text>
+              <Text type="secondary">3 dịch vụ mới thêm</Text>
+            </Card>
+          </Col>
+          <Col xs={24} sm={12} lg={6}>
+            <Card hoverable>
+              <Statistic
+                title="Quy định"
+                value={5}
+                prefix={<CheckCircleOutlined style={{ color: '#52c41a' }} />}
+                suffix={
+                  <Text style={{ fontSize: '14px' }}>
+                    Đang áp dụng
+                  </Text>
+                }
+              />
+              <Text type="secondary">Cập nhật mới nhất: 15/05/2025</Text>
             </Card>
           </Col>
         </Row>
 
         <Row gutter={[16, 16]} style={{ marginTop: '24px' }}>
           <Col xs={24} lg={16}>
-            <Card title="Đơn đặt tiệc gần đây" extra={<Button type="link">Xem tất cả</Button>}>
+            <Card title="Sự kiện sắp tới" extra={<Button type="link">Xem tất cả</Button>}>
               <Table 
                 columns={columns} 
-                dataSource={recentBookings}
+                dataSource={upcomingEvents}
                 rowKey="id"
                 pagination={false}
                 size="middle"
@@ -205,35 +221,28 @@ const DashboardPage = () => {
             </Card>
           </Col>
           <Col xs={24} lg={8}>
-            <Card title="Hiệu suất sảnh cưới" extra={<Button type="link">Chi tiết</Button>}>
+            <Card title="Thông tin chung" extra={<Button type="link">Chi tiết</Button>}>
               <Space direction="vertical" style={{ width: '100%' }} size="middle">
                 <div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                    <Text>Diamond</Text>
-                    <Text>90%</Text>
-                  </div>
-                  <Progress percent={90} status="active" showInfo={false} />
+                  <Text strong>Giờ làm việc:</Text>
+                  <br />
+                  <Text>Thứ 2 - Thứ 6: 8:00 - 17:00</Text>
+                  <br />
+                  <Text>Thứ 7: 8:00 - 12:00</Text>
                 </div>
                 <div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                    <Text>Platinum</Text>
-                    <Text>75%</Text>
-                  </div>
-                  <Progress percent={75} status="active" showInfo={false} />
+                  <Text strong>Liên hệ hỗ trợ:</Text>
+                  <br />
+                  <Text>Hotline: 1900 1234</Text>
+                  <br />
+                  <Text>Email: support@wedding.com</Text>
                 </div>
                 <div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                    <Text>Gold</Text>
-                    <Text>60%</Text>
-                  </div>
-                  <Progress percent={60} status="active" showInfo={false} />
-                </div>
-                <div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                    <Text>Silver</Text>
-                    <Text>45%</Text>
-                  </div>
-                  <Progress percent={45} status="active" showInfo={false} />
+                  <Text strong>Địa chỉ:</Text>
+                  <br />
+                  <Text>123 Đường ABC, Quận XYZ</Text>
+                  <br />
+                  <Text>TP. Hồ Chí Minh</Text>
                 </div>
               </Space>
             </Card>

@@ -101,11 +101,10 @@ function BookingSuccessPage() {
       <div style={{ maxWidth: 800, margin: '0 auto' }}>
         <Result
           status="success"
-          title="Đặt tiệc thành công!"
+          title="Đặt tiệc thành công!"          
           subTitle={
-            <div>
-              <Paragraph>
-                Mã đơn đặt tiệc của bạn là: <strong>{bookingData.bookingId}</strong>
+            <div>              <Paragraph>
+                Mã đơn đặt tiệc của bạn là: <strong>{bookingData.ID_TiecCuoi || bookingData.bookingId || bookingData.id || 'Đang xử lý'}</strong>
               </Paragraph>
               <Paragraph>
                 Vui lòng lưu lại mã đơn này để tra cứu thông tin tiệc cưới của bạn sau này.
@@ -133,10 +132,9 @@ function BookingSuccessPage() {
 
         <Card style={{ marginTop: 24 }} bordered={false}>
           <Title level={4}>Thông tin đặt tiệc</Title>
-          
-          <Descriptions column={1} bordered style={{ marginTop: 16 }}>
+            <Descriptions column={1} bordered style={{ marginTop: 16 }}>            
             <Descriptions.Item label="Mã đơn đặt tiệc">
-              {bookingData.bookingId}
+              {bookingData.ID_TiecCuoi}
             </Descriptions.Item>
             <Descriptions.Item label="Tên khách hàng">
               {bookingData.customerName}
@@ -149,18 +147,23 @@ function BookingSuccessPage() {
             </Descriptions.Item>
             <Descriptions.Item label="Địa chỉ">
               {bookingData.address}
-            </Descriptions.Item>            <Descriptions.Item label="Ngày tổ chức">
-              {bookingData.weddingDate ? bookingData.weddingDate : 'Không có thông tin'}
+            </Descriptions.Item>            
+            <Descriptions.Item label="Ngày tổ chức">
+              {bookingData.weddingDate}
             </Descriptions.Item>
             <Descriptions.Item label="Ca tiệc">
-              {bookingData.shiftName || 'Không có thông tin'}
+              {bookingData.shiftName}
             </Descriptions.Item>
             <Descriptions.Item label="Sảnh tiệc">
-              {bookingData.hallName || 'Không có thông tin'}
+              {bookingData.hallName}
             </Descriptions.Item>
             <Descriptions.Item label="Số lượng khách">
-              {bookingData.numberOfGuests || bookingData.guestCount || 0} khách
-            </Descriptions.Item>            <Descriptions.Item label="Tổng tiền">
+              {bookingData.numberOfGuests} khách
+            </Descriptions.Item>            
+            <Descriptions.Item label="Số lượng bàn đặt">
+              {bookingData.tableCount || Math.ceil((parseInt(bookingData.numberOfGuests || bookingData.guestCount || 10)) / 10)} bàn
+            </Descriptions.Item>
+            <Descriptions.Item label="Tổng tiền">
               <FormattedPrice amount={bookingData.totalAmount} />
             </Descriptions.Item>
             <Descriptions.Item label="Tiền đặt cọc (50%)">
@@ -168,6 +171,7 @@ function BookingSuccessPage() {
             </Descriptions.Item>
           </Descriptions>
           
+          {/* Hiển thị dịch vụ đã chọn */}
           {bookingData.services && Object.keys(bookingData.services).length > 0 && (
             <>
               <Title level={4} style={{ marginTop: 24 }}>
@@ -199,6 +203,48 @@ function BookingSuccessPage() {
               </table>
             </>
           )}
+
+          {bookingData.foods && Object.keys(bookingData.foods).length > 0 && (
+            <>
+              <Title level={4} style={{ marginTop: 24 }}>
+                Món ăn đã chọn
+              </Title>
+              <table style={{ width: '100%', marginTop: 16, borderCollapse: 'collapse' }}>
+                <thead>
+                  <tr style={{ borderBottom: '1px solid #f0f0f0' }}>
+                    <th style={{ padding: '8px', textAlign: 'left' }}>Tên món</th>
+                    <th style={{ padding: '8px', textAlign: 'center' }}>Số lượng</th>
+                    <th style={{ padding: '8px', textAlign: 'right' }}>Đơn giá</th>
+                    <th style={{ padding: '8px', textAlign: 'right' }}>Thành tiền</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {Object.entries(bookingData.foods).map(([foodId, quantity]) => {
+                    const foodDetail = bookingData.foodsData?.find(f => f.ID_MonAn.toString() === foodId.toString());
+                    return (
+                      <tr key={foodId} style={{ borderBottom: '1px solid #f0f0f0' }}>
+                        <td style={{ padding: '8px' }}>
+                          {foodDetail?.TenMonAn || `Món ăn #${foodId}`}
+                        </td>
+                        <td style={{ padding: '8px', textAlign: 'center' }}>{quantity}</td>
+                        <td style={{ padding: '8px', textAlign: 'right' }}>
+                          <FormattedPrice amount={foodDetail?.DonGia || 0} />
+                        </td>
+                        <td style={{ padding: '8px', textAlign: 'right' }}>
+                          <FormattedPrice amount={(foodDetail?.DonGia || 0) * quantity} />
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </>
+          )}          {/* Thêm debug info để kiểm tra dữ liệu */}
+          {console.log("Booking Data:", bookingData)}
+          {console.log("ID_TiecCuoi:", bookingData.ID_TiecCuoi)}
+          {console.log("tableCount:", bookingData.tableCount)}
+          {console.log("Foods data:", bookingData.foods)}
+          {console.log("Foods details:", bookingData.foodsData)}
 
           <Title level={4} style={{ marginTop: 24 }}>
             Các bước tiếp theo

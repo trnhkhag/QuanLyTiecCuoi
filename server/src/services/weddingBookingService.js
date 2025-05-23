@@ -1,4 +1,4 @@
-const pool = require('../config/db');
+const { pool } = require('../config/db');
 
 class WeddingBookingService {
   /**
@@ -97,11 +97,13 @@ class WeddingBookingService {
         formattedDate = bookingData.weddingDate;
       }
       
-      let bookingId;      try {        const [result] = await connection.query(
-          `INSERT INTO tiecCuoi (
+      let bookingId;      
+      try {        
+        const [result] = await connection.query(
+          `INSERT INTO TiecCuoi (
             ID_KhachHang, ID_SanhTiec, NgayToChuc, ID_Ca, 
             ThoiDiemDat, SoLuongBan, SoBanDuTru, TrangThai
-          ) VALUES (?, ?, ?, ?, NOW(), ?, ?, ?)`,
+          ) VALUES (?, ?, ?, ?, NOW(), ?, ?, "Chưa thanh toán còn lại")`,
           [
             bookingData.customerId,
             bookingData.hallId,
@@ -109,7 +111,6 @@ class WeddingBookingService {
             bookingData.shiftId,
             bookingData.tableCount || 0,
             bookingData.reserveTableCount || 0,
-            'Đã đặt' // Set default status as "Booked"
           ]
         );
         
@@ -152,15 +153,115 @@ class WeddingBookingService {
             console.error('Error inserting service:', serviceError);
           }
         }
+      }      // Thêm mới: Xử lý thêm món ăn
+      if (bookingData.foods && Array.isArray(bookingData.foods) && bookingData.foods.length > 0) {
+        console.log('Adding foods array:', bookingData.foods);
+        
+        for (const foodItem of bookingData.foods) {
+          try {
+            const foodId = foodItem.id || foodItem.foodId;
+            const quantity = parseInt(foodItem.quantity) || 0;
+            
+            if (!foodId || quantity <= 0) {
+              console.error('Invalid food data, skipping:', foodItem);
+              continue;
+            }
+            
+            console.log(`Adding food: ID=${foodId}, quantity=${quantity}`);
+            
+            // Get food price if not provided
+            let price = parseFloat(foodItem.price) || 0;
+            if (!price) {
+              const [foodResult] = await connection.query(
+                'SELECT DonGia FROM MonAn WHERE ID_MonAn = ?',
+                [foodId]
+              );
+              
+              if (!foodResult || foodResult.length === 0) {
+                console.warn(`Food with ID ${foodId} not found, skipping`);
+                continue;
+              }
+              
+              price = parseFloat(foodResult[0].DonGia) || 0;
+            }
+            
+            // Add food to Tiec_MonAn table
+            await connection.query(
+              `INSERT INTO Tiec_MonAn (ID_TiecCuoi, ID_MonAn, SoLuong, DonGia) 
+               VALUES (?, ?, ?, ?)`,
+              [
+                bookingId,
+                foodId,
+                quantity,
+                price
+              ]
+            );
+            console.log(`Food added successfully: ID=${foodId}, quantity=${quantity}, price=${price}`);
+          } catch (foodError) {
+            console.error('Error inserting food:', foodError);
+          }
+        }
       }
-        // Get hall price
+      // Backward compatibility: Handle foods as object format
+      else if (bookingData.foods && typeof bookingData.foods === 'object' && Object.keys(bookingData.foods).length > 0) {
+        console.log('Adding foods object:', bookingData.foods);
+        
+        for (const [foodId, quantity] of Object.entries(bookingData.foods)) {
+          try {
+            if (!foodId || !quantity || quantity <= 0) {
+              console.error('Invalid food data, skipping:', { foodId, quantity });
+              continue;
+            }
+            
+            console.log(`Adding food: ID=${foodId}, quantity=${quantity}`);
+            
+            // Lấy đơn giá của món ăn
+            const [foodResult] = await connection.query(
+              'SELECT DonGia FROM MonAn WHERE ID_MonAn = ?',
+              [foodId]
+            );
+            
+            if (!foodResult || foodResult.length === 0) {
+              console.warn(`Food with ID ${foodId} not found, skipping`);
+              continue;
+            }
+            
+            const price = parseFloat(foodResult[0].DonGia) || 0;
+            
+            // Thêm món ăn vào bảng Tiec_MonAn
+            await connection.query(
+              `INSERT INTO Tiec_MonAn (ID_TiecCuoi, ID_MonAn, SoLuong, DonGia) 
+               VALUES (?, ?, ?, ?)`,
+              [
+                bookingId,
+                foodId,
+                quantity,
+                price
+              ]
+            );
+            console.log(`Food added successfully: ID=${foodId}, quantity=${quantity}, price=${price}`);
+          } catch (foodError) {
+            console.error('Error inserting food:', foodError);
+          }
+        }
+      }        // Get hall price and table minimum price
       const [hallResult] = await connection.query(
-        'SELECT GiaThue FROM SanhTiec WHERE ID_SanhTiec = ?',
+        `SELECT s.GiaThue, l.GiaBanToiThieu 
+         FROM SanhTiec s
+         JOIN LoaiSanh l ON s.ID_LoaiSanh = l.ID_LoaiSanh
+         WHERE s.ID_SanhTiec = ?`,
         [bookingData.hallId]
       );
       
       const hallPrice = hallResult[0] ? hallResult[0].GiaThue : 0;
+      const tableMinPrice = hallResult[0] ? hallResult[0].GiaBanToiThieu : 0;
+      const tableCount = bookingData.tableCount || 0;
+      const tableTotal = tableMinPrice * tableCount;
+      
       console.log('Hall price:', hallPrice);
+      console.log('Table minimum price:', tableMinPrice);
+      console.log('Table count:', tableCount);
+      console.log('Table total price:', tableTotal);
         // Calculate services total
       let servicesTotal = 0;
       if (bookingData.services && bookingData.services.length > 0) {
@@ -192,17 +293,78 @@ class WeddingBookingService {
         }
       }
       console.log('Services total calculated:', servicesTotal);
-        // Convert to numbers and add to ensure proper numeric addition
+        // Thêm mới: Tính tổng tiền món ăn
+      let foodsTotal = 0;
+      
+      // Xử lý trường hợp foods là mảng (định dạng mới)
+      if (bookingData.foods && Array.isArray(bookingData.foods) && bookingData.foods.length > 0) {
+        try {
+          for (const foodItem of bookingData.foods) {
+            const foodId = foodItem.id || foodItem.foodId;
+            const quantity = parseInt(foodItem.quantity) || 0;
+            
+            if (!foodId || quantity <= 0) continue;
+            
+            console.log(`Getting price for food ID: ${foodId}`);
+            // Nếu đã có giá trong dữ liệu thì dùng luôn
+            let foodPrice = parseFloat(foodItem.price) || 0;
+            
+            // Nếu không có giá thì query từ DB
+            if (!foodPrice) {
+              const [foodResult] = await connection.query(
+                'SELECT DonGia FROM MonAn WHERE ID_MonAn = ?',
+                [foodId]
+              );
+              foodPrice = foodResult[0] ? foodResult[0].DonGia : 0;
+            }
+            
+            const foodTotal = foodPrice * quantity;
+            console.log(`Food ${foodId}: Price=${foodPrice}, Quantity=${quantity}, Total=${foodTotal}`);
+            foodsTotal += foodTotal;
+          }
+        } catch (calcError) {
+          console.error('Error calculating foods total (array format):', calcError);
+        }
+      } 
+      // Xử lý trường hợp foods là object (định dạng cũ)
+      else if (bookingData.foods && typeof bookingData.foods === 'object' && Object.keys(bookingData.foods).length > 0) {
+        try {
+          for (const [foodId, quantity] of Object.entries(bookingData.foods)) {
+            if (!foodId || !quantity || quantity <= 0) continue;
+            
+            console.log(`Getting price for food ID: ${foodId}`);
+            const [foodResult] = await connection.query(
+              'SELECT DonGia FROM MonAn WHERE ID_MonAn = ?',
+              [foodId]
+            );
+            
+            const foodPrice = foodResult[0] ? foodResult[0].DonGia : 0;
+            const foodTotal = foodPrice * quantity;
+            
+            console.log(`Food ${foodId}: Price=${foodPrice}, Quantity=${quantity}, Total=${foodTotal}`);
+            foodsTotal += foodTotal;
+          }
+        } catch (calcError) {
+          console.error('Error calculating foods total (object format):', calcError);
+        }
+      }
+      
+      console.log('Foods total calculated:', foodsTotal);
+          // Convert to numbers and add to ensure proper numeric addition
       const hallPriceNum = parseFloat(hallPrice) || 0;
+      const tableTotalNum = parseFloat(tableTotal) || 0;
       const servicesTotalNum = parseFloat(servicesTotal) || 0;
-      const totalAmount = hallPriceNum + servicesTotalNum;
+      const foodsTotalNum = parseFloat(foodsTotal) || 0;
+      const totalAmount = hallPriceNum + tableTotalNum + servicesTotalNum + foodsTotalNum;
       
       // Use provided deposit or calculate 50% of total
       const depositAmount = bookingData.deposit ? parseInt(bookingData.deposit) : Math.round(totalAmount * 0.5);
       
       console.log('Final calculation:');
       console.log('- Hall price:', hallPriceNum);
+      console.log('- Table total:', tableTotalNum);
       console.log('- Services total:', servicesTotalNum);
+      console.log('- Foods total:', foodsTotalNum);
       console.log('- Total amount:', totalAmount);
       console.log('- Deposit amount:', depositAmount);
         // 3. Tạo hóa đơn đặt cọc
@@ -320,6 +482,17 @@ class WeddingBookingService {
       
       booking.services = serviceRows;
       
+      // Thêm mới: Lấy thông tin món ăn
+      const [foodRows] = await pool.query(
+        `SELECT tm.*, m.TenMonAn
+         FROM Tiec_MonAn tm
+         JOIN MonAn m ON tm.ID_MonAn = m.ID_MonAn
+         WHERE tm.ID_TiecCuoi = ?`,
+        [bookingId]
+      );
+      
+      booking.foods = foodRows;
+      
       return booking;
     } catch (error) {
       throw error;
@@ -349,6 +522,12 @@ class WeddingBookingService {
         [bookingId]
       );
       
+      // Thêm mới: Xóa món ăn cũ
+      await connection.query(
+        `DELETE FROM Tiec_MonAn WHERE ID_TiecCuoi = ?`,
+        [bookingId]
+      );
+      
       // 3. Thêm dịch vụ mới
       if (updateData.services && updateData.services.length > 0) {
         const serviceValues = updateData.services.map(service => [
@@ -363,6 +542,32 @@ class WeddingBookingService {
            VALUES ?`,
           [serviceValues]
         );
+      }
+      
+      // Thêm mới: Thêm món ăn mới
+      if (updateData.foods && Object.keys(updateData.foods).length > 0) {
+        for (const [foodId, quantity] of Object.entries(updateData.foods)) {
+          try {
+            if (!foodId || !quantity || quantity <= 0) continue;
+            
+            const [foodResult] = await connection.query(
+              'SELECT DonGia FROM MonAn WHERE ID_MonAn = ?',
+              [foodId]
+            );
+            
+            if (!foodResult || foodResult.length === 0) continue;
+            
+            const price = parseFloat(foodResult[0].DonGia) || 0;
+            
+            await connection.query(
+              `INSERT INTO Tiec_MonAn (ID_TiecCuoi, ID_MonAn, SoLuong, DonGia) 
+               VALUES (?, ?, ?, ?)`,
+              [bookingId, foodId, quantity, price]
+            );
+          } catch (foodError) {
+            console.error('Error inserting updated food:', foodError);
+          }
+        }
       }
       
       await connection.commit();

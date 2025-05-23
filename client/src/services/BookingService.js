@@ -1,6 +1,5 @@
 import axios from 'axios';
-
-const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:3001/api';
+import { WEDDING_ENDPOINTS } from '../globals/api.global';
 
 /**
  * Service class để tương tác với API liên quan đến đặt tiệc cưới
@@ -12,7 +11,7 @@ class BookingService {
    * @returns {Promise} - Promise that resolves to the API response
    */
   getAllBookings(filters = {}) {
-    let url = `${API_URL}/bookings`;
+    let url = WEDDING_ENDPOINTS.BOOKING.GET_ALL;
     const params = new URLSearchParams();
     
     if (filters.date) {
@@ -49,7 +48,7 @@ class BookingService {
    * @returns {Promise} - Promise that resolves to the API response
    */
   getBookingById(id) {
-    return axios.get(`${API_URL}/bookings/${id}`)
+    return axios.get(WEDDING_ENDPOINTS.BOOKING.GET_BY_ID(id))
       .then(response => {
         if (response.data && response.data.success) {
           return response.data;
@@ -96,7 +95,7 @@ class BookingService {
     
     // Use Promise.race to implement a timeout
     return Promise.race([
-      axios.post(`${API_URL}/bookings`, bookingData, {
+      axios.post(WEDDING_ENDPOINTS.BOOKING.CREATE, bookingData, {
         headers: {
           'Content-Type': 'application/json'
         }
@@ -190,7 +189,7 @@ class BookingService {
    * @returns {Promise} - Promise that resolves to the API response
    */
   updateBooking(id, updateData) {
-    return axios.put(`${API_URL}/bookings/${id}`, updateData)
+    return axios.put(`${WEDDING_ENDPOINTS.BOOKING.UPDATE}/${id}`, updateData)
       .then(response => {
         if (response.data && response.data.success) {
           return response.data;
@@ -206,7 +205,7 @@ class BookingService {
    * @returns {Promise} - Promise that resolves to the API response
    */
   cancelBooking(id, reason) {
-    return axios.delete(`${API_URL}/bookings/${id}`, { data: { reason } })
+    return axios.delete(`${WEDDING_ENDPOINTS.BOOKING.CANCEL}/${id}`, { data: { reason } })
       .then(response => {
         if (response.data && response.data.success) {
           return response.data;
@@ -222,7 +221,7 @@ class BookingService {
    * @returns {Promise} - Promise that resolves to the API response
    */
   updateBookingStatus(id, status) {
-    return axios.patch(`${API_URL}/bookings/${id}/status`, { status })
+    return axios.patch(`${WEDDING_ENDPOINTS.BOOKING.UPDATE_STATUS}/${id}`, { status })
       .then(response => {
         if (response.data && response.data.success) {
           return response.data;

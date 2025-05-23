@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { Form, Button, Steps, message, Typography, Spin, Alert, Input } from 'antd';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import moment from 'moment';
-import { useBookingForm } from '../../hooks/Booking/useBookingFormFixed';
+import { useBookingForm } from '../../hooks/Booking/useBookings';
 import BookingBasicInfoAnt from '../../components/features/Booking/BookingBasicInfoAnt';
-import ServiceSelectionAnt from '../../components/features/Booking/ServiceSelectionAnt';
+import { Form, Button, Steps, message, Typography, Spin, Alert, Input, Tabs, Table, InputNumber } from 'antd';
+import { FormattedPrice } from '../../components/common/FormattedPrice';
 import BookingContactInfoAnt from '../../components/features/Booking/BookingContactInfoAnt';
 import BookingConfirmationAnt from '../../components/features/Booking/BookingConfirmationAnt';
 import UserLayout from '../../components/layout/User/UserLayout';
@@ -27,6 +27,7 @@ const BookingFormPage = () => {
     halls,
     services,
     shifts,
+    foods,
     selectedHall,
     loading,
     error,
@@ -86,24 +87,145 @@ const BookingFormPage = () => {
       />
     },
     {
-      title: 'Dịch vụ',
+      title: 'Dịch vụ và món ăn',
       content: (
         <div>
-          <Form.Item name="services" label="Chọn dịch vụ kèm theo" initialValue={{}}>
-            <ServiceSelectionAnt 
-              services={services} 
-              value={form.getFieldValue('services') || {}}
-              onChange={(value) => {
-                // Cập nhật giá trị services và tính lại tổng tiền
-                form.setFieldsValue({ services: value });
-                // Lấy tất cả giá trị hiện tại của form và tính lại tổng
-                const allValues = form.getFieldsValue(true);
-                allValues.services = value; // Đảm bảo dữ liệu mới nhất được sử dụng
-                calculateTotal(allValues);
-              }}
-            />
-          </Form.Item>
-
+          <Tabs defaultActiveKey="services" style={{ marginBottom: 20 }}>
+            <Tabs.TabPane tab="Dịch vụ đi kèm" key="services">
+              <Form.Item name="services" initialValue={{}}>
+                <Table
+                  rowSelection={{
+                    type: 'checkbox',
+                    getCheckboxProps: (record) => ({
+                      name: record.ID_DichVu,
+                    }),
+                    onSelect: (record, selected) => {
+                      const currentServices = form.getFieldValue('services') || {};
+                      let newServices = { ...currentServices };
+                      
+                      if (selected) {
+                        newServices[record.ID_DichVu] = {
+                          name: record.TenDichVu,
+                          price: record.DonGia,
+                          quantity: 1
+                        };
+                      } else {
+                        delete newServices[record.ID_DichVu];
+                      }
+                      
+                      form.setFieldsValue({ services: newServices });
+                      const allValues = form.getFieldsValue(true);
+                      calculateTotal(allValues);
+                    }
+                  }}
+                  dataSource={services}
+                  columns={[
+                    {
+                      title: 'Tên dịch vụ',
+                      dataIndex: 'TenDichVu',
+                      key: 'TenDichVu',
+                    },
+                    {
+                      title: 'Mô tả',
+                      dataIndex: 'MoTa',
+                      key: 'MoTa',
+                      ellipsis: true,
+                    },
+                    {
+                      title: 'Đơn giá',
+                      dataIndex: 'DonGia',
+                      key: 'DonGia',
+                      render: (text) => <FormattedPrice amount={text} />,
+                    },
+                    {
+                      title: 'Số lượng',
+                      key: 'quantity',
+                      render: (_, record) => {
+                        const services = form.getFieldValue('services') || {};
+                        const isSelected = services[record.ID_DichVu];
+                        
+                        return isSelected ? (
+                          <InputNumber
+                            min={1}
+                            defaultValue={1}
+                            value={services[record.ID_DichVu]?.quantity || 1}
+                            onChange={(value) => {
+                              const currentServices = form.getFieldValue('services') || {};
+                              const newServices = { 
+                                ...currentServices,
+                                [record.ID_DichVu]: {
+                                  ...currentServices[record.ID_DichVu],
+                                  quantity: value
+                                }
+                              };
+                              
+                              form.setFieldsValue({ services: newServices });
+                              const allValues = form.getFieldsValue(true);
+                              calculateTotal(allValues);
+                            }}
+                          />
+                        ) : null;
+                      }
+                    }
+                  ]}
+                  rowKey="ID_DichVu"
+                  pagination={false}
+                />
+              </Form.Item>
+            </Tabs.TabPane>
+            
+            <Tabs.TabPane tab="Món ăn" key="foods">
+              <Form.Item name="foods" initialValue={{}}>
+                <Table
+                  dataSource={foods || []}
+                  columns={[
+                    {
+                      title: 'Tên món',
+                      dataIndex: 'TenMonAn',
+                      key: 'TenMonAn',
+                    },
+                    {
+                      title: 'Đơn giá',
+                      dataIndex: 'DonGia',
+                      key: 'DonGia',
+                      render: (text) => <FormattedPrice amount={text} />,
+                    },
+                    {
+                      title: 'Số lượng',
+                      key: 'quantity',
+                      render: (_, record) => {
+                        const foodsValue = form.getFieldValue('foods') || {};
+                        
+                        return (
+                          <InputNumber
+                            min={0}
+                            value={foodsValue[record.ID_MonAn] || 0}
+                            onChange={(value) => {
+                              const currentFoods = form.getFieldValue('foods') || {};
+                              let newFoods = { ...currentFoods };
+                              
+                              if (value > 0) {
+                                newFoods[record.ID_MonAn] = value;
+                              } else {
+                                delete newFoods[record.ID_MonAn];
+                              }
+                              
+                              form.setFieldsValue({ foods: newFoods });
+                              const allValues = form.getFieldsValue(true);
+                              calculateTotal(allValues);
+                            }}
+                          />
+                        );
+                      }
+                    }
+                  ]}
+                  rowKey="ID_MonAn"
+                  pagination={false}
+                />
+              </Form.Item>
+            </Tabs.TabPane>
+          </Tabs>
+          
           <Form.Item name="note" label="Ghi chú">
             <Input.TextArea
               rows={4}
@@ -124,6 +246,7 @@ const BookingFormPage = () => {
         selectedHall={selectedHall} 
         totalAmount={totalAmount} 
         shifts={shifts} 
+        foods={foods}
       />
     }
   ];
@@ -168,7 +291,7 @@ const BookingFormPage = () => {
       
       // Prepare success data
       const successData = {
-        bookingId: result.bookingId || result.id || 'WD-' + Date.now(),
+        ID_TiecCuoi: result.ID_TiecCuoi || result.id || 'WD-' + Date.now(),
         totalAmount: totalAmount,
         depositAmount: Math.round(totalAmount * 0.5),
         customerName: values.customerName || '',
@@ -182,7 +305,9 @@ const BookingFormPage = () => {
         shiftName: shiftName,
         numberOfGuests: values.guestCount || 0,
         guestCount: values.guestCount || 0,
-        services: values.services || {}
+        services: values.services || {},
+        foods: values.foods || {},
+        foodsData: foods || []
       };
       
       // Save to localStorage as backup
