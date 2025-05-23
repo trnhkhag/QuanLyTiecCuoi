@@ -8,14 +8,14 @@ const router = express.Router();
  * @swagger
  * tags:
  *   name: Auth Service
- *   description: Authentication and user management operations
+ *   description: Xác thực và quản lý người dùng
  */
 
 /**
  * @swagger
  * /api/v1/auth-service/login:
  *   post:
- *     summary: Login to the application
+ *     summary: Đăng nhập vào ứng dụng
  *     tags: [Auth Service]
  *     requestBody:
  *       required: true
@@ -25,19 +25,19 @@ const router = express.Router();
  *             $ref: '#/components/schemas/LoginRequest'
  *     responses:
  *       200:
- *         description: Login successful
+ *         description: Đăng nhập thành công
  *         content:
  *           application/json:
  *             schema:
  *               $ref: '#/components/schemas/AuthResponse'
  *       401:
- *         description: Invalid credentials
+ *         description: Thông tin đăng nhập không hợp lệ
  *         content:
  *           application/json:
  *             schema:
  *               $ref: '#/components/schemas/ErrorResponse'
  *       400:
- *         description: Validation error
+ *         description: Lỗi xác thực dữ liệu
  *         content:
  *           application/json:
  *             schema:
@@ -49,7 +49,7 @@ router.post('/login', validateLogin, authController.login);
  * @swagger
  * /api/v1/auth-service/register:
  *   post:
- *     summary: Register a new user
+ *     summary: Đăng ký người dùng mới
  *     tags: [Auth Service]
  *     requestBody:
  *       required: true
@@ -59,13 +59,13 @@ router.post('/login', validateLogin, authController.login);
  *             $ref: '#/components/schemas/RegisterRequest'
  *     responses:
  *       201:
- *         description: Registration successful
+ *         description: Đăng ký thành công
  *         content:
  *           application/json:
  *             schema:
  *               $ref: '#/components/schemas/AuthResponse'
  *       400:
- *         description: Validation error or email already exists
+ *         description: Lỗi xác thực hoặc email đã tồn tại
  *         content:
  *           application/json:
  *             schema:
@@ -77,11 +77,11 @@ router.post('/register', validateRegister, authController.register);
  * @swagger
  * /api/v1/auth-service/health:
  *   get:
- *     summary: Check Auth Service health
+ *     summary: Kiểm tra tình trạng dịch vụ xác thực
  *     tags: [Auth Service]
  *     responses:
  *       200:
- *         description: Auth Service is operational
+ *         description: Dịch vụ xác thực đang hoạt động
  *         content:
  *           application/json:
  *             schema:

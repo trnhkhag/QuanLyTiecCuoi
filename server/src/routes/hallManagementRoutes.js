@@ -7,18 +7,18 @@ const upload = require('../middlewares/uploadMiddleware');
  * @swagger
  * tags:
  *   name: Hall Management
- *   description: Wedding hall and hall type management
+ *   description: Quản lý sảnh tiệc và loại sảnh
  */
 
 /**
  * @swagger
  * /api/v1/wedding-service/lobby/halls:
  *   get:
- *     summary: Get all wedding halls
+ *     summary: Lấy danh sách tất cả sảnh tiệc
  *     tags: [Hall Management]
  *     responses:
  *       200:
- *         description: List of wedding halls
+ *         description: Danh sách sảnh tiệc
  *         content:
  *           application/json:
  *             schema:
@@ -37,7 +37,7 @@ router.get('/halls', hallManagementController.getAllHalls);
  * @swagger
  * /api/v1/wedding-service/lobby/halls/{id}:
  *   get:
- *     summary: Get wedding hall by ID
+ *     summary: Lấy thông tin sảnh tiệc theo ID
  *     tags: [Hall Management]
  *     parameters:
  *       - in: path
@@ -45,9 +45,10 @@ router.get('/halls', hallManagementController.getAllHalls);
  *         required: true
  *         schema:
  *           type: integer
+ *         description: ID sảnh tiệc
  *     responses:
  *       200:
- *         description: Wedding hall details
+ *         description: Thông tin chi tiết sảnh tiệc
  *         content:
  *           application/json:
  *             schema:
@@ -64,7 +65,7 @@ router.get('/halls/:id', hallManagementController.getHallById);
  * @swagger
  * /api/v1/wedding-service/lobby/halls:
  *   post:
- *     summary: Create new wedding hall
+ *     summary: Tạo sảnh tiệc mới
  *     tags: [Hall Management]
  *     requestBody:
  *       required: true
@@ -75,18 +76,23 @@ router.get('/halls/:id', hallManagementController.getHallById);
  *             properties:
  *               name:
  *                 type: string
+ *                 description: Tên sảnh tiệc
  *               type:
  *                 type: string
+ *                 description: Loại sảnh
  *               capacity:
  *                 type: integer
+ *                 description: Sức chứa
  *               price:
  *                 type: number
+ *                 description: Giá thuê
  *               image:
  *                 type: string
  *                 format: binary
+ *                 description: Hình ảnh sảnh
  *     responses:
  *       201:
- *         description: Wedding hall created successfully
+ *         description: Tạo sảnh tiệc thành công
  */
 router.post('/halls', upload.single('image'), hallManagementController.createHall);
 
@@ -94,7 +100,7 @@ router.post('/halls', upload.single('image'), hallManagementController.createHal
  * @swagger
  * /api/v1/wedding-service/lobby/halls/{id}:
  *   put:
- *     summary: Update wedding hall
+ *     summary: Cập nhật thông tin sảnh tiệc
  *     tags: [Hall Management]
  *     parameters:
  *       - in: path
@@ -102,6 +108,7 @@ router.post('/halls', upload.single('image'), hallManagementController.createHal
  *         required: true
  *         schema:
  *           type: integer
+ *         description: ID sảnh tiệc
  *     requestBody:
  *       required: true
  *       content:
@@ -111,18 +118,23 @@ router.post('/halls', upload.single('image'), hallManagementController.createHal
  *             properties:
  *               name:
  *                 type: string
+ *                 description: Tên sảnh tiệc
  *               type:
  *                 type: string
+ *                 description: Loại sảnh
  *               capacity:
  *                 type: integer
+ *                 description: Sức chứa
  *               price:
  *                 type: number
+ *                 description: Giá thuê
  *               image:
  *                 type: string
  *                 format: binary
+ *                 description: Hình ảnh sảnh
  *     responses:
  *       200:
- *         description: Wedding hall updated successfully
+ *         description: Cập nhật sảnh tiệc thành công
  */
 router.put('/halls/:id', upload.single('image'), hallManagementController.updateHall);
 
@@ -130,7 +142,7 @@ router.put('/halls/:id', upload.single('image'), hallManagementController.update
  * @swagger
  * /api/v1/wedding-service/lobby/halls/{id}:
  *   delete:
- *     summary: Delete wedding hall
+ *     summary: Xóa sảnh tiệc
  *     tags: [Hall Management]
  *     parameters:
  *       - in: path
@@ -138,9 +150,10 @@ router.put('/halls/:id', upload.single('image'), hallManagementController.update
  *         required: true
  *         schema:
  *           type: integer
+ *         description: ID sảnh tiệc
  *     responses:
  *       200:
- *         description: Wedding hall deleted successfully
+ *         description: Xóa sảnh tiệc thành công
  */
 router.delete('/halls/:id', hallManagementController.deleteHall);
 
@@ -148,11 +161,11 @@ router.delete('/halls/:id', hallManagementController.deleteHall);
  * @swagger
  * /api/v1/wedding-service/lobby/hall-types:
  *   get:
- *     summary: Get all hall types
+ *     summary: Lấy danh sách tất cả loại sảnh
  *     tags: [Hall Management]
  *     responses:
  *       200:
- *         description: List of hall types
+ *         description: Danh sách loại sảnh
  *         content:
  *           application/json:
  *             schema:
@@ -171,7 +184,7 @@ router.get('/hall-types', hallManagementController.getAllHallTypes);
  * @swagger
  * /api/v1/wedding-service/lobby/hall-types:
  *   post:
- *     summary: Create new hall type
+ *     summary: Tạo loại sảnh mới
  *     tags: [Hall Management]
  *     requestBody:
  *       required: true
@@ -181,7 +194,7 @@ router.get('/hall-types', hallManagementController.getAllHallTypes);
  *             $ref: '#/components/schemas/HallType'
  *     responses:
  *       201:
- *         description: Hall type created successfully
+ *         description: Tạo loại sảnh thành công
  */
 router.post('/hall-types', hallManagementController.createHallType);
 
@@ -189,7 +202,7 @@ router.post('/hall-types', hallManagementController.createHallType);
  * @swagger
  * /api/v1/wedding-service/lobby/hall-types/{id}:
  *   put:
- *     summary: Update hall type
+ *     summary: Cập nhật thông tin loại sảnh
  *     tags: [Hall Management]
  *     parameters:
  *       - in: path
@@ -197,6 +210,7 @@ router.post('/hall-types', hallManagementController.createHallType);
  *         required: true
  *         schema:
  *           type: integer
+ *         description: ID loại sảnh
  *     requestBody:
  *       required: true
  *       content:
@@ -205,7 +219,7 @@ router.post('/hall-types', hallManagementController.createHallType);
  *             $ref: '#/components/schemas/HallType'
  *     responses:
  *       200:
- *         description: Hall type updated successfully
+ *         description: Cập nhật loại sảnh thành công
  */
 router.put('/hall-types/:id', hallManagementController.updateHallType);
 
@@ -213,7 +227,7 @@ router.put('/hall-types/:id', hallManagementController.updateHallType);
  * @swagger
  * /api/v1/wedding-service/lobby/hall-types/{id}:
  *   delete:
- *     summary: Delete hall type
+ *     summary: Xóa loại sảnh
  *     tags: [Hall Management]
  *     parameters:
  *       - in: path
@@ -221,9 +235,10 @@ router.put('/hall-types/:id', hallManagementController.updateHallType);
  *         required: true
  *         schema:
  *           type: integer
+ *         description: ID loại sảnh
  *     responses:
  *       200:
- *         description: Hall type deleted successfully
+ *         description: Xóa loại sảnh thành công
  */
 router.delete('/hall-types/:id', hallManagementController.deleteHallType);
 

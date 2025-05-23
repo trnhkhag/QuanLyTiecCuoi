@@ -4,17 +4,17 @@ const router = express.Router();
 const weddingLookupController = require('../controllers/WeddingLookupController');
 
 /**
-//  * @swagger
+ * @swagger
  * tags:
  *   name: Wedding Lookup
- *   description: Wedding search and lookup functionality
+ *   description: Tra cứu và tìm kiếm tiệc cưới
  */
 
 /**
-//  * @swagger
+ * @swagger
  * /api/v1/wedding-service/lookup:
  *   get:
- *     summary: Search weddings
+ *     summary: Tìm kiếm tiệc cưới
  *     tags: [Wedding Lookup]
  *     parameters:
  *       - in: query
@@ -22,21 +22,21 @@ const weddingLookupController = require('../controllers/WeddingLookupController'
  *         schema:
  *           type: string
  *           format: date
- *         description: Wedding date to search for
+ *         description: Ngày tổ chức tiệc cưới cần tìm
  *       - in: query
  *         name: hallId
  *         schema:
  *           type: integer
- *         description: Hall ID to search for
+ *         description: ID sảnh cần tìm
  *       - in: query
  *         name: status
  *         schema:
  *           type: string
  *           enum: [PENDING, CONFIRMED, CANCELLED]
- *         description: Wedding status to filter by
+ *         description: Trạng thái tiệc cưới để lọc
  *     responses:
  *       200:
- *         description: List of matching weddings
+ *         description: Danh sách tiệc cưới phù hợp
  *         content:
  *           application/json:
  *             schema:
@@ -55,11 +55,11 @@ router.get('/', weddingLookupController.searchBookings);
  * @swagger
  * /api/v1/wedding-service/lookup/shifts:
  *   get:
- *     summary: Get all available shifts
+ *     summary: Lấy danh sách tất cả ca tiệc
  *     tags: [Wedding Lookup]
  *     responses:
  *       200:
- *         description: List of available shifts
+ *         description: Danh sách ca tiệc có sẵn
  *         content:
  *           application/json:
  *             schema:
@@ -74,20 +74,24 @@ router.get('/', weddingLookupController.searchBookings);
  *                     properties:
  *                       id:
  *                         type: integer
+ *                         description: ID ca tiệc
  *                       name:
  *                         type: string
+ *                         description: Tên ca tiệc
  *                       startTime:
  *                         type: string
+ *                         description: Thời gian bắt đầu
  *                       endTime:
  *                         type: string
+ *                         description: Thời gian kết thúc
  */
 router.get('/shifts', weddingLookupController.getShifts);
 
 /**
-//  * @swagger
+ * @swagger
  * /api/v1/wedding-service/lookup/{id}:
  *   get:
- *     summary: Get wedding details
+ *     summary: Lấy thông tin chi tiết tiệc cưới
  *     tags: [Wedding Lookup]
  *     parameters:
  *       - in: path
@@ -95,9 +99,10 @@ router.get('/shifts', weddingLookupController.getShifts);
  *         required: true
  *         schema:
  *           type: integer
+ *         description: ID tiệc cưới
  *     responses:
  *       200:
- *         description: Wedding details
+ *         description: Thông tin chi tiết tiệc cưới
  *         content:
  *           application/json:
  *             schema:

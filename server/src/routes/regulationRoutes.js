@@ -6,18 +6,18 @@ const regulationController = require('../controllers/regulationController');
  * @swagger
  * tags:
  *   name: Regulation Management
- *   description: Wedding regulation management
+ *   description: Quản lý quy định tiệc cưới
  */
 
 /**
  * @swagger
  * /api/v1/wedding-service/regulations:
  *   get:
- *     summary: Get all regulations
+ *     summary: Lấy danh sách tất cả quy định
  *     tags: [Regulation Management]
  *     responses:
  *       200:
- *         description: List of regulations
+ *         description: Danh sách quy định
  *         content:
  *           application/json:
  *             schema:
@@ -36,7 +36,7 @@ router.get('/', regulationController.getAllRegulations);
  * @swagger
  * /api/v1/wedding-service/regulations/{id}:
  *   get:
- *     summary: Get regulation by ID
+ *     summary: Lấy thông tin quy định theo ID
  *     tags: [Regulation Management]
  *     parameters:
  *       - in: path
@@ -44,9 +44,10 @@ router.get('/', regulationController.getAllRegulations);
  *         required: true
  *         schema:
  *           type: integer
+ *         description: ID của quy định
  *     responses:
  *       200:
- *         description: Regulation details
+ *         description: Thông tin chi tiết quy định
  *         content:
  *           application/json:
  *             schema:
@@ -63,7 +64,7 @@ router.get('/:id', regulationController.getRegulationById);
  * @swagger
  * /api/v1/wedding-service/regulations:
  *   post:
- *     summary: Create new regulation
+ *     summary: Tạo quy định mới
  *     tags: [Regulation Management]
  *     requestBody:
  *       required: true
@@ -74,14 +75,17 @@ router.get('/:id', regulationController.getRegulationById);
  *             properties:
  *               title:
  *                 type: string
+ *                 description: Tiêu đề quy định
  *               content:
  *                 type: string
+ *                 description: Nội dung quy định
  *               type:
  *                 type: string
+ *                 description: Loại quy định
  *                 enum: [GENERAL, PAYMENT, CANCELLATION]
  *     responses:
  *       201:
- *         description: Regulation created successfully
+ *         description: Tạo quy định thành công
  */
 router.post('/', regulationController.createRegulation);
 
@@ -89,7 +93,7 @@ router.post('/', regulationController.createRegulation);
  * @swagger
  * /api/v1/wedding-service/regulations/{id}:
  *   put:
- *     summary: Update regulation
+ *     summary: Cập nhật thông tin quy định
  *     tags: [Regulation Management]
  *     parameters:
  *       - in: path
@@ -97,6 +101,7 @@ router.post('/', regulationController.createRegulation);
  *         required: true
  *         schema:
  *           type: integer
+ *         description: ID của quy định
  *     requestBody:
  *       required: true
  *       content:
@@ -106,14 +111,17 @@ router.post('/', regulationController.createRegulation);
  *             properties:
  *               title:
  *                 type: string
+ *                 description: Tiêu đề quy định
  *               content:
  *                 type: string
+ *                 description: Nội dung quy định
  *               type:
  *                 type: string
+ *                 description: Loại quy định
  *                 enum: [GENERAL, PAYMENT, CANCELLATION]
  *     responses:
  *       200:
- *         description: Regulation updated successfully
+ *         description: Cập nhật quy định thành công
  */
 router.put('/:id', regulationController.updateRegulation);
 
@@ -121,7 +129,7 @@ router.put('/:id', regulationController.updateRegulation);
  * @swagger
  * /api/v1/wedding-service/regulations/{id}:
  *   delete:
- *     summary: Delete regulation
+ *     summary: Xóa quy định
  *     tags: [Regulation Management]
  *     parameters:
  *       - in: path
@@ -129,9 +137,10 @@ router.put('/:id', regulationController.updateRegulation);
  *         required: true
  *         schema:
  *           type: integer
+ *         description: ID của quy định
  *     responses:
  *       200:
- *         description: Regulation deleted successfully
+ *         description: Xóa quy định thành công
  */
 router.delete('/:id', regulationController.deleteRegulation);
 
