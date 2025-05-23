@@ -83,6 +83,47 @@ class AuthController {
       });
     }
   }
+
+  /**
+   * Get current user profile
+   */
+  async getProfile(req, res) {
+    try {
+      // req.user is set by authenticateToken middleware
+      res.status(200).json({
+        success: true,
+        user: req.user
+      });
+    } catch (error) {
+      console.error('Get profile error:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Internal server error'
+      });
+    }
+  }
+
+  /**
+   * Logout user
+   */
+  async logout(req, res) {
+    try {
+      // For JWT, logout is typically handled on client side by removing token
+      // Here we can log the logout event or implement token blacklist in future
+      console.log(`User ${req.user.email} logged out`);
+      
+      res.status(200).json({
+        success: true,
+        message: 'Logged out successfully'
+      });
+    } catch (error) {
+      console.error('Logout error:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Internal server error'
+      });
+    }
+  }
 }
 
 module.exports = new AuthController(); 

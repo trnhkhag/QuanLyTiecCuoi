@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const regulationController = require('../controllers/regulationController');
+const { authenticateToken, requireRole } = require('../middlewares/authMiddleware');
 
 /**
  * @swagger
@@ -15,6 +16,8 @@ const regulationController = require('../controllers/regulationController');
  *   get:
  *     summary: Get all regulations
  *     tags: [Regulation Management]
+ *     security:
+ *       - bearerAuth: []
  *     responses:
  *       200:
  *         description: List of regulations
@@ -30,7 +33,7 @@ const regulationController = require('../controllers/regulationController');
  *                   items:
  *                     $ref: '#/components/schemas/Regulation'
  */
-router.get('/', regulationController.getAllRegulations);
+router.get('/', authenticateToken, regulationController.getAllRegulations);
 
 /**
  * @swagger
@@ -38,6 +41,8 @@ router.get('/', regulationController.getAllRegulations);
  *   get:
  *     summary: Get regulation by ID
  *     tags: [Regulation Management]
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -57,7 +62,7 @@ router.get('/', regulationController.getAllRegulations);
  *                 data:
  *                   $ref: '#/components/schemas/Regulation'
  */
-router.get('/:id', regulationController.getRegulationById);
+router.get('/:id', authenticateToken, regulationController.getRegulationById);
 
 /**
  * @swagger
@@ -65,6 +70,8 @@ router.get('/:id', regulationController.getRegulationById);
  *   post:
  *     summary: Create new regulation
  *     tags: [Regulation Management]
+ *     security:
+ *       - bearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -83,7 +90,7 @@ router.get('/:id', regulationController.getRegulationById);
  *       201:
  *         description: Regulation created successfully
  */
-router.post('/', regulationController.createRegulation);
+router.post('/', authenticateToken, requireRole(['admin']), regulationController.createRegulation);
 
 /**
  * @swagger
@@ -91,6 +98,8 @@ router.post('/', regulationController.createRegulation);
  *   put:
  *     summary: Update regulation
  *     tags: [Regulation Management]
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -115,7 +124,7 @@ router.post('/', regulationController.createRegulation);
  *       200:
  *         description: Regulation updated successfully
  */
-router.put('/:id', regulationController.updateRegulation);
+router.put('/:id', authenticateToken, requireRole(['admin']), regulationController.updateRegulation);
 
 /**
  * @swagger
@@ -123,6 +132,8 @@ router.put('/:id', regulationController.updateRegulation);
  *   delete:
  *     summary: Delete regulation
  *     tags: [Regulation Management]
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -133,6 +144,6 @@ router.put('/:id', regulationController.updateRegulation);
  *       200:
  *         description: Regulation deleted successfully
  */
-router.delete('/:id', regulationController.deleteRegulation);
+router.delete('/:id', authenticateToken, requireRole(['admin']), regulationController.deleteRegulation);
 
 module.exports = router;

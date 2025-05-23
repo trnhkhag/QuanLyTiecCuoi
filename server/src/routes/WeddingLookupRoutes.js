@@ -2,6 +2,7 @@
 const express = require('express');
 const router = express.Router();
 const weddingLookupController = require('../controllers/WeddingLookupController');
+const { authenticateToken } = require('../middlewares/authMiddleware');
 
 /**
 //  * @swagger
@@ -57,6 +58,8 @@ router.get('/', weddingLookupController.searchBookings);
  *   get:
  *     summary: Get wedding details
  *     tags: [Wedding Lookup]
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -76,6 +79,6 @@ router.get('/', weddingLookupController.searchBookings);
  *                 data:
  *                   $ref: '#/components/schemas/Wedding'
  */
-router.get('/:id', weddingLookupController.getBookingDetail);
+router.get('/:id', authenticateToken, weddingLookupController.getBookingDetail);
 
 module.exports = router;

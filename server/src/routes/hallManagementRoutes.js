@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const hallManagementController = require('../controllers/hallManagementController');
 const upload = require('../middlewares/uploadMiddleware');
+const { authenticateToken, requireRole } = require('../middlewares/authMiddleware');
 
 /**
  * @swagger
@@ -16,6 +17,8 @@ const upload = require('../middlewares/uploadMiddleware');
  *   get:
  *     summary: Get all wedding halls
  *     tags: [Hall Management]
+ *     security:
+ *       - bearerAuth: []
  *     responses:
  *       200:
  *         description: List of wedding halls
@@ -31,7 +34,7 @@ const upload = require('../middlewares/uploadMiddleware');
  *                   items:
  *                     $ref: '#/components/schemas/Hall'
  */
-router.get('/halls', hallManagementController.getAllHalls);
+router.get('/halls', authenticateToken, hallManagementController.getAllHalls);
 
 /**
  * @swagger
@@ -39,6 +42,8 @@ router.get('/halls', hallManagementController.getAllHalls);
  *   get:
  *     summary: Get wedding hall by ID
  *     tags: [Hall Management]
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -58,7 +63,7 @@ router.get('/halls', hallManagementController.getAllHalls);
  *                 data:
  *                   $ref: '#/components/schemas/Hall'
  */
-router.get('/halls/:id', hallManagementController.getHallById);
+router.get('/halls/:id', authenticateToken, hallManagementController.getHallById);
 
 /**
  * @swagger
@@ -66,6 +71,8 @@ router.get('/halls/:id', hallManagementController.getHallById);
  *   post:
  *     summary: Create new wedding hall
  *     tags: [Hall Management]
+ *     security:
+ *       - bearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -88,7 +95,7 @@ router.get('/halls/:id', hallManagementController.getHallById);
  *       201:
  *         description: Wedding hall created successfully
  */
-router.post('/halls', upload.single('image'), hallManagementController.createHall);
+router.post('/halls', authenticateToken, requireRole(['admin', 'manager']), upload.single('image'), hallManagementController.createHall);
 
 /**
  * @swagger
@@ -96,6 +103,8 @@ router.post('/halls', upload.single('image'), hallManagementController.createHal
  *   put:
  *     summary: Update wedding hall
  *     tags: [Hall Management]
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -124,7 +133,7 @@ router.post('/halls', upload.single('image'), hallManagementController.createHal
  *       200:
  *         description: Wedding hall updated successfully
  */
-router.put('/halls/:id', upload.single('image'), hallManagementController.updateHall);
+router.put('/halls/:id', authenticateToken, requireRole(['admin', 'manager']), upload.single('image'), hallManagementController.updateHall);
 
 /**
  * @swagger
@@ -132,6 +141,8 @@ router.put('/halls/:id', upload.single('image'), hallManagementController.update
  *   delete:
  *     summary: Delete wedding hall
  *     tags: [Hall Management]
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -142,7 +153,7 @@ router.put('/halls/:id', upload.single('image'), hallManagementController.update
  *       200:
  *         description: Wedding hall deleted successfully
  */
-router.delete('/halls/:id', hallManagementController.deleteHall);
+router.delete('/halls/:id', authenticateToken, requireRole(['admin', 'manager']), hallManagementController.deleteHall);
 
 /**
  * @swagger
@@ -173,6 +184,8 @@ router.get('/hall-types', hallManagementController.getAllHallTypes);
  *   post:
  *     summary: Create new hall type
  *     tags: [Hall Management]
+ *     security:
+ *       - bearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -183,7 +196,7 @@ router.get('/hall-types', hallManagementController.getAllHallTypes);
  *       201:
  *         description: Hall type created successfully
  */
-router.post('/hall-types', hallManagementController.createHallType);
+router.post('/hall-types', authenticateToken, requireRole(['admin', 'manager']), hallManagementController.createHallType);
 
 /**
  * @swagger
@@ -191,6 +204,8 @@ router.post('/hall-types', hallManagementController.createHallType);
  *   put:
  *     summary: Update hall type
  *     tags: [Hall Management]
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -207,7 +222,7 @@ router.post('/hall-types', hallManagementController.createHallType);
  *       200:
  *         description: Hall type updated successfully
  */
-router.put('/hall-types/:id', hallManagementController.updateHallType);
+router.put('/hall-types/:id', authenticateToken, requireRole(['admin', 'manager']), hallManagementController.updateHallType);
 
 /**
  * @swagger
@@ -215,6 +230,8 @@ router.put('/hall-types/:id', hallManagementController.updateHallType);
  *   delete:
  *     summary: Delete hall type
  *     tags: [Hall Management]
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -225,6 +242,6 @@ router.put('/hall-types/:id', hallManagementController.updateHallType);
  *       200:
  *         description: Hall type deleted successfully
  */
-router.delete('/hall-types/:id', hallManagementController.deleteHallType);
+router.delete('/hall-types/:id', authenticateToken, requireRole(['admin', 'manager']), hallManagementController.deleteHallType);
 
 module.exports = router;

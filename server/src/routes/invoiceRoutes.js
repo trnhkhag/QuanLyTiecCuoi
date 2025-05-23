@@ -1,5 +1,6 @@
 const express = require('express');
 const invoiceController = require('../controllers/invoiceController');
+const { authenticateToken, requireRole } = require('../middlewares/authMiddleware');
 const router = express.Router();
 
 /**
@@ -15,6 +16,8 @@ const router = express.Router();
  *   get:
  *     summary: Get all invoices
  *     tags: [Invoice Service]
+ *     security:
+ *       - bearerAuth: []
  *     responses:
  *       200:
  *         description: A list of invoices
@@ -31,20 +34,23 @@ const router = express.Router();
  *                   items:
  *                     $ref: '#/components/schemas/Invoice'
  */
-router.get('/', invoiceController.getAllInvoices);
+router.get('/', authenticateToken, requireRole(['admin', 'manager']), invoiceController.getAllInvoices);
 
 /**
  * @swagger
  * /api/v1/invoice-service/{id}:
  *   get:
- *     summary: Get an invoice by ID
+ *     summary: Get invoice by ID
  *     tags: [Invoice Service]
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
  *         required: true
  *         schema:
- *           type: integer
+ *           type: string
+ *         description: Invoice ID
  *     responses:
  *       200:
  *         description: Invoice details
@@ -55,13 +61,10 @@ router.get('/', invoiceController.getAllInvoices);
  *               properties:
  *                 success:
  *                   type: boolean
- *                   example: true
  *                 data:
  *                   $ref: '#/components/schemas/Invoice'
- *       404:
- *         description: Invoice not found
  */
-router.get('/:id', invoiceController.getInvoiceById);
+router.get('/:id', authenticateToken, invoiceController.getInvoiceById);
 
 /**
  * @swagger
@@ -69,6 +72,8 @@ router.get('/:id', invoiceController.getInvoiceById);
  *   post:
  *     summary: Create a new invoice
  *     tags: [Invoice Service]
+ *     security:
+ *       - bearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -79,7 +84,7 @@ router.get('/:id', invoiceController.getInvoiceById);
  *       201:
  *         description: Invoice created successfully
  */
-router.post('/', invoiceController.createInvoice);
+router.post('/', authenticateToken, requireRole(['admin', 'manager']), invoiceController.createInvoice);
 
 /**
  * @swagger
@@ -87,12 +92,15 @@ router.post('/', invoiceController.createInvoice);
  *   put:
  *     summary: Update an invoice
  *     tags: [Invoice Service]
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
  *         required: true
  *         schema:
- *           type: integer
+ *           type: string
+ *         description: Invoice ID
  *     requestBody:
  *       required: true
  *       content:
@@ -102,10 +110,8 @@ router.post('/', invoiceController.createInvoice);
  *     responses:
  *       200:
  *         description: Invoice updated successfully
- *       404:
- *         description: Invoice not found
  */
-router.put('/:id', invoiceController.updateInvoice);
+router.put('/:id', authenticateToken, requireRole(['admin', 'manager']), invoiceController.updateInvoice);
 
 /**
  * @swagger
@@ -113,19 +119,20 @@ router.put('/:id', invoiceController.updateInvoice);
  *   delete:
  *     summary: Delete an invoice
  *     tags: [Invoice Service]
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
  *         required: true
  *         schema:
- *           type: integer
+ *           type: string
+ *         description: Invoice ID
  *     responses:
  *       200:
  *         description: Invoice deleted successfully
- *       404:
- *         description: Invoice not found
  */
-router.delete('/:id', invoiceController.deleteInvoice);
+router.delete('/:id', authenticateToken, requireRole(['admin']), invoiceController.deleteInvoice);
 
 /**
  * @swagger

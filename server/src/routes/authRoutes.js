@@ -1,6 +1,7 @@
 const express = require('express');
 const authController = require('../controllers/authController');
 const { validateLogin, validateRegister } = require('../middlewares/validateInput');
+const { authenticateToken } = require('../middlewares/authMiddleware');
 
 const router = express.Router();
 
@@ -95,5 +96,62 @@ router.post('/register', validateRegister, authController.register);
  *                   example: auth-service
  */
 // Health check endpoint is defined in app.js
+
+/**
+ * @swagger
+ * /api/v1/auth-service/profile:
+ *   get:
+ *     summary: Lấy thông tin profile người dùng hiện tại
+ *     tags: [Auth Service]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Thông tin profile người dùng
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 user:
+ *                   type: object
+ *                   properties:
+ *                     id:
+ *                       type: integer
+ *                     name:
+ *                       type: string
+ *                     email:
+ *                       type: string
+ *                     role:
+ *                       type: string
+ *       401:
+ *         description: Token không hợp lệ hoặc hết hạn
+ */
+router.get('/profile', authenticateToken, authController.getProfile);
+
+/**
+ * @swagger
+ * /api/v1/auth-service/logout:
+ *   post:
+ *     summary: Đăng xuất người dùng
+ *     tags: [Auth Service]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Đăng xuất thành công
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 message:
+ *                   type: string
+ */
+router.post('/logout', authenticateToken, authController.logout);
 
 module.exports = router; 

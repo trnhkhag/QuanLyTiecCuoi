@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const serviceController = require('../controllers/serviceController');
 const upload = require('../middlewares/uploadMiddleware');
+const { authenticateToken, requireRole } = require('../middlewares/authMiddleware');
 
 /**
  * @swagger
@@ -16,6 +17,8 @@ const upload = require('../middlewares/uploadMiddleware');
  *   get:
  *     summary: Get all services
  *     tags: [Service Management]
+ *     security:
+ *       - bearerAuth: []
  *     responses:
  *       200:
  *         description: List of services
@@ -31,7 +34,7 @@ const upload = require('../middlewares/uploadMiddleware');
  *                   items:
  *                     $ref: '#/components/schemas/Service'
  */
-router.get('/', serviceController.getAllServices);
+router.get('/', authenticateToken, serviceController.getAllServices);
 
 /**
  * @swagger
@@ -39,6 +42,8 @@ router.get('/', serviceController.getAllServices);
  *   get:
  *     summary: Get service by ID
  *     tags: [Service Management]
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -58,7 +63,7 @@ router.get('/', serviceController.getAllServices);
  *                 data:
  *                   $ref: '#/components/schemas/Service'
  */
-router.get('/:id', serviceController.getServiceById);
+router.get('/:id', authenticateToken, serviceController.getServiceById);
 
 /**
  * @swagger
@@ -66,6 +71,8 @@ router.get('/:id', serviceController.getServiceById);
  *   post:
  *     summary: Create new service
  *     tags: [Service Management]
+ *     security:
+ *       - bearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -86,7 +93,7 @@ router.get('/:id', serviceController.getServiceById);
  *       201:
  *         description: Service created successfully
  */
-router.post('/', upload.single('image'), serviceController.createService);
+router.post('/', authenticateToken, requireRole(['admin', 'manager']), upload.single('image'), serviceController.createService);
 
 /**
  * @swagger
@@ -94,6 +101,8 @@ router.post('/', upload.single('image'), serviceController.createService);
  *   put:
  *     summary: Update service
  *     tags: [Service Management]
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -120,7 +129,7 @@ router.post('/', upload.single('image'), serviceController.createService);
  *       200:
  *         description: Service updated successfully
  */
-router.put('/:id', upload.single('image'), serviceController.updateService);
+router.put('/:id', authenticateToken, requireRole(['admin', 'manager']), upload.single('image'), serviceController.updateService);
 
 /**
  * @swagger
@@ -128,6 +137,8 @@ router.put('/:id', upload.single('image'), serviceController.updateService);
  *   delete:
  *     summary: Delete service
  *     tags: [Service Management]
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -138,6 +149,6 @@ router.put('/:id', upload.single('image'), serviceController.updateService);
  *       200:
  *         description: Service deleted successfully
  */
-router.delete('/:id', serviceController.deleteService);
+router.delete('/:id', authenticateToken, requireRole(['admin', 'manager']), serviceController.deleteService);
 
 module.exports = router;

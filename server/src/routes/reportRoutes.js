@@ -1,5 +1,6 @@
 const express = require('express');
 const reportController = require('../controllers/reportController');
+const { authenticateToken, requireRole } = require('../middlewares/authMiddleware');
 const router = express.Router();
 
 /**
@@ -15,6 +16,8 @@ const router = express.Router();
  *   get:
  *     summary: Get monthly report data
  *     tags: [Report Service]
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: query
  *         name: year
@@ -34,7 +37,7 @@ const router = express.Router();
  *             schema:
  *               $ref: '#/components/schemas/MonthlyReport'
  */
-router.get('/monthly', reportController.getMonthlyReport);
+router.get('/monthly', authenticateToken, requireRole(['admin', 'manager']), reportController.getMonthlyReport);
 
 /**
  * @swagger
@@ -168,5 +171,40 @@ router.get('/revenue-trend', reportController.getRevenueTrend);
  *                   example: report-service
  */
 // Health check endpoint is defined in app.js
+
+/**
+ * @swagger
+ * /api/v1/report-service/revenue:
+ *   get:
+ *     summary: Get revenue statistics
+ *     tags: [Report Service]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Revenue statistics data
+ */
+router.get('/revenue', authenticateToken, requireRole(['admin', 'manager']), reportController.getRevenueReport);
+
+/**
+ * @swagger
+ * /api/v1/report-service/trending:
+ *   get:
+ *     summary: Get trending revenue report for multiple months
+ *     tags: [Report Service]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: months
+ *         schema:
+ *           type: integer
+ *           default: 6
+ *         description: Number of months to include in trending report
+ *     responses:
+ *       200:
+ *         description: Trending revenue data
+ */
+router.get('/trending', authenticateToken, requireRole(['admin', 'manager']), reportController.getRevenueTrending);
 
 module.exports = router; 
