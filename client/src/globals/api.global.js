@@ -29,7 +29,20 @@ export const WEDDING_ENDPOINTS = {
   BASE: `${API_URL}/v1/wedding-service`,
   CA_TIEC: {
     BASE: `${API_URL}/v1/wedding-service/ca-tiec`,
-    GET_ALL: `${API_URL}/v1/wedding-service/ca-tiec`
+    GET_ALL: `${API_URL}/v1/wedding-service/ca-tiec`,
+    GET_BY_ID: (id) => `${API_URL}/v1/wedding-service/ca-tiec/${id}`,
+  },  FOOD: {
+    BASE: `${API_URL}/v1/wedding-service/mon-an`,
+    GET_ALL: `${API_URL}/v1/wedding-service/mon-an`,
+    GET_BY_ID: (id) => `${API_URL}/v1/wedding-service/mon-an/${id}`,
+  },
+  BOOKING: {
+    BASE: `${API_URL}/v1/wedding-service/bookings`,
+    GET_ALL: `${API_URL}/v1/wedding-service/bookings`,
+    GET_BY_ID: (id) => `${API_URL}/v1/wedding-service/bookings/${id}`,
+    CREATE: `${API_URL}/v1/wedding-service/bookings`,
+    UPDATE: (id) => `${API_URL}/v1/wedding-service/bookings/${id}`,
+    DELETE: (id) => `${API_URL}/v1/wedding-service/bookings/${id}`
   },
   HALL: {
     BASE: `${API_URL}/v1/wedding-service/lobby/halls`,
@@ -61,12 +74,12 @@ export const WEDDING_ENDPOINTS = {
     CREATE: `${API_URL}/v1/wedding-service/services`,
     UPDATE: (id) => `${API_URL}/v1/wedding-service/services/${id}`,
     DELETE: (id) => `${API_URL}/v1/wedding-service/services/${id}`
-  },
-  LOOKUP: {
+  },  LOOKUP: {
     BASE: `${API_URL}/v1/wedding-service/lookup`,
     SEARCH: `${API_URL}/v1/wedding-service/lookup`,
     GET_BY_ID: (id) => `${API_URL}/v1/wedding-service/lookup/${id}`,
-    SHIFTS: `${API_URL}/v1/wedding-service/lookup/shifts`
+    SHIFTS: `${API_URL}/v1/wedding-service/lookup/shifts`,
+    FOODS: `${API_URL}/v1/wedding-service/lookup/foods`
   }
 };
 
@@ -88,4 +101,4 @@ export const INVOICE_ENDPOINTS = {
   UPDATE: (id) => `${API_URL}/v1/invoice-service/${id}`,
   DELETE: (id) => `${API_URL}/v1/invoice-service/${id}`,
   HEALTH: `${API_URL}/v1/invoice-service/health`,
-}; 
+};

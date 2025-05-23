@@ -11,6 +11,7 @@ const hallManagementRoutes = require('./routes/hallManagementRoutes');
 const regulationRoutes = require('./routes/regulationRoutes');
 const serviceRoutes = require('./routes/serviceRoutes');
 const weddingLookupRoutes = require('./routes/WeddingLookupRoutes');
+const weddingBookingRoutes = require('./routes/weddingBookingRoutes');
 
 // Initialize Express app
 const app = express();
@@ -62,6 +63,7 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpecs, {
 // Microservice-style API routes - each with its own prefix
 app.use('/api/v1/auth-service', authRoutes);
 app.use('/api/v1/invoice-service', invoiceRoutes);
+app.use('/api/v1/wedding-service/bookings', weddingBookingRoutes);
 app.use('/api/v1/wedding-service/tiec-cuoi', tiecCuoiRoutes);
 app.use('/api/v1/wedding-service/ca-tiec', caTiecRoutes);
 app.use('/api/v1/wedding-service/lobby', hallManagementRoutes);
@@ -73,6 +75,7 @@ app.use('/api/v1/report-service', reportRoutes);
 // Legacy routes for backward compatibility - TO BE REMOVED IN FUTURE
 app.use('/api/auth', authRoutes);  
 app.use('/api/invoices', invoiceRoutes);
+app.use('/api/bookings', weddingBookingRoutes);
 
 // Not found handler
 app.use((req, res) => {
@@ -91,4 +94,4 @@ app.use((err, req, res, next) => {
   });
 });
 
-module.exports = app; 
+module.exports = app;

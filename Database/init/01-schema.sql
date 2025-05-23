@@ -75,6 +75,7 @@ CREATE TABLE SanhTiec (
     SucChua INT NOT NULL,
     GiaThue DECIMAL(18,2) NOT NULL,
     ID_LoaiSanh INT NOT NULL,
+    HinhAnh VARCHAR(255),
     FOREIGN KEY (ID_LoaiSanh) REFERENCES LoaiSanh(ID_LoaiSanh)
 );
 
@@ -87,6 +88,7 @@ CREATE TABLE TiecCuoi (
     ThoiDiemDat DATETIME NOT NULL,
     SoLuongBan INT NOT NULL,
     SoBanDuTru INT,
+    TrangThai VARCHAR(50) NOT NULL, -- Chưa thanh toán còn lại, Đã thanh toán, Đã hủy
     FOREIGN KEY (ID_KhachHang) REFERENCES KhachHang(ID_KhachHang),
     FOREIGN KEY (ID_SanhTiec) REFERENCES SanhTiec(ID_SanhTiec),
     FOREIGN KEY (ID_Ca) REFERENCES CaTiec(ID_Ca)
@@ -139,6 +141,7 @@ CREATE TABLE MonAn (
 CREATE TABLE Tiec_MonAn (
     ID_TiecCuoi INT,
     ID_MonAn INT,
+    SoLuong INT NOT NULL,
     DonGia DECIMAL(18,2) NOT NULL,
     PRIMARY KEY (ID_TiecCuoi, ID_MonAn),
     FOREIGN KEY (ID_TiecCuoi) REFERENCES TiecCuoi(ID_TiecCuoi),

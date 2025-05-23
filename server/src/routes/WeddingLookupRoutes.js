@@ -2,6 +2,7 @@
 const express = require('express');
 const router = express.Router();
 const weddingLookupController = require('../controllers/WeddingLookupController');
+const foodController = require('../controllers/foodController');
 
 /**
  * @swagger
@@ -114,5 +115,28 @@ router.get('/shifts', weddingLookupController.getShifts);
  *                   $ref: '#/components/schemas/Wedding'
  */
 router.get('/:id', weddingLookupController.getBookingDetail);
+
+/**
+ * @swagger
+ * /api/v1/wedding-service/lookup/foods:
+ *   get:
+ *     summary: Lấy danh sách món ăn
+ *     tags: [Wedding Lookup]
+ *     responses:
+ *       200:
+ *         description: Danh sách món ăn
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/Food'
+ */
+router.get('/foods', foodController.getAllFoods.bind(foodController));
 
 module.exports = router;

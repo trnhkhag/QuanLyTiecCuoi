@@ -16,6 +16,12 @@ class WeddingBookingController {
       // Lấy dữ liệu từ request
       const bookingData = req.body;
       console.log('Received booking data:', bookingData);
+
+      console.log('Received booking data:', JSON.stringify(bookingData, null, 2));
+      console.log('Received foods data (type):', typeof bookingData.foods);
+      console.log('Is foods array?', Array.isArray(bookingData.foods));
+      console.log('Foods data:', bookingData.foods);
+
       // Debug required fields
       console.log('Validating required fields:', {
         hallId: bookingData.hallId,
@@ -60,13 +66,19 @@ class WeddingBookingController {
       const serviceBookingData = {
         customerId,
         hallId: parseInt(bookingData.hallId),
+
         weddingDate: formattedWeddingDate,
         shiftId: parseInt(bookingData.shiftId),
         tableCount: parseInt(bookingData.numberOfTables) || 0,
         reserveTableCount: parseInt(bookingData.numberOfGuests) || 0,
+        weddingDate: formattedWeddingDate,
+        shiftId: parseInt(bookingData.shiftId),        
+        tableCount: parseInt(bookingData.tableCount) || parseInt(bookingData.numberOfTables) || 0,
+        reserveTableCount: parseInt(bookingData.reserveTableCount) || Math.ceil((parseInt(bookingData.tableCount) || 1) * 0.1) || 0,
         note: bookingData.note || '',
         deposit: parseInt(bookingData.deposit) || 0,
-        services: []
+        services: [],
+        foods: [] // Thêm mảng foods cho dữ liệu món ăn
       };
       
       console.log('Prepared booking data:', serviceBookingData);
@@ -101,6 +113,42 @@ class WeddingBookingController {
             }
           } catch (serviceError) {
             console.error('Error processing service:', serviceError);
+          }
+        }
+      }
+      
+      // Xử lý dữ liệu món ăn nếu có
+      if (bookingData.foods && bookingData.foods.length > 0) {
+        console.log('Processing foods:', bookingData.foods);
+        
+        for (const food of bookingData.foods) {
+          console.log('Processing food:', food);
+          
+          if (!food.id) {
+            console.warn('Missing food ID, skipping food:', food);
+            continue;
+          }
+          
+          try {
+            const [foodData] = await connection.query(
+              'SELECT DonGia FROM MonAn WHERE ID_MonAn = ?',
+              [food.id]
+            );
+            
+            if (foodData && foodData.length > 0) {
+              const foodItem = {
+                id: parseInt(food.id),
+                quantity: parseInt(food.quantity) || 1,
+                price: parseFloat(foodData[0].DonGia)
+              };
+              
+              console.log('Adding food to booking data:', foodItem);
+              serviceBookingData.foods.push(foodItem);
+            } else {
+              console.warn('Food not found in database:', food.id);
+            }
+          } catch (foodError) {
+            console.error('Error processing food:', foodError);
           }
         }
       }
