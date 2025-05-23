@@ -18,6 +18,7 @@ const serviceRoutes = require('./routes/serviceRoutes');
 const regulationRoutes = require('./routes/regulationRoutes');
 const weddingLookupRoutes = require('./routes/WeddingLookupRoutes');
 const hallManagementRoutes = require('./routes/hallManagementRoutes');
+const tiecCuoiRoutes = require('./routes/tiecCuoiRoutes');
 
 // Register thêm các routes
 app.use('/api/v1/wedding-service/bookings', weddingBookingRoutes);
@@ -26,6 +27,7 @@ app.use('/api/v1/wedding-service/services', serviceRoutes);
 app.use('/api/v1/wedding-service/regulations', regulationRoutes);
 app.use('/api/v1/wedding-service/lookup', weddingLookupRoutes);
 app.use('/api/v1/wedding-service/lobby', hallManagementRoutes);
+app.use('/api/v1/wedding-service/tiec-cuoi', tiecCuoiRoutes);
 
 // Legacy routes cho backward compatibility
 app.use('/api/bookings', weddingBookingRoutes);

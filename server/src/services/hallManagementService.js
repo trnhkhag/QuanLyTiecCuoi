@@ -1,10 +1,10 @@
-const db = require('../config/db');
+const { pool } = require('../config/db');
 
 class HallManagementService {
   // Lấy tất cả sảnh kèm thông tin loại
   async getAllHalls() {
     try {
-      const [halls] = await db.query(`
+      const [halls] = await pool.query(`
         SELECT s.ID_SanhTiec, s.TenSanh, s.SucChua, s.GiaThue, s.HinhAnh,
                l.ID_LoaiSanh, l.TenLoai, l.GiaBanToiThieu
         FROM SanhTiec s
@@ -21,7 +21,7 @@ class HallManagementService {
   // Lấy chi tiết một sảnh theo ID
   async getHallById(hallId) {
     try {
-      const [halls] = await db.query(`
+      const [halls] = await pool.query(`
         SELECT s.ID_SanhTiec, s.TenSanh, s.SucChua, s.GiaThue, s.HinhAnh,
                l.ID_LoaiSanh, l.TenLoai, l.GiaBanToiThieu
         FROM SanhTiec s
@@ -38,7 +38,7 @@ class HallManagementService {
   // Tạo sảnh mới
   async createHall(hallData) {
     try {
-      const [result] = await db.query(
+      const [result] = await pool.query(
         'INSERT INTO SanhTiec (TenSanh, SucChua, GiaThue, ID_LoaiSanh, HinhAnh) VALUES (?, ?, ?, ?, ?)',
         [hallData.TenSanh, hallData.SucChua, hallData.GiaThue, hallData.ID_LoaiSanh, hallData.HinhAnh]
       );
@@ -78,7 +78,7 @@ class HallManagementService {
 
       params.push(hallId);
 
-      await db.query(
+      await pool.query(
         `UPDATE SanhTiec SET ${updateFields.join(', ')} WHERE ID_SanhTiec = ?`,
         params
       );
@@ -92,7 +92,7 @@ class HallManagementService {
   // Xóa sảnh
   async deleteHall(hallId) {
     try {
-      const [result] = await db.query('DELETE FROM SanhTiec WHERE ID_SanhTiec = ?', [hallId]);
+      const [result] = await pool.query('DELETE FROM SanhTiec WHERE ID_SanhTiec = ?', [hallId]);
       return result.affectedRows > 0;
     } catch (error) {
       console.error('Error in deleteHall service:', error);
@@ -103,7 +103,7 @@ class HallManagementService {
   // Lấy tất cả loại sảnh
   async getAllHallTypes() {
     try {
-      const [types] = await db.query('SELECT * FROM LoaiSanh ORDER BY TenLoai');
+      const [types] = await pool.query('SELECT * FROM LoaiSanh ORDER BY TenLoai');
       return types;
     } catch (error) {
       console.error('Error in getAllHallTypes service:', error);

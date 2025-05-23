@@ -1,12 +1,11 @@
 import axios from 'axios';
-
-const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:3001/api';
+import { WEDDING_ENDPOINTS } from '../globals/api.global';
 
 class RegulationService {
     // Lấy danh sách quy định
     async getRegulations() {
         try {
-            const response = await axios.get(`${API_URL}/regulations`);
+            const response = await axios.get(WEDDING_ENDPOINTS.REGULATION.GET_ALL);
             return response.data.data;
         } catch (error) {
             console.error('Error fetching regulations:', error);
@@ -17,7 +16,7 @@ class RegulationService {
     // Lấy chi tiết quy định
     async getRegulationById(id) {
         try {
-            const response = await axios.get(`${API_URL}/regulations/${id}`);
+            const response = await axios.get(WEDDING_ENDPOINTS.REGULATION.GET_BY_ID(id));
             return response.data.data;
         } catch (error) {
             console.error('Error fetching regulation detail:', error);
@@ -25,35 +24,24 @@ class RegulationService {
         }
     }
 
-    // Cập nhật quy định
-    async updateRegulation(id, data) {
+    // Tạo quy định mới
+    async createRegulation(regulationData) {
         try {
-            const response = await axios.put(`${API_URL}/regulations/${id}`, data);
-            return response.data.data;
+            const response = await axios.post(WEDDING_ENDPOINTS.REGULATION.CREATE, regulationData);
+            return response.data;
         } catch (error) {
-            console.error('Error updating regulation:', error);
+            console.error('Error creating regulation:', error);
             throw error;
         }
     }
 
-    // Thêm mới quy định
-    async createRegulation(data) {
+    // Cập nhật quy định
+    async updateRegulation(id, regulationData) {
         try {
-            // Tạo ID tự động theo format QDx, với x là số tiếp theo
-            const response = await axios.get(`${API_URL}/regulations`);
-            const regulations = response.data.data;
-            let maxId = 0;
-            regulations.forEach(reg => {
-                const num = parseInt(reg.ID_QuyDinh.replace('QD', ''));
-                if (!isNaN(num) && num > maxId) maxId = num;
-            });
-            const newId = `QD${maxId + 1}`;
-            
-            const newData = { ...data, ID_QuyDinh: newId };
-            const createResponse = await axios.post(`${API_URL}/regulations`, newData);
-            return { ...newData, ...createResponse.data.data };
+            const response = await axios.put(WEDDING_ENDPOINTS.REGULATION.UPDATE(id), regulationData);
+            return response.data;
         } catch (error) {
-            console.error('Error creating regulation:', error);
+            console.error('Error updating regulation:', error);
             throw error;
         }
     }
@@ -61,7 +49,7 @@ class RegulationService {
     // Xóa quy định
     async deleteRegulation(id) {
         try {
-            await axios.delete(`${API_URL}/regulations/${id}`);
+            await axios.delete(WEDDING_ENDPOINTS.REGULATION.DELETE(id));
             return true;
         } catch (error) {
             console.error('Error deleting regulation:', error);
@@ -70,5 +58,4 @@ class RegulationService {
     }
 }
 
-const regulationService = new RegulationService();
-export default regulationService;
+export default new RegulationService();

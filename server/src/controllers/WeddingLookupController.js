@@ -74,6 +74,36 @@ class WeddingLookupController {
       });
     }
   }
+
+  getShifts = async (req, res) => {
+    try {
+      const shifts = [
+        {
+          id: 1,
+          name: 'Ca sáng',
+          startTime: '11:00',
+          endTime: '14:00'
+        },
+        {
+          id: 2,
+          name: 'Ca chiều',
+          startTime: '17:00',
+          endTime: '20:00'
+        }
+      ];
+
+      res.json({
+        success: true,
+        data: shifts
+      });
+    } catch (error) {
+      console.error('Error getting shifts:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Internal server error'
+      });
+    }
+  };
 }
 
 module.exports = new WeddingLookupController();

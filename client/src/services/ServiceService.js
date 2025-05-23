@@ -1,6 +1,5 @@
 import axios from 'axios';
-
-const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:3001/api';
+import { WEDDING_ENDPOINTS } from '../globals/api.global';
 
 /**
  * Service class để tương tác với API liên quan đến dịch vụ
@@ -8,7 +7,7 @@ const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:3001/api';
 class ServiceService {  // Lấy danh sách dịch vụ
   async getServices() {
     try {
-      const response = await axios.get(`${API_URL}/services`);
+      const response = await axios.get(WEDDING_ENDPOINTS.SERVICE.GET_ALL);
       console.log('API response for services:', response);
       
       // Kiểm tra cấu trúc dữ liệu
@@ -34,7 +33,7 @@ class ServiceService {  // Lấy danh sách dịch vụ
   // Lấy chi tiết dịch vụ
   async getServiceById(id) {
     try {
-      const response = await axios.get(`${API_URL}/services/${id}`);
+      const response = await axios.get(WEDDING_ENDPOINTS.SERVICE.GET_BY_ID(id));
       return response.data.success ? response.data.data : null;
     } catch (error) {
       console.error(`Error fetching service ${id}:`, error);

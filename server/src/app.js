@@ -7,6 +7,10 @@ const invoiceRoutes = require('./routes/invoiceRoutes');
 const tiecCuoiRoutes = require('./routes/tiecCuoiRoutes');
 const caTiecRoutes = require('./routes/caTiecRoutes');
 const reportRoutes = require('./routes/reportRoutes');
+const hallManagementRoutes = require('./routes/hallManagementRoutes');
+const regulationRoutes = require('./routes/regulationRoutes');
+const serviceRoutes = require('./routes/serviceRoutes');
+const weddingLookupRoutes = require('./routes/WeddingLookupRoutes');
 
 // Initialize Express app
 const app = express();
@@ -60,6 +64,10 @@ app.use('/api/v1/auth-service', authRoutes);
 app.use('/api/v1/invoice-service', invoiceRoutes);
 app.use('/api/v1/wedding-service/tiec-cuoi', tiecCuoiRoutes);
 app.use('/api/v1/wedding-service/ca-tiec', caTiecRoutes);
+app.use('/api/v1/wedding-service/lobby', hallManagementRoutes);
+app.use('/api/v1/wedding-service/regulations', regulationRoutes);
+app.use('/api/v1/wedding-service/services', serviceRoutes);
+app.use('/api/v1/wedding-service/lookup', weddingLookupRoutes);
 app.use('/api/v1/report-service', reportRoutes);
 
 // Legacy routes for backward compatibility - TO BE REMOVED IN FUTURE

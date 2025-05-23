@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { Form, Row, Col, Card, Button } from 'react-bootstrap';
+import { Form, Row, Col, Card, Button, Nav, Tab } from 'react-bootstrap';
 import { 
   LineChart, Line, 
   XAxis, YAxis, CartesianGrid, Tooltip, Legend, 
@@ -21,6 +21,7 @@ const MonthlyReportPage = () => {
   // Local state for filters
   const [year, setYear] = useState(currentDate.getFullYear());
   const [month, setMonth] = useState(currentDate.getMonth() + 1);
+  const [activeTab, setActiveTab] = useState('6months'); // Default to 6 months tab
   
   // Get report data from Redux store
   const { 
@@ -32,8 +33,10 @@ const MonthlyReportPage = () => {
   
   const fetchReportData = useCallback(() => {
     dispatch(fetchMonthlyReport({ year, month }));
-    dispatch(fetchRevenueTrend(6)); // Get 6 months of data
-  }, [year, month, dispatch]);
+    // Get months based on active tab
+    const months = activeTab === '6months' ? 6 : activeTab === '9months' ? 9 : 12;
+    dispatch(fetchRevenueTrend({ months, month, year }));
+  }, [year, month, activeTab, dispatch]);
   
   useEffect(() => {
     // Redirect to login if not authenticated
@@ -42,9 +45,9 @@ const MonthlyReportPage = () => {
       return;
     }
     
-    // Fetch report data when year or month changes
+    // Fetch report data when year, month, or active tab changes
     fetchReportData();
-  }, [year, month, navigate, fetchReportData]);
+  }, [year, month, activeTab, navigate, fetchReportData]);
   
   // Generate year options for the last 5 years and next year
   const yearOptions = [];
@@ -110,7 +113,7 @@ const MonthlyReportPage = () => {
           </div>
         )}
         
-        {/* Summary Statistics - Keep only the requested cards */}
+        {/* Summary Statistics */}
         <div className="report-summary">
           <Row>
             <Col md={4}>
@@ -146,11 +149,22 @@ const MonthlyReportPage = () => {
           </Row>
         </div>
         
-        {/* Charts Section - Keep only Revenue Trend */}
+        {/* Charts Section with Tabs */}
         <div className="report-charts">
-          {/* Revenue Trend */}
           <Card className="chart-card mt-4">
-            <Card.Header>Xu hướng doanh thu (6 tháng)</Card.Header>
+            <Card.Header>
+              <Nav variant="tabs" defaultActiveKey="6months" onSelect={(key) => setActiveTab(key)}>
+                <Nav.Item>
+                  <Nav.Link eventKey="6months">6 tháng</Nav.Link>
+                </Nav.Item>
+                <Nav.Item>
+                  <Nav.Link eventKey="9months">9 tháng</Nav.Link>
+                </Nav.Item>
+                <Nav.Item>
+                  <Nav.Link eventKey="12months">12 tháng</Nav.Link>
+                </Nav.Item>
+              </Nav>
+            </Card.Header>
             <Card.Body>
               {loading.trend ? (
                 <div className="text-center py-5">Đang tải dữ liệu...</div>
@@ -160,7 +174,7 @@ const MonthlyReportPage = () => {
                   <Row className="mb-4">
                     <Col md={4}>
                       <div className="trend-stat">
-                        <div className="trend-stat-label">Tổng doanh thu (6 tháng)</div>
+                        <div className="trend-stat-label">Tổng doanh thu</div>
                         <div className="trend-stat-value">{formatCurrency(revenueTrend.totalRevenue || 0)}</div>
                       </div>
                     </Col>

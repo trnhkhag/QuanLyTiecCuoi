@@ -1,19 +1,18 @@
 import axios from 'axios';
-
-const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:3001/api/v1';
+import { WEDDING_ENDPOINTS } from '../globals/api.global';
 
 class AdminHallService {
   // API quản lý sảnh
   getAllHalls() {
-    return axios.get(`${API_URL}/lobby/halls`);
+    return axios.get(WEDDING_ENDPOINTS.HALL.GET_ALL);
   }
 
   getHallById(id) {
-    return axios.get(`${API_URL}/lobby/halls/${id}`);
+    return axios.get(WEDDING_ENDPOINTS.HALL.GET_BY_ID(id));
   }
 
   createHall(hallData) {
-    return axios.post(`${API_URL}/lobby/halls`, hallData, {
+    return axios.post(WEDDING_ENDPOINTS.HALL.CREATE, hallData, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },
@@ -25,30 +24,29 @@ class AdminHallService {
       ? { 'Content-Type': 'multipart/form-data' }
       : { 'Content-Type': 'application/json' };
     
-    return axios.put(`${API_URL}/lobby/halls/${id}`, data, { headers });
+    return axios.put(WEDDING_ENDPOINTS.HALL.UPDATE(id), data, { headers });
   }
 
   deleteHall(id) {
-    return axios.delete(`${API_URL}/lobby/halls/${id}`);
+    return axios.delete(WEDDING_ENDPOINTS.HALL.DELETE(id));
   }
 
   // API quản lý loại sảnh
   getAllHallTypes() {
-    return axios.get(`${API_URL}/lobby/hall-types`);
+    return axios.get(WEDDING_ENDPOINTS.HALL_TYPE.GET_ALL);
   }
 
   createHallType(typeData) {
-    return axios.post(`${API_URL}/lobby/hall-types`, typeData);
+    return axios.post(WEDDING_ENDPOINTS.HALL_TYPE.CREATE, typeData);
   }
 
   updateHallType(id, typeData) {
-    return axios.put(`${API_URL}/lobby/hall-types/${id}`, typeData);
+    return axios.put(WEDDING_ENDPOINTS.HALL_TYPE.UPDATE(id), typeData);
   }
 
   deleteHallType(id) {
-    return axios.delete(`${API_URL}/lobby/hall-types/${id}`);
+    return axios.delete(WEDDING_ENDPOINTS.HALL_TYPE.DELETE(id));
   }
 }
 
-const adminHallService = new AdminHallService();
-export default adminHallService;
+export default new AdminHallService();

@@ -52,6 +52,38 @@ const weddingLookupController = require('../controllers/WeddingLookupController'
 router.get('/', weddingLookupController.searchBookings);
 
 /**
+ * @swagger
+ * /api/v1/wedding-service/lookup/shifts:
+ *   get:
+ *     summary: Get all available shifts
+ *     tags: [Wedding Lookup]
+ *     responses:
+ *       200:
+ *         description: List of available shifts
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       id:
+ *                         type: integer
+ *                       name:
+ *                         type: string
+ *                       startTime:
+ *                         type: string
+ *                       endTime:
+ *                         type: string
+ */
+router.get('/shifts', weddingLookupController.getShifts);
+
+/**
 //  * @swagger
  * /api/v1/wedding-service/lookup/{id}:
  *   get:

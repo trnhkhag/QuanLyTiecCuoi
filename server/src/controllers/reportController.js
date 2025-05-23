@@ -183,11 +183,17 @@ exports.getYearlyReport = async (req, res) => {
 // Get revenue trend data for the specified number of months
 exports.getRevenueTrend = async (req, res) => {
   try {
-    const { months } = req.query;
+    const { months, month, year } = req.query;
     const numberOfMonths = parseInt(months) || 6; // Default to 6 months if not specified
     
-    // Calculate the date range (current month and past N months)
-    const currentDate = new Date();
+    // Calculate the date range based on the specified month and year, or use current date
+    let currentDate;
+    if (month && year) {
+      currentDate = new Date(parseInt(year), parseInt(month) - 1);
+    } else {
+      currentDate = new Date();
+    }
+    
     const endDate = endOfMonth(currentDate);
     const startDate = startOfMonth(subMonths(currentDate, numberOfMonths - 1));
     

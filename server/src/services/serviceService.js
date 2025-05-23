@@ -1,10 +1,10 @@
-const db = require('../config/db');
+const { pool } = require('../config/db');
 
 class ServiceService {
   // Lấy tất cả dịch vụ
   async getAllServices() {
     try {
-      const [services] = await db.query(`
+      const [services] = await pool.query(`
         SELECT ID_DichVu, TenDichVu, DonGia
         FROM DichVu
         ORDER BY ID_DichVu
@@ -19,7 +19,7 @@ class ServiceService {
   // Lấy dịch vụ theo ID
   async getServiceById(serviceId) {
     try {
-      const [services] = await db.query(`
+      const [services] = await pool.query(`
         SELECT ID_DichVu, TenDichVu, DonGia
         FROM DichVu
         WHERE ID_DichVu = ?
@@ -42,7 +42,7 @@ class ServiceService {
     try {
       const { TenDichVu, DonGia } = serviceData;
       
-      const [result] = await db.query(`
+      const [result] = await pool.query(`
         INSERT INTO DichVu (TenDichVu, DonGia)
         VALUES (?, ?)
       `, [TenDichVu, DonGia]);
@@ -64,7 +64,7 @@ class ServiceService {
     try {
       const { TenDichVu, DonGia } = serviceData;
       
-      const [result] = await db.query(`
+      const [result] = await pool.query(`
         UPDATE DichVu
         SET TenDichVu = ?, DonGia = ?
         WHERE ID_DichVu = ?
@@ -90,7 +90,7 @@ class ServiceService {
   async deleteService(serviceId) {
     try {
       // Kiểm tra xem dịch vụ đã được sử dụng trong bảng Tiec_DichVu chưa
-      const [usedServices] = await db.query(`
+      const [usedServices] = await pool.query(`
         SELECT ID_TiecCuoi
         FROM Tiec_DichVu
         WHERE ID_DichVu = ?
@@ -102,7 +102,7 @@ class ServiceService {
         throw new Error('Không thể xóa dịch vụ đã được sử dụng trong tiệc cưới');
       }
       
-      const [result] = await db.query(`
+      const [result] = await pool.query(`
         DELETE FROM DichVu
         WHERE ID_DichVu = ?
       `, [serviceId]);

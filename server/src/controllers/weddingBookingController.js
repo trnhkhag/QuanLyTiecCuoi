@@ -1,5 +1,5 @@
 const weddingBookingService = require('../services/weddingBookingService');
-const pool = require('../config/db');
+const { pool } = require('../config/db');
 
 /**
  * Controller quản lý các API cho chức năng đặt tiệc cưới
