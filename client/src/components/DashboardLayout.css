@@ -41,11 +41,11 @@ body {
 
 .main-content {
   flex: 1;
-  margin-left: var(--sidebar-width);
+  margin-left: 250px; /* Cố định chiều rộng sidebar dựa trên DashboardNavbar */
   transition: all 0.3s ease;
   min-height: 100vh;
   background-color: var(--bg-color);
-  width: calc(100% - var(--sidebar-width));
+  width: calc(100% - 250px); /* Sửa để phù hợp với chiều rộng sidebar thực tế */
   overflow-x: auto;
 }
 
@@ -213,4 +213,4 @@ body {
     box-shadow: none;
     border: 1px solid var(--border-color);
   }
-} 
+}
