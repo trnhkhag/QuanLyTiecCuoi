@@ -3,7 +3,7 @@ version: '3.8'
 services:
   # Frontend React application - Production
   qltc-client:
-    image: ${BIZFLY_REGISTRY:-cr-hn-1.bizflycloud.vn}/${BIZFLY_UNIQUE_ID}/qltc-client:${IMAGE_TAG:-latest}
+    image: ${DOCKER_USERNAME:-qltc}/qltc-client:${IMAGE_TAG:-latest}
     ports:
       - "80:80"
     environment:
@@ -21,7 +21,7 @@ services:
 
   # Backend Node.js server - Production
   qltc-server:
-    image: ${BIZFLY_REGISTRY:-cr-hn-1.bizflycloud.vn}/${BIZFLY_UNIQUE_ID}/qltc-server:${IMAGE_TAG:-latest}
+    image: ${DOCKER_USERNAME:-qltc}/qltc-server:${IMAGE_TAG:-latest}
     ports:
       - "3001:3001"
     environment:

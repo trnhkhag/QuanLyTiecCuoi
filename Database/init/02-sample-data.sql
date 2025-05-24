@@ -86,8 +86,10 @@ VALUES
 (6, 1), -- MANAGE_HALLS (Quản lý Sảnh)
 (6, 8), -- VIEW_PROFILE
 
--- Customer - Chỉ có quyền xem thông tin cá nhân
-(7, 8);
+-- Customer - Chỉ có quyền xem thông tin cá nhân và đặt tiệc cưới
+(7, 2), -- MANAGE_BOOKINGS (Nhận Đặt Tiệc Cưới)
+(7, 3), -- SEARCH_WEDDINGS (Tra cứu Tiệc Cưới)
+(7, 8); -- VIEW_PROFILE
 
 -- Assign roles to accounts
 INSERT INTO TaiKhoan_VaiTro (ID_TaiKhoan, ID_VaiTro)
