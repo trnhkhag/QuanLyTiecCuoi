@@ -23,6 +23,18 @@ authAxios.interceptors.request.use(
   }
 );
 
+// Permission constants matching backend
+export const PERMISSIONS = {
+  MANAGE_HALLS: 1,
+  MANAGE_BOOKINGS: 2,
+  SEARCH_WEDDINGS: 4,
+  MANAGE_INVOICES: 8,
+  VIEW_REPORTS: 16,
+  MANAGE_REGULATIONS: 32,
+  MANAGE_USERS: 64,
+  VIEW_PROFILE: 128
+};
+
 /**
  * Authentication service for handling auth-related API requests
  */
@@ -46,9 +58,19 @@ class AuthService {
       });
       
       if (response.data.token) {
-        localStorage.setItem('user', JSON.stringify(response.data));
+        // Store complete user data including permissions
+        const userData = {
+          token: response.data.token,
+          user: response.data.user,
+          totalPermissions: response.data.user?.totalPermissions || 0
+        };
+        
+        localStorage.setItem('user', JSON.stringify(userData));
+        localStorage.setItem('token', response.data.token);
+        
         // Set the token for all future axios requests
         axios.defaults.headers.common['Authorization'] = `Bearer ${response.data.token}`;
+        authAxios.defaults.headers.common['Authorization'] = `Bearer ${response.data.token}`;
       }
       
       return response.data;
@@ -76,9 +98,19 @@ class AuthService {
       });
       
       if (response.data.token) {
-        localStorage.setItem('user', JSON.stringify(response.data));
+        // Store complete user data including permissions
+        const userData = {
+          token: response.data.token,
+          user: response.data.user,
+          totalPermissions: response.data.user?.totalPermissions || 0
+        };
+        
+        localStorage.setItem('user', JSON.stringify(userData));
+        localStorage.setItem('token', response.data.token);
+        
         // Set the token for all future axios requests
         axios.defaults.headers.common['Authorization'] = `Bearer ${response.data.token}`;
+        authAxios.defaults.headers.common['Authorization'] = `Bearer ${response.data.token}`;
       }
       
       return response.data;
@@ -93,8 +125,10 @@ class AuthService {
    */
   logout() {
     localStorage.removeItem('user');
+    localStorage.removeItem('token');
     // Remove the token from axios headers
     delete axios.defaults.headers.common['Authorization'];
+    delete authAxios.defaults.headers.common['Authorization'];
   }
 
   /**
@@ -107,12 +141,59 @@ class AuthService {
   }
 
   /**
+   * Get the current user's total permissions
+   * @returns {number} The user's total permissions value
+   */
+  getCurrentUserPermissions() {
+    const user = this.getCurrentUser();
+    return user?.totalPermissions || 0;
+  }
+
+  /**
    * Check if a user is logged in
    * @returns {boolean} True if user is logged in
    */
   isLoggedIn() {
     const user = this.getCurrentUser();
-    return !!user && !!user.token;
+    const token = localStorage.getItem('token');
+    return !!user && !!token;
+  }
+
+  /**
+   * Check if the current user has a specific permission
+   * @param {number} permission - Permission value to check
+   * @returns {boolean} True if user has the permission
+   */
+  hasPermission(permission) {
+    const userPermissions = this.getCurrentUserPermissions();
+    return (userPermissions & permission) === permission;
+  }
+
+  /**
+   * Check if the current user has any of the specified permissions
+   * @param {number} permissions - Permission values combined with bitwise OR
+   * @returns {boolean} True if user has any of the permissions
+   */
+  hasAnyPermission(permissions) {
+    const userPermissions = this.getCurrentUserPermissions();
+    return (userPermissions & permissions) > 0;
+  }
+
+  /**
+   * Get a list of permission names the user has
+   * @returns {Array<string>} Array of permission names
+   */
+  getUserPermissionNames() {
+    const userPermissions = this.getCurrentUserPermissions();
+    const permissionNames = [];
+    
+    Object.entries(PERMISSIONS).forEach(([name, value]) => {
+      if (this.hasPermission(value)) {
+        permissionNames.push(name.toLowerCase().replace(/_/g, ' '));
+      }
+    });
+    
+    return permissionNames;
   }
 
   /**
@@ -140,13 +221,10 @@ class AuthService {
 
 // Set the authorization header if the user is already logged in
 const setAuthHeader = () => {
-  const userJson = localStorage.getItem('user');
-  if (userJson) {
-    const user = JSON.parse(userJson);
-    if (user && user.token) {
-      axios.defaults.headers.common['Authorization'] = `Bearer ${user.token}`;
-      authAxios.defaults.headers.common['Authorization'] = `Bearer ${user.token}`;
-    }
+  const token = localStorage.getItem('token');
+  if (token) {
+    axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+    authAxios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
   }
 };
 

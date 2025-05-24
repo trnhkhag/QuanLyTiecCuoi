@@ -20,13 +20,13 @@ const RegisterPage = () => {
         <div className="auth-card register-card">
           <div className="auth-header">
             <h2 className="auth-title">Tạo tài khoản</h2>
-            <p className="auth-subtitle">Tham gia vào hệ thống của tụi tớ đi</p>
+            <p className="auth-subtitle">Tạo tài khoản để trở thành thành viên của chúng tôi</p>
           </div>
           <div className="auth-body">
             <RegisterForm />
           </div>
           <div className="auth-footer">
-            <p>Đã có acc rồi à? <a href="/login" className="auth-link">Đăng nhập ngay</a></p>
+            <p>Bạn đã có tài khoản? <a href="/login" className="auth-link">Đăng nhập ngay</a></p>
           </div>
         </div>
       </div>

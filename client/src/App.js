@@ -7,6 +7,10 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import 'react-toastify/dist/ReactToastify.css';
 import './App.css';
 
+// Components
+import ProtectedRoute from './components/ProtectedRoute';
+import { PERMISSIONS } from './services/authService';
+
 // Layouts
 import DashboardLayout from './components/DashboardLayout';
 
@@ -19,6 +23,7 @@ import DashboardPage from './pages/dashboard/DashboardPage';
 import InvoicesPage from './pages/invoice/InvoicesPage';
 import InvoiceInformationPage from './pages/invoice/InvoiceInformationPage';
 import MonthlyReportPage from './pages/report/MonthlyReportPage';
+import ProfilePage from './pages/Profile/ProfilePage';
 
 // Admin Routes
 import AdminRoutes from './main/Admin/AdminRoutes';
@@ -49,14 +54,49 @@ function App() {
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
         
-        {/* Dashboard Layout Routes */}
-        <Route element={<DashboardLayout />}>
+        {/* Protected Dashboard Layout Routes */}
+        <Route element={
+          <ProtectedRoute>
+            <DashboardLayout />
+          </ProtectedRoute>
+        }>
           <Route path="/dashboard" element={<DashboardPage />} />
-          <Route path="/invoices" element={<InvoicesPage />} />
-          <Route path="/invoice/:id" element={<InvoiceInformationPage />} />
-          <Route path="/reports" element={<MonthlyReportPage />} />
-          <Route path="/admin/*" element={<AdminRoutes />} />
-          <Route path="/booking/*" element={<BookingRoutes />} />
+          
+          <Route path="/invoices" element={
+            <ProtectedRoute requiredPermission={PERMISSIONS.MANAGE_INVOICES}>
+              <InvoicesPage />
+            </ProtectedRoute>
+          } />
+          
+          <Route path="/invoice/:id" element={
+            <ProtectedRoute requiredPermission={PERMISSIONS.MANAGE_INVOICES}>
+              <InvoiceInformationPage />
+            </ProtectedRoute>
+          } />
+          
+          <Route path="/reports" element={
+            <ProtectedRoute requiredPermission={PERMISSIONS.VIEW_REPORTS}>
+              <MonthlyReportPage />
+            </ProtectedRoute>
+          } />
+          
+          <Route path="/profile" element={
+            <ProtectedRoute requiredPermission={PERMISSIONS.VIEW_PROFILE}>
+              <ProfilePage />
+            </ProtectedRoute>
+          } />
+          
+          <Route path="/admin/*" element={
+            <ProtectedRoute requiredPermission={PERMISSIONS.MANAGE_HALLS | PERMISSIONS.MANAGE_REGULATIONS | PERMISSIONS.MANAGE_USERS}>
+              <AdminRoutes />
+            </ProtectedRoute>
+          } />
+          
+          <Route path="/booking/*" element={
+            <ProtectedRoute requiredPermission={PERMISSIONS.MANAGE_BOOKINGS | PERMISSIONS.SEARCH_WEDDINGS}>
+              <BookingRoutes />
+            </ProtectedRoute>
+          } />
         </Route>
 
         {/* Redirect root to dashboard */}

@@ -7,10 +7,11 @@ const invoiceRoutes = require('./routes/invoiceRoutes');
 const tiecCuoiRoutes = require('./routes/tiecCuoiRoutes');
 const caTiecRoutes = require('./routes/caTiecRoutes');
 const reportRoutes = require('./routes/reportRoutes');
+const profileRoutes = require('./routes/profileRoutes');
 const hallManagementRoutes = require('./routes/hallManagementRoutes');
 const regulationRoutes = require('./routes/regulationRoutes');
 const serviceRoutes = require('./routes/serviceRoutes');
-const weddingLookupRoutes = require('./routes/WeddingLookupRoutes');
+const weddingLookupRoutes = require('./routes/weddingLookupRoutes'); // Sửa đúng chữ hoa/thường
 const weddingBookingRoutes = require('./routes/weddingBookingRoutes');
 
 // Initialize Express app
@@ -39,6 +40,15 @@ app.get('/api/v1/wedding-service/health', (req, res) => {
 
 app.get('/api/v1/report-service/health', (req, res) => {
   res.status(200).json({ status: 'OK', service: 'report-service' });
+});
+
+app.get('/api/v1/profile-service/health', (req, res) => {
+  res.status(200).json({ status: 'OK', service: 'profile-service' });
+});
+
+// Health check endpoint for api root
+app.get('/api/health', (req, res) => {
+  res.status(200).json({ status: 'ok', message: 'API is running' });
 });
 
 // Swagger UI setup
@@ -71,11 +81,15 @@ app.use('/api/v1/wedding-service/regulations', regulationRoutes);
 app.use('/api/v1/wedding-service/services', serviceRoutes);
 app.use('/api/v1/wedding-service/lookup', weddingLookupRoutes);
 app.use('/api/v1/report-service', reportRoutes);
+app.use('/api/v1/profile-service', profileRoutes);
 
 // Legacy routes for backward compatibility - TO BE REMOVED IN FUTURE
 app.use('/api/auth', authRoutes);  
 app.use('/api/invoices', invoiceRoutes);
 app.use('/api/bookings', weddingBookingRoutes);
+
+// Thêm mới: Routes cho giao diện người dùng phía client
+app.use('/api/weddings', weddingLookupRoutes);
 
 // Not found handler
 app.use((req, res) => {

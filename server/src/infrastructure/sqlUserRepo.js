@@ -208,10 +208,20 @@ class SqlUserRepository {
         WHERE vq.ID_VaiTro = ?
       `;
       
-      const roleId = user.ID_VaiTro || 2; // Default to regular user if not found
+      const roleId = user.ID_VaiTro || 3; // Default to customer role if not found
       console.log(`Fetching permissions for account ID: ${user.ID_TaiKhoan}, role ID: ${roleId}`);
       
       const permissionsResult = await execute(permissionsQuery, [roleId]);
+      
+      // Calculate total permissions value using bitwise OR
+      let totalPermissions = 0;
+      const permissions = permissionsResult.map(p => {
+        totalPermissions |= p.GiaTri; // Bitwise OR to combine permissions
+        return {
+          name: p.Ten_Quyen,
+          value: p.GiaTri
+        };
+      });
       
       // Create user profile with permissions
       const userProfile = {
@@ -220,20 +230,19 @@ class SqlUserRepository {
         employeeId: user.ID_NhanVien > 0 ? user.ID_NhanVien : null,
         name: user.HoTen,
         email: user.Email,
-        role: user.TenVaiTro || 'user',
-        permissions: permissionsResult.map(p => ({
-          name: p.Ten_Quyen,
-          value: p.GiaTri
-        }))
+        role: user.TenVaiTro || 'customer',
+        permissions: permissions,
+        totalPermissions: totalPermissions // Total permissions value for bitwise operations
       };
       
-      // Create JWT token
+      // Create JWT token with permissions
       const payload = {
         user: {
           id: userProfile.id,
           name: userProfile.name,
           email: userProfile.email,
-          role: userProfile.role
+          role: userProfile.role,
+          permissions: totalPermissions // Include in JWT for authorization
         }
       };
       

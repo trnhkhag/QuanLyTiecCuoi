@@ -39,13 +39,27 @@ const HallDetailPage = () => {
   const [selectedImage, setSelectedImage] = useState(null);
   const [bookedDates, setBookedDates] = useState([]);
 
-  // Thêm ảnh demo cho sảnh
-  const hallImages = [
-    `/assets/hall-${id}.jpg`,
-    '/assets/hall-1.jpg',
-    '/assets/hall-2.jpg',
-    '/assets/hall-3.jpg',
-  ];
+  // Hàm để lấy URL hình ảnh từ đường dẫn trong database
+  const getImageUrl = (hallData) => {
+    if (hallData && hallData.HinhAnh) {
+      // Lấy tên file từ đường dẫn đầy đủ
+      const fileName = hallData.HinhAnh.split('/').pop();
+      return `http://localhost:3001/api/v1/wedding-service/lobby/image/${fileName}`;
+    }
+    // Fallback nếu không có hình ảnh
+    return '/assets/hall-1.jpg';
+  };
+
+  // Tạo danh sách hình ảnh từ hình ảnh trong database và các hình ảnh mặc định
+  const getHallImages = (hallData) => {
+    const mainImage = hallData && hallData.HinhAnh ? getImageUrl(hallData) : `/assets/hall-${id}.jpg`;
+    return [
+      mainImage,
+      '/assets/hall-1.jpg',
+      '/assets/hall-2.jpg',
+      '/assets/hall-3.jpg',
+    ];
+  };
 
   useEffect(() => {
     fetchHallDetails();
@@ -99,6 +113,9 @@ const HallDetailPage = () => {
   );
 
   if (!hall) return null;
+
+  // Lấy danh sách hình ảnh dựa trên dữ liệu sảnh
+  const hallImages = getHallImages(hall);
 
   const disabledDate = (current) => {
     // Disable dates before today and booked dates

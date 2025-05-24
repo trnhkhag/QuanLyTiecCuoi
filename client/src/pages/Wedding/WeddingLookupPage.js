@@ -10,10 +10,10 @@ import {
   Tag,
   Descriptions,
   Divider,
+  Space
 } from 'antd';
 import {
   SearchOutlined,
-  PhoneOutlined,
   IdcardOutlined,
   CheckCircleOutlined,
   ClockCircleOutlined,
@@ -49,6 +49,12 @@ const WeddingLookupPage = () => {
     }
   };
 
+  const handleReset = () => {
+    form.resetFields();
+    setBooking(null);
+    setError(null);
+  };
+
   return (
     <UserLayout>
       <div style={{ maxWidth: 800, margin: '0 auto' }}>
@@ -74,32 +80,24 @@ const WeddingLookupPage = () => {
               />
             </Form.Item>
 
-            <Form.Item
-              name="phone"
-              label="Số điện thoại"
-              rules={[
-                { required: true, message: 'Vui lòng nhập số điện thoại' },
-                { pattern: /^[0-9]{10}$/, message: 'Số điện thoại không hợp lệ' }
-              ]}
-            >
-              <Input
-                prefix={<PhoneOutlined />}
-                placeholder="Nhập số điện thoại đăng ký"
-                size="large"
-              />
-            </Form.Item>
-
             <Form.Item>
-              <Button
-                type="primary"
-                htmlType="submit"
-                icon={<SearchOutlined />}
-                loading={loading}
-                size="large"
-                block
-              >
-                Tra cứu
-              </Button>
+              <Space style={{ width: '100%', justifyContent: 'end' }}>
+                <Button 
+                  onClick={handleReset}
+                  size="large"
+                >
+                  Đặt lại
+                </Button>
+                <Button
+                  type="primary"
+                  htmlType="submit"
+                  icon={<SearchOutlined />}
+                  loading={loading}
+                  size="large"
+                >
+                  Tra cứu
+                </Button>
+              </Space>
             </Form.Item>
           </Form>
         </Card>
@@ -121,29 +119,38 @@ const WeddingLookupPage = () => {
             
             <Descriptions column={1} bordered style={{ marginTop: 24 }}>
               <Descriptions.Item label="Mã đơn">
-                {booking.ID_DonDatTiec}
+                {booking.ID_TiecCuoi || booking.ID_DonDatTiec}
               </Descriptions.Item>
               <Descriptions.Item label="Tên khách hàng">
                 {booking.TenKhachHang}
+              </Descriptions.Item>
+              <Descriptions.Item label="Số điện thoại">
+                {booking.SoDienThoai}
               </Descriptions.Item>
               <Descriptions.Item label="Ngày tổ chức">
                 <FormattedDate date={booking.NgayToChuc} />
               </Descriptions.Item>
               <Descriptions.Item label="Ca tiệc">
-                {booking.TenCa} ({booking.ThoiGianBatDau} - {booking.ThoiGianKetThuc})
+                {booking.TenCa} {booking.ThoiGianBatDau && booking.ThoiGianKetThuc ? 
+                  `(${booking.ThoiGianBatDau} - ${booking.ThoiGianKetThuc})` : ''}
               </Descriptions.Item>
               <Descriptions.Item label="Sảnh tiệc">
                 {booking.TenSanh}
               </Descriptions.Item>
-              <Descriptions.Item label="Số lượng khách">
-                {booking.SoLuongKhach} khách
+              <Descriptions.Item label="Số lượng bàn">
+                {booking.SoLuongBan} bàn chính + {booking.SoBanDuTru} bàn dự trữ
               </Descriptions.Item>
               <Descriptions.Item label="Tổng tiền">
-                <FormattedPrice amount={booking.TongTien} />
+                <FormattedPrice amount={booking.TongTien || booking.GiaThue} />
               </Descriptions.Item>
               <Descriptions.Item label="Trạng thái">
-                <Tag color={booking.TrangThai === 'confirmed' ? 'success' : 'processing'}>
-                  {booking.TrangThai === 'confirmed' ? 'Đã xác nhận' : 'Đang xử lý'}
+                <Tag color={
+                  booking.TrangThai === 'Đã thanh toán' || booking.TrangThai === 'confirmed' ? 'success' : 
+                  booking.TrangThai === 'Đang xử lý' || booking.TrangThai === 'pending' ? 'processing' : 
+                  booking.TrangThai === 'Đã hủy' || booking.TrangThai === 'cancelled' ? 'error' : 'default'
+                }>
+                  {booking.TrangThai === 'confirmed' ? 'Đã xác nhận' : 
+                   booking.TrangThai === 'pending' ? 'Đang xử lý' : booking.TrangThai}
                 </Tag>
               </Descriptions.Item>
             </Descriptions>
@@ -158,18 +165,18 @@ const WeddingLookupPage = () => {
               >
                 Đã tạo đơn đặt tiệc
                 <Text type="secondary" style={{ marginLeft: 8 }}>
-                  <FormattedDate date={booking.NgayDat} />
+                  <FormattedDate date={booking.ThoiDiemDat || booking.NgayDat} />
                 </Text>
               </Timeline.Item>
 
-              {booking.TrangThai === 'confirmed' ? (
+              {(booking.TrangThai === 'confirmed' || booking.TrangThai === 'Đã thanh toán') ? (
                 <Timeline.Item 
                   color="green" 
                   dot={<CheckCircleOutlined />}
                 >
                   Đã xác nhận đơn
                   <Text type="secondary" style={{ marginLeft: 8 }}>
-                    <FormattedDate date={booking.NgayXacNhan} />
+                    <FormattedDate date={booking.NgayXacNhan || booking.ThoiDiemDat} />
                   </Text>
                 </Timeline.Item>
               ) : (
@@ -182,7 +189,7 @@ const WeddingLookupPage = () => {
               )}
 
               <Timeline.Item 
-                color={booking.TrangThai === 'confirmed' ? 'blue' : 'gray'}
+                color={(booking.TrangThai === 'confirmed' || booking.TrangThai === 'Đã thanh toán') ? 'blue' : 'gray'}
               >
                 Tổ chức tiệc cưới
                 <Text type="secondary" style={{ marginLeft: 8 }}>
@@ -191,19 +198,24 @@ const WeddingLookupPage = () => {
               </Timeline.Item>
             </Timeline>
 
-            {booking.DichVu && booking.DichVu.length > 0 && (
+            {(booking.DichVu && booking.DichVu.length > 0) || (booking.services && booking.services.length > 0) ? (
               <>
                 <Divider />
                 <Title level={4}>Dịch vụ đi kèm</Title>
                 <ul style={{ paddingLeft: 20 }}>
-                  {booking.DichVu.map((service, index) => (
+                  {(booking.DichVu || []).map((service, index) => (
                     <li key={index}>
                       {service.TenDichVu} - <FormattedPrice amount={service.Gia} />
                     </li>
                   ))}
+                  {(booking.services || []).map((service, index) => (
+                    <li key={`service-${index}`}>
+                      {service.TenDichVu} (SL: {service.SoLuong}) - <FormattedPrice amount={service.DonGia} />
+                    </li>
+                  ))}
                 </ul>
               </>
-            )}
+            ) : null}
           </Card>
         )}
       </div>

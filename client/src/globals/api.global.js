@@ -102,3 +102,23 @@ export const INVOICE_ENDPOINTS = {
   DELETE: (id) => `${API_URL}/v1/invoice-service/${id}`,
   HEALTH: `${API_URL}/v1/invoice-service/health`,
 };
+
+// Profile service endpoints
+export const PROFILE_ENDPOINTS = {
+  BASE: `${API_URL}/v1/profile-service`,
+  GET_PROFILE: `${API_URL}/v1/profile-service/profile`,
+  UPDATE_CUSTOMER: `${API_URL}/v1/profile-service/customer`,
+  UPDATE_EMPLOYEE: `${API_URL}/v1/profile-service/employee`,
+  CHANGE_PASSWORD: `${API_URL}/v1/profile-service/change-password`,
+  PERMISSIONS: `${API_URL}/v1/profile-service/permissions`,
+  HEALTH: `${API_URL}/v1/profile-service/health`
+};
+
+// Unified API endpoints object for easier access
+export const API_ENDPOINTS = {
+  AUTH: AUTH_ENDPOINTS,
+  WEDDING: WEDDING_ENDPOINTS,
+  REPORT: REPORT_ENDPOINTS,
+  INVOICE: INVOICE_ENDPOINTS,
+  PROFILE: PROFILE_ENDPOINTS
+};

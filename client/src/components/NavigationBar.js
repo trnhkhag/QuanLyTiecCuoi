@@ -1,13 +1,20 @@
 import React from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Navbar, Nav, Container } from 'react-bootstrap';
+import authService from '../services/authService';
 import './NavigationBar.css';
 
 const NavigationBar = () => {
   const location = useLocation();
+  const navigate = useNavigate();
 
   const isActive = (path) => {
     return location.pathname.startsWith(path) ? 'active' : '';
+  };
+
+  const handleLogout = () => {
+    authService.logout();
+    navigate('/login');
   };
 
   return (
@@ -59,7 +66,10 @@ const NavigationBar = () => {
             <Nav.Link as={Link} to="/profile">
               Tài Khoản
             </Nav.Link>
-            <Nav.Link as={Link} to="/logout">
+            <Nav.Link 
+              onClick={handleLogout}
+              style={{ cursor: 'pointer' }}
+            >
               Đăng Xuất
             </Nav.Link>
           </Nav>

@@ -26,88 +26,93 @@
 /* Dashboard Layout */
 .dashboard {
   min-height: 100vh;
-  background: var(--bg-gradient);
-  width: 100%;
+  background-color: #f8f6ff;
 }
 
 /* Dashboard Header */
 .dashboard-header {
-  background-color: var(--card-bg);
-  padding: 16px 24px;
-  box-shadow: 0 4px 15px var(--shadow-color);
-  margin-bottom: 24px;
-  width: 100%;
-  border-radius: 10px;
+  background: linear-gradient(135deg, #c7b3f0 0%, #b8a5e8 100%);
+  color: white;
+  padding: 2rem;
+  margin-bottom: 2rem;
+  box-shadow: 0 4px 8px rgba(185, 155, 240, 0.3);
 }
 
 .header-content {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  max-width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
 }
 
 .user-info {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 1rem;
 }
 
 .user-avatar {
-  font-size: 32px;
-  color: var(--primary-color);
-  background-color: #ffeef7;
-  padding: 8px;
+  width: 60px;
+  height: 60px;
   border-radius: 50%;
+  background: rgba(255, 255, 255, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  border: 3px solid rgba(255, 255, 255, 0.3);
 }
 
 .user-details h3 {
   margin: 0;
-  font-size: 16px;
-  color: var(--primary-dark);
+  font-size: 1.5rem;
+  font-weight: 600;
 }
 
 .user-details p {
-  margin: 4px 0 0;
-  font-size: 14px;
-  color: #666;
+  margin: 0;
+  opacity: 0.9;
+  font-size: 0.9rem;
+}
+
+.permission-tags {
+  margin-top: 0.5rem;
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
 }
 
 /* Dashboard Content */
 .dashboard-content {
-  padding: 0 24px 24px;
-  width: 100%;
-  max-width: 100%;
-  margin: 0;
-}
-
-.dashboard-content.container-fluid {
-  padding-left: 24px;
-  padding-right: 24px;
-  margin-left: 0;
-  margin-right: 0;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1rem;
 }
 
 .content-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 24px;
-  width: 100%;
+  margin-bottom: 2rem;
+}
+
+.content-header h3 {
+  margin: 0;
+  color: #6b46c1;
 }
 
 /* Cards */
 .ant-card {
-  border-radius: 10px;
-  box-shadow: 0 4px 15px var(--shadow-color);
-  background: var(--card-bg);
-  border: none;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  border-radius: 12px;
+  box-shadow: 0 2px 12px rgba(185, 155, 240, 0.1);
+  border: 1px solid rgba(185, 155, 240, 0.2);
 }
 
-.ant-card-hoverable:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 8px 25px var(--shadow-color);
+.ant-card:hover {
+  box-shadow: 0 4px 20px rgba(185, 155, 240, 0.2);
+  transform: translateY(-2px);
+  transition: all 0.3s ease;
 }
 
 .ant-card-head {
@@ -117,34 +122,32 @@
 }
 
 .ant-card-head-title {
-  color: var(--primary-dark);
+  color: #6b46c1;
   font-weight: 600;
 }
 
 /* Status Badges */
 .status-badge {
-  padding: 4px 8px;
-  border-radius: 20px;
+  padding: 4px 12px;
+  border-radius: 16px;
   font-size: 12px;
   font-weight: 500;
+  text-transform: uppercase;
 }
 
-.status-badge.da-xac-nhan {
-  background-color: #e8f5e9;
-  color: #4caf50;
-  border: 1px solid #c8e6c9;
+.status-badge.đã-xác-nhận {
+  background-color: #dcfce7;
+  color: #166534;
 }
 
-.status-badge.cho-xac-nhan {
-  background-color: #fff3e0;
-  color: #ff9800;
-  border: 1px solid #ffe0b2;
+.status-badge.chờ-xác-nhận {
+  background-color: #fef3c7;
+  color: #92400e;
 }
 
-.status-badge.da-thanh-toan {
-  background-color: #e3f2fd;
-  color: #2196f3;
-  border: 1px solid #bbdefb;
+.status-badge.đã-thanh-toán {
+  background-color: #dbeafe;
+  color: #1e40af;
 }
 
 /* Table Styles */
@@ -206,28 +209,25 @@
 
 /* Responsive Adjustments */
 @media (max-width: 768px) {
-  .dashboard-content {
-    padding: 0 16px 16px;
-  }
-
-  .dashboard-content.container-fluid {
-    padding-left: 16px;
-    padding-right: 16px;
-  }
-
-  .content-header {
+  .header-content {
     flex-direction: column;
-    gap: 16px;
-    align-items: flex-start;
+    gap: 1rem;
+    text-align: center;
   }
-
+  
   .user-info {
     flex-direction: column;
     text-align: center;
   }
-
-  .user-avatar {
-    margin-bottom: 8px;
+  
+  .content-header {
+    flex-direction: column;
+    gap: 1rem;
+    align-items: flex-start;
+  }
+  
+  .permission-tags {
+    justify-content: center;
   }
 }
 
@@ -291,4 +291,14 @@
 
 .widget-content {
   padding: 20px;
+}
+
+/* Permission Info Card */
+.ant-card .ant-card-head-title {
+  color: #6b46c1;
+  font-weight: 600;
+}
+
+.permission-tags .ant-tag {
+  margin-bottom: 4px;
 } 

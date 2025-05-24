@@ -123,6 +123,13 @@ html, body {
   text-decoration: none;
   border-radius: 8px;
   transition: all 0.3s ease;
+  background: none;
+  border: none;
+  cursor: pointer;
+  width: 100%;
+  text-align: left;
+  font-size: 1rem;
+  font-family: inherit;
 }
 
 .nav-profile:hover,

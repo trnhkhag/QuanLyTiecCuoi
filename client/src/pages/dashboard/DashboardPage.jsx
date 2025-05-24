@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Card, Row, Col, Statistic, Typography, Space, Progress, Table, Button, Alert } from 'antd';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { Card, Row, Col, Statistic, Typography, Space, Progress, Table, Button, Alert, message, Tag } from 'antd';
 import {
   UserOutlined,
   ShopOutlined,
@@ -11,6 +11,7 @@ import {
   CheckCircleOutlined,
   ClockCircleOutlined,
   BellOutlined,
+  SafetyOutlined,
 } from '@ant-design/icons';
 import authService from '../../services/authService';
 import '../../styles/dashboard.css';
@@ -19,6 +20,7 @@ const { Title, Text } = Typography;
 
 const DashboardPage = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [user, setUser] = useState(null);
   
   // Sample data for upcoming events
@@ -88,6 +90,13 @@ const DashboardPage = () => {
   ];
 
   useEffect(() => {
+    // Check for permission error from navigation state
+    if (location.state?.error) {
+      message.error(location.state.error);
+      // Clear the error from state
+      navigate(location.pathname, { replace: true, state: {} });
+    }
+
     // If not logged in, redirect to login
     if (!authService.isLoggedIn()) {
       navigate('/login');
@@ -101,12 +110,16 @@ const DashboardPage = () => {
     } catch (error) {
       console.error('Error loading user data:', error);
     }
-  }, [navigate]);
+  }, [navigate, location]);
 
   const handleLogout = () => {
     authService.logout();
     navigate('/login');
   };
+
+  // Get user permissions for display
+  const userPermissions = authService.getCurrentUserPermissions();
+  const permissionNames = authService.getUserPermissionNames();
 
   return (
     <div className="dashboard">
@@ -117,6 +130,14 @@ const DashboardPage = () => {
             <div className="user-details">
               <h3>{user?.user?.name || 'Người dùng'}</h3>
               <p>{user?.user?.email || ''}</p>
+              <div className="permission-tags">
+                <Tag icon={<SafetyOutlined />} color="processing">
+                  {user?.user?.role || 'user'}
+                </Tag>
+                <Tag color="orange">
+                  Quyền: {userPermissions}
+                </Tag>
+              </div>
             </div>
           </div>
           <Button type="primary" danger onClick={handleLogout}>
@@ -144,6 +165,46 @@ const DashboardPage = () => {
           icon={<BellOutlined />}
           style={{ marginBottom: '24px' }}
         />
+
+        {/* User Permissions Info */}
+        <Row gutter={[16, 16]} style={{ marginBottom: '24px' }}>
+          <Col span={24}>
+            <Card 
+              title={
+                <Space>
+                  <SafetyOutlined />
+                  <span>Thông tin quyền hạn</span>
+                </Space>
+              }
+              size="small"
+            >
+              <Row>
+                <Col span={12}>
+                  <Text strong>Vai trò: </Text>
+                  <Tag color="blue">{user?.user?.role || 'user'}</Tag>
+                </Col>
+                <Col span={12}>
+                  <Text strong>Tổng quyền: </Text>
+                  <Tag color="green">{userPermissions}</Tag>
+                </Col>
+              </Row>
+              <div style={{ marginTop: '12px' }}>
+                <Text strong>Quyền hạn chi tiết: </Text>
+                <div style={{ marginTop: '8px' }}>
+                  {permissionNames.length > 0 ? (
+                    permissionNames.map((permission, index) => (
+                      <Tag key={index} color="cyan" style={{ marginBottom: '4px' }}>
+                        {permission}
+                      </Tag>
+                    ))
+                  ) : (
+                    <Text type="secondary">Không có quyền đặc biệt</Text>
+                  )}
+                </div>
+              </div>
+            </Card>
+          </Col>
+        </Row>
         
         <Row gutter={[16, 16]}>
           <Col xs={24} sm={12} lg={6}>

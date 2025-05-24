@@ -1,142 +1,82 @@
-// filepath: d:\CNPM\QuanLyTiecCuoi\server\TraCuuTiecCuoi\weddingLookupRoute.js
+// filepath: d:\CNPM\QuanLyTiecCuoi\server\TraCuuTiecCuoi\weddingLookupRoutes.js
 const express = require('express');
 const router = express.Router();
-const weddingLookupController = require('../controllers/WeddingLookupController');
-const foodController = require('../controllers/foodController');
+const WeddingLookupService = require('../services/WeddingLookupService');
 
 /**
- * @swagger
- * tags:
- *   name: Wedding Lookup
- *   description: Tra cứu và tìm kiếm tiệc cưới
+ * @route   GET /api/weddings
+ * @desc    Lấy danh sách tiệc cưới
+ * @access  Public
  */
+router.get('/', async (req, res) => {
+  try {
+    console.log('GET /api/weddings API được gọi', req.query);
+    const filters = req.query;
+    const bookings = await WeddingLookupService.getAllBookings(filters);
+    
+    res.json({
+      success: true,
+      data: bookings
+    });
+  } catch (error) {
+    console.error('Error in GET /api/weddings:', error);
+    res.status(500).json({ 
+      success: false,
+      message: 'Đã xảy ra lỗi khi lấy danh sách tiệc cưới',
+      error: error.message 
+    });
+  }
+});
 
 /**
- * @swagger
- * /api/v1/wedding-service/lookup:
- *   get:
- *     summary: Tìm kiếm tiệc cưới
- *     tags: [Wedding Lookup]
- *     parameters:
- *       - in: query
- *         name: date
- *         schema:
- *           type: string
- *           format: date
- *         description: Ngày tổ chức tiệc cưới cần tìm
- *       - in: query
- *         name: hallId
- *         schema:
- *           type: integer
- *         description: ID sảnh cần tìm
- *       - in: query
- *         name: status
- *         schema:
- *           type: string
- *           enum: [PENDING, CONFIRMED, CANCELLED]
- *         description: Trạng thái tiệc cưới để lọc
- *     responses:
- *       200:
- *         description: Danh sách tiệc cưới phù hợp
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 success:
- *                   type: boolean
- *                 data:
- *                   type: array
- *                   items:
- *                     $ref: '#/components/schemas/Wedding'
+ * @route   GET /api/weddings/filter
+ * @desc    Lấy danh sách tiệc cưới đã lọc
+ * @access  Public
  */
-router.get('/', weddingLookupController.searchBookings);
+router.get('/filter', async (req, res) => {
+  try {
+    console.log('GET /api/weddings/filter API được gọi', req.query);
+    const filters = req.query;
+    const bookings = await WeddingLookupService.getAllBookings(filters);
+    
+    res.json({
+      success: true,
+      data: bookings
+    });
+  } catch (error) {
+    console.error('Error in GET /api/weddings/filter:', error);
+    res.status(500).json({ 
+      success: false,
+      message: 'Đã xảy ra lỗi khi lọc danh sách tiệc cưới',
+      error: error.message 
+    });
+  }
+});
 
 /**
- * @swagger
- * /api/v1/wedding-service/lookup/shifts:
- *   get:
- *     summary: Lấy danh sách tất cả ca tiệc
- *     tags: [Wedding Lookup]
- *     responses:
- *       200:
- *         description: Danh sách ca tiệc có sẵn
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 success:
- *                   type: boolean
- *                 data:
- *                   type: array
- *                   items:
- *                     type: object
- *                     properties:
- *                       id:
- *                         type: integer
- *                         description: ID ca tiệc
- *                       name:
- *                         type: string
- *                         description: Tên ca tiệc
- *                       startTime:
- *                         type: string
- *                         description: Thời gian bắt đầu
- *                       endTime:
- *                         type: string
- *                         description: Thời gian kết thúc
+ * @route   GET /api/weddings/:id
+ * @desc    Lấy thông tin chi tiết của tiệc cưới theo ID
+ * @access  Public
  */
-router.get('/shifts', weddingLookupController.getShifts);
-
-/**
- * @swagger
- * /api/v1/wedding-service/lookup/{id}:
- *   get:
- *     summary: Lấy thông tin chi tiết tiệc cưới
- *     tags: [Wedding Lookup]
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: integer
- *         description: ID tiệc cưới
- *     responses:
- *       200:
- *         description: Thông tin chi tiết tiệc cưới
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 success:
- *                   type: boolean
- *                 data:
- *                   $ref: '#/components/schemas/Wedding'
- */
-router.get('/:id', weddingLookupController.getBookingDetail);
-
-/**
- * @swagger
- * /api/v1/wedding-service/lookup/foods:
- *   get:
- *     summary: Lấy danh sách món ăn
- *     tags: [Wedding Lookup]
- *     responses:
- *       200:
- *         description: Danh sách món ăn
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 success:
- *                   type: boolean
- *                 data:
- *                   type: array
- *                   items:
- *                     $ref: '#/components/schemas/Food'
- */
-router.get('/foods', foodController.getAllFoods.bind(foodController));
+router.get('/:id', async (req, res) => {
+  try {
+    console.log('GET /api/weddings/:id API được gọi với ID:', req.params.id);
+    const bookingId = req.params.id;
+    
+    const booking = await WeddingLookupService.getBookingById(bookingId);
+    
+    res.json({
+      success: true,
+      data: booking
+    });
+  } catch (error) {
+    console.error(`Error in GET /api/weddings/${req.params.id}:`, error);
+    res.status(404).json({
+      success: false,
+      message: 'Không tìm thấy tiệc cưới với ID này',
+      error: error.message
+    });
+  }
+});
 
 module.exports = router;

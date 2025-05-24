@@ -1,6 +1,7 @@
 const express = require('express');
 const invoiceController = require('../controllers/invoiceController');
 const router = express.Router();
+const { authMiddleware, requirePermission, PERMISSIONS } = require('../middleware/authMiddleware');
 
 /**
  * @swagger
@@ -15,6 +16,8 @@ const router = express.Router();
  *   get:
  *     summary: Get all invoices
  *     tags: [Invoice Service]
+ *     security:
+ *       - bearerAuth: []
  *     responses:
  *       200:
  *         description: A list of invoices
@@ -30,8 +33,16 @@ const router = express.Router();
  *                   type: array
  *                   items:
  *                     $ref: '#/components/schemas/Invoice'
+ *       401:
+ *         description: Chưa đăng nhập
+ *       403:
+ *         description: Không có quyền
  */
-router.get('/', invoiceController.getAllInvoices);
+router.get('/', 
+  authMiddleware,
+  requirePermission(PERMISSIONS.MANAGE_INVOICES),
+  invoiceController.getAllInvoices
+);
 
 /**
  * @swagger
@@ -39,6 +50,8 @@ router.get('/', invoiceController.getAllInvoices);
  *   get:
  *     summary: Get an invoice by ID
  *     tags: [Invoice Service]
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -58,10 +71,16 @@ router.get('/', invoiceController.getAllInvoices);
  *                   example: true
  *                 data:
  *                   $ref: '#/components/schemas/Invoice'
- *       404:
- *         description: Invoice not found
+ *       401:
+ *         description: Chưa đăng nhập
+ *       403:
+ *         description: Không có quyền
  */
-router.get('/:id', invoiceController.getInvoiceById);
+router.get('/:id', 
+  authMiddleware,
+  requirePermission(PERMISSIONS.MANAGE_INVOICES),
+  invoiceController.getInvoiceById
+);
 
 /**
  * @swagger
@@ -69,6 +88,8 @@ router.get('/:id', invoiceController.getInvoiceById);
  *   post:
  *     summary: Create a new invoice
  *     tags: [Invoice Service]
+ *     security:
+ *       - bearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -78,8 +99,16 @@ router.get('/:id', invoiceController.getInvoiceById);
  *     responses:
  *       201:
  *         description: Invoice created successfully
+ *       401:
+ *         description: Chưa đăng nhập
+ *       403:
+ *         description: Không có quyền
  */
-router.post('/', invoiceController.createInvoice);
+router.post('/', 
+  authMiddleware,
+  requirePermission(PERMISSIONS.MANAGE_INVOICES),
+  invoiceController.createInvoice
+);
 
 /**
  * @swagger
@@ -87,6 +116,8 @@ router.post('/', invoiceController.createInvoice);
  *   put:
  *     summary: Update an invoice
  *     tags: [Invoice Service]
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -102,10 +133,16 @@ router.post('/', invoiceController.createInvoice);
  *     responses:
  *       200:
  *         description: Invoice updated successfully
- *       404:
- *         description: Invoice not found
+ *       401:
+ *         description: Chưa đăng nhập
+ *       403:
+ *         description: Không có quyền
  */
-router.put('/:id', invoiceController.updateInvoice);
+router.put('/:id', 
+  authMiddleware,
+  requirePermission(PERMISSIONS.MANAGE_INVOICES),
+  invoiceController.updateInvoice
+);
 
 /**
  * @swagger
@@ -113,6 +150,8 @@ router.put('/:id', invoiceController.updateInvoice);
  *   delete:
  *     summary: Delete an invoice
  *     tags: [Invoice Service]
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -122,10 +161,16 @@ router.put('/:id', invoiceController.updateInvoice);
  *     responses:
  *       200:
  *         description: Invoice deleted successfully
- *       404:
- *         description: Invoice not found
+ *       401:
+ *         description: Chưa đăng nhập
+ *       403:
+ *         description: Không có quyền
  */
-router.delete('/:id', invoiceController.deleteInvoice);
+router.delete('/:id', 
+  authMiddleware,
+  requirePermission(PERMISSIONS.MANAGE_INVOICES),
+  invoiceController.deleteInvoice
+);
 
 /**
  * @swagger

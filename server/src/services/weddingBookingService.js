@@ -389,7 +389,8 @@ class WeddingBookingService {
           ID_TiecCuoi: bookingId, 
           message: 'Đặt tiệc thành công',
           totalAmount,
-          depositAmount
+          depositAmount,
+          TrangThai: "Chưa thanh toán còn lại"
         };
       } catch (invoiceError) {
         console.error('Error creating invoice:', invoiceError);
@@ -407,40 +408,53 @@ class WeddingBookingService {
    * Lấy danh sách đặt tiệc
    */
   async getAllBookings(filters = {}) {
-    try {      let query = `
-        SELECT t.ID_TiecCuoi, k.HoTen AS TenKhachHang, k.SoDienThoai,
-               s.TenSanh, t.NgayToChuc, c.TenCa, t.SoLuongBan,
-               t.SoBanDuTru, t.TrangThai, h.TienThanhToan AS TienCoc
+    try {
+      let query = `
+        SELECT t.*, s.TenSanh, s.GiaThue, c.TenCa, kh.TenKhachHang, kh.SoDienThoai
         FROM TiecCuoi t
-        JOIN KhachHang k ON t.ID_KhachHang = k.ID_KhachHang
         JOIN SanhTiec s ON t.ID_SanhTiec = s.ID_SanhTiec
         JOIN CaTiec c ON t.ID_Ca = c.ID_Ca
-        LEFT JOIN HoaDon h ON t.ID_TiecCuoi = h.ID_TiecCuoi AND h.LoaiHoaDon = 'Thanh toán đặt cọc'
+        JOIN KhachHang kh ON t.ID_KhachHang = kh.ID_KhachHang
         WHERE 1=1
       `;
       
       const queryParams = [];
       
-      // Thêm các điều kiện lọc nếu có
+      // Lọc theo ngày
       if (filters.date) {
         query += " AND t.NgayToChuc = ?";
         queryParams.push(filters.date);
       }
       
-      if (filters.hallId) {
-        query += " AND t.ID_SanhTiec = ?";
-        queryParams.push(filters.hallId);
+      // Lọc theo tên khách hàng
+      if (filters.customerName) {
+        query += " AND kh.TenKhachHang LIKE ?";
+        queryParams.push(`%${filters.customerName}%`);
       }
       
-      if (filters.customerId) {
-        query += " AND t.ID_KhachHang = ?";
-        queryParams.push(filters.customerId);
+      // Chỉ lọc theo 2 loại trạng thái hợp lệ
+      if (filters.status) {
+        if (filters.status.toLowerCase() === 'completed' || 
+            filters.status.toLowerCase() === 'đã thanh toán') {
+          query += " AND t.TrangThai = 'Đã thanh toán'";
+        } else {
+          query += " AND t.TrangThai = 'Chưa thanh toán còn lại'";
+        }
       }
       
       query += " ORDER BY t.NgayToChuc DESC";
       
       const [rows] = await pool.query(query, queryParams);
-      return rows;
+      
+      // Đảm bảo chỉ có 2 loại trạng thái khi trả về kết quả
+      const standardizedRows = rows.map(row => {
+        if (row.TrangThai !== 'Đã thanh toán') {
+          row.TrangThai = 'Chưa thanh toán còn lại';
+        }
+        return row;
+      });
+      
+      return standardizedRows;
     } catch (error) {
       throw error;
     }
@@ -493,6 +507,11 @@ class WeddingBookingService {
       
       booking.foods = foodRows;
       
+      // Chuẩn hóa trạng thái
+      if (booking.TrangThai !== 'Đã thanh toán') {
+        booking.TrangThai = 'Chưa thanh toán còn lại';
+      }
+      
       return booking;
     } catch (error) {
       throw error;
@@ -508,12 +527,20 @@ class WeddingBookingService {
     try {
       await connection.beginTransaction();
       
+      // Chuẩn hóa trạng thái
+      let status = 'Chưa thanh toán còn lại';
+      if (updateData.status === 'Đã thanh toán' || 
+          updateData.status === 'completed' || 
+          updateData.status === 'paid') {
+        status = 'Đã thanh toán';
+      }
+      
       // 1. Cập nhật thông tin cơ bản
       await connection.query(
         `UPDATE TiecCuoi 
-         SET SoLuongBan = ?, SoBanDuTru = ?
+         SET SoLuongBan = ?, SoBanDuTru = ?, TrangThai = ?
          WHERE ID_TiecCuoi = ?`,
-        [updateData.tableCount, updateData.reserveTableCount, bookingId]
+        [updateData.tableCount, updateData.reserveTableCount, status, bookingId]
       );
       
       // 2. Xóa dịch vụ cũ
@@ -572,12 +599,42 @@ class WeddingBookingService {
       
       await connection.commit();
       
-      return { message: 'Cập nhật đặt tiệc thành công' };
+      return { 
+        message: 'Cập nhật đặt tiệc thành công',
+        status: status
+      };
     } catch (error) {
       await connection.rollback();
       throw error;
     } finally {
       connection.release();
+    }
+  }
+
+  /**
+   * Thay đổi trạng thái thanh toán tiệc cưới
+   */
+  async updateBookingStatus(bookingId, isFullyPaid = false) {
+    try {
+      const status = isFullyPaid ? 'Đã thanh toán' : 'Chưa thanh toán còn lại';
+      
+      const [result] = await pool.query(
+        `UPDATE TiecCuoi SET TrangThai = ? WHERE ID_TiecCuoi = ?`,
+        [status, bookingId]
+      );
+      
+      if (result.affectedRows === 0) {
+        throw new Error('Không tìm thấy tiệc cưới');
+      }
+      
+      return { 
+        success: true, 
+        message: `Cập nhật trạng thái thành ${status}`,
+        status: status
+      };
+    } catch (error) {
+      console.error('Error updating booking status:', error);
+      throw error;
     }
   }
 

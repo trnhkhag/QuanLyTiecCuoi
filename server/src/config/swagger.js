@@ -45,10 +45,6 @@ const options = {
         description: 'Quản lý dịch vụ tiệc cưới'
       },
       {
-        name: 'Regulation Management',
-        description: 'Quản lý quy định hệ thống'
-      },
-      {
         name: 'Wedding Lookup',
         description: 'Tra cứu và tìm kiếm tiệc cưới'
       }

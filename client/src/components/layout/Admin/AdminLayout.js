@@ -12,6 +12,7 @@ import {
   UserOutlined
 } from '@ant-design/icons';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
+import authService, { PERMISSIONS } from '../../../services/authService';
 
 const { Header, Sider, Content } = Layout;
 const { Title } = Typography;
@@ -25,33 +26,32 @@ const AdminLayout = ({ children }) => {
     setCollapsed(!collapsed);
   };
 
-  const menuItems = [
-    {
-      key: '/admin',
-      icon: <DashboardOutlined />,
-      label: 'Dashboard',
-    },
+  const allMenuItems = [
     {
       key: '/admin/halls',
       icon: <ShopOutlined />,
       label: 'Quản lý Sảnh cưới',
+      permission: PERMISSIONS.MANAGE_HALLS
     },
     {
       key: '/admin/regulations',
       icon: <FileTextOutlined />,
       label: 'Quản lý Quy định',
+      permission: PERMISSIONS.MANAGE_REGULATIONS
     },
-    {
-      key: '/admin/users',
-      icon: <TeamOutlined />,
-      label: 'Quản lý Người dùng',
-    },
-    {
-      key: '/admin/settings',
-      icon: <SettingOutlined />,
-      label: 'Cài đặt Hệ thống',
-    },
+    // {
+    //   key: '/admin/users',
+    //   icon: <TeamOutlined />,
+    //   label: 'Quản lý Người dùng',
+    //   permission: PERMISSIONS.MANAGE_USERS
+    // },
   ];
+
+  // Filter menu items based on permissions
+  const menuItems = allMenuItems.filter(item => {
+    if (!item.permission) return true; // No permission required
+    return authService.hasPermission(item.permission);
+  });
 
   return (
     <Layout style={{ minHeight: '100vh' }}>
