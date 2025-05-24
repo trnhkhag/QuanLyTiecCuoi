@@ -147,3 +147,11 @@ CREATE TABLE Tiec_MonAn (
     FOREIGN KEY (ID_TiecCuoi) REFERENCES TiecCuoi(ID_TiecCuoi),
     FOREIGN KEY (ID_MonAn) REFERENCES MonAn(ID_MonAn)
 );
+
+-- Bảng Quy Định
+CREATE TABLE QuyDinh (
+    ID_QuyDinh VARCHAR(10) PRIMARY KEY,
+    TenQuyDinh VARCHAR(100) NOT NULL,
+    MoTa TEXT,
+    GhiChu TEXT
+);

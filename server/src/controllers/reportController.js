@@ -83,13 +83,13 @@ exports.getMonthlyReport = async (req, res) => {
     res.status(200).json({
       success: true,
       data: {
-        year: currentYear,
-        month: currentMonth,
-        totalRevenue: stats.totalRevenue || 0,
-        totalWeddings: stats.totalWeddings || 0,
-        averageRevenue: stats.averageRevenue || 0,
-        venueBreakdown: venueResult,
-        serviceBreakdown: serviceResult
+      year: currentYear,
+      month: currentMonth,
+        totalRevenue: parseFloat(stats.totalRevenue) || 0,
+        totalWeddings: parseInt(stats.totalWeddings) || 0,
+        averageRevenue: parseFloat(stats.averageRevenue) || 0,
+      venueBreakdown: venueResult,
+      serviceBreakdown: serviceResult
       }
     });
   } catch (error) {
@@ -173,18 +173,22 @@ exports.getYearlyReport = async (req, res) => {
     
     // Fill in the data from the query
     monthlyResult.forEach(record => {
-      allMonths[record.month - 1] = record;
+      allMonths[record.month - 1] = {
+        month: record.month,
+        weddingCount: parseInt(record.weddingCount) || 0,
+        revenue: parseFloat(record.revenue) || 0
+      };
     });
     
     res.status(200).json({
       success: true,
       data: {
-        year: currentYear,
-        totalRevenue: stats.totalRevenue || 0,
-        totalWeddings: stats.totalWeddings || 0,
-        averageRevenue: stats.averageRevenue || 0,
-        monthlyBreakdown: allMonths,
-        venueBreakdown: venueResult
+      year: currentYear,
+        totalRevenue: parseFloat(stats.totalRevenue) || 0,
+        totalWeddings: parseInt(stats.totalWeddings) || 0,
+        averageRevenue: parseFloat(stats.averageRevenue) || 0,
+      monthlyBreakdown: allMonths,
+      venueBreakdown: venueResult
       }
     });
   } catch (error) {
@@ -260,26 +264,26 @@ exports.getRevenueTrend = async (req, res) => {
         m => m.year === record.year && m.month === record.month
       );
       if (index !== -1) {
-        allMonths[index].weddingCount = record.weddingCount;
-        allMonths[index].revenue = record.revenue || 0;
+        allMonths[index].weddingCount = parseInt(record.weddingCount) || 0;
+        allMonths[index].revenue = parseFloat(record.revenue) || 0;
       }
     });
     
     // Calculate additional analytics
-    const totalRevenue = allMonths.reduce((sum, month) => sum + (month.revenue || 0), 0);
-    const totalWeddings = allMonths.reduce((sum, month) => sum + (month.weddingCount || 0), 0);
+    const totalRevenue = allMonths.reduce((sum, month) => sum + parseFloat(month.revenue || 0), 0);
+    const totalWeddings = allMonths.reduce((sum, month) => sum + parseInt(month.weddingCount || 0), 0);
     const averageMonthlyRevenue = numberOfMonths > 0 ? totalRevenue / numberOfMonths : 0;
     
     res.status(200).json({
       success: true,
       data: {
-        numberOfMonths,
-        startDate: format(startDate, 'yyyy-MM-dd'),
-        endDate: format(endDate, 'yyyy-MM-dd'),
-        totalRevenue,
-        totalWeddings,
-        averageMonthlyRevenue,
-        trend: allMonths
+      numberOfMonths,
+      startDate: format(startDate, 'yyyy-MM-dd'),
+      endDate: format(endDate, 'yyyy-MM-dd'),
+      totalRevenue,
+      totalWeddings,
+      averageMonthlyRevenue,
+      trend: allMonths
       }
     });
   } catch (error) {

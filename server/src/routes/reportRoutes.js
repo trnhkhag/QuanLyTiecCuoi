@@ -1,6 +1,7 @@
 const express = require('express');
 const reportController = require('../controllers/reportController');
 const router = express.Router();
+const { authMiddleware, requirePermission, PERMISSIONS } = require('../middleware/authMiddleware');
 
 /**
  * @swagger
@@ -15,6 +16,8 @@ const router = express.Router();
  *   get:
  *     summary: Get monthly report data
  *     tags: [Report Service]
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: query
  *         name: year
@@ -33,8 +36,16 @@ const router = express.Router();
  *           application/json:
  *             schema:
  *               $ref: '#/components/schemas/MonthlyReport'
+ *       401:
+ *         description: Chưa đăng nhập
+ *       403:
+ *         description: Không có quyền
  */
-router.get('/monthly', reportController.getMonthlyReport);
+router.get('/monthly', 
+  authMiddleware,
+  requirePermission(PERMISSIONS.VIEW_REPORTS),
+  reportController.getMonthlyReport
+);
 
 /**
  * @swagger
@@ -42,6 +53,8 @@ router.get('/monthly', reportController.getMonthlyReport);
  *   get:
  *     summary: Get yearly report data
  *     tags: [Report Service]
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: query
  *         name: year
@@ -82,8 +95,16 @@ router.get('/monthly', reportController.getMonthlyReport);
  *                       revenue:
  *                         type: number
  *                         example: 45000000
+ *       401:
+ *         description: Chưa đăng nhập
+ *       403:
+ *         description: Không có quyền
  */
-router.get('/yearly', reportController.getYearlyReport);
+router.get('/yearly', 
+  authMiddleware,
+  requirePermission(PERMISSIONS.VIEW_REPORTS),
+  reportController.getYearlyReport
+);
 
 /**
  * @swagger
@@ -91,6 +112,8 @@ router.get('/yearly', reportController.getYearlyReport);
  *   get:
  *     summary: Get revenue trend data
  *     tags: [Report Service]
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: query
  *         name: months
@@ -143,8 +166,16 @@ router.get('/yearly', reportController.getYearlyReport);
  *                       revenue:
  *                         type: number
  *                         example: 65000000
+ *       401:
+ *         description: Chưa đăng nhập
+ *       403:
+ *         description: Không có quyền
  */
-router.get('/revenue-trend', reportController.getRevenueTrend);
+router.get('/revenue-trend', 
+  authMiddleware,
+  requirePermission(PERMISSIONS.VIEW_REPORTS),
+  reportController.getRevenueTrend
+);
 
 /**
  * @swagger

@@ -2,13 +2,13 @@
 const express = require('express');
 const router = express.Router();
 const weddingLookupController = require('../controllers/WeddingLookupController');
-const foodController = require('../controllers/foodController');
+const { authMiddleware, requirePermission, PERMISSIONS } = require('../middleware/authMiddleware');
 
 /**
  * @swagger
  * tags:
  *   name: Wedding Lookup
- *   description: Tra cứu và tìm kiếm tiệc cưới
+ *   description: Tra cứu thông tin tiệc cưới
  */
 
 /**
@@ -17,75 +17,50 @@ const foodController = require('../controllers/foodController');
  *   get:
  *     summary: Tìm kiếm tiệc cưới
  *     tags: [Wedding Lookup]
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: query
  *         name: date
  *         schema:
  *           type: string
  *           format: date
- *         description: Ngày tổ chức tiệc cưới cần tìm
+ *         description: Ngày tổ chức
  *       - in: query
- *         name: hallId
- *         schema:
- *           type: integer
- *         description: ID sảnh cần tìm
- *       - in: query
- *         name: status
+ *         name: hallName
  *         schema:
  *           type: string
- *           enum: [PENDING, CONFIRMED, CANCELLED]
- *         description: Trạng thái tiệc cưới để lọc
+ *         description: Tên sảnh
+ *       - in: query
+ *         name: customerName
+ *         schema:
+ *           type: string
+ *         description: Tên khách hàng
  *     responses:
  *       200:
- *         description: Danh sách tiệc cưới phù hợp
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 success:
- *                   type: boolean
- *                 data:
- *                   type: array
- *                   items:
- *                     $ref: '#/components/schemas/Wedding'
+ *         description: Danh sách tiệc cưới tìm được
+ *       401:
+ *         description: Chưa đăng nhập
+ *       403:
+ *         description: Không có quyền
  */
-router.get('/', weddingLookupController.searchBookings);
+router.get('/', 
+  authMiddleware,
+  requirePermission(PERMISSIONS.SEARCH_WEDDINGS),
+  weddingLookupController.searchBookings
+);
 
 /**
  * @swagger
  * /api/v1/wedding-service/lookup/shifts:
  *   get:
- *     summary: Lấy danh sách tất cả ca tiệc
+ *     summary: Lấy danh sách ca tiệc
  *     tags: [Wedding Lookup]
  *     responses:
  *       200:
- *         description: Danh sách ca tiệc có sẵn
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 success:
- *                   type: boolean
- *                 data:
- *                   type: array
- *                   items:
- *                     type: object
- *                     properties:
- *                       id:
- *                         type: integer
- *                         description: ID ca tiệc
- *                       name:
- *                         type: string
- *                         description: Tên ca tiệc
- *                       startTime:
- *                         type: string
- *                         description: Thời gian bắt đầu
- *                       endTime:
- *                         type: string
- *                         description: Thời gian kết thúc
+ *         description: Danh sách ca tiệc
  */
+// Public route - anyone can view shifts
 router.get('/shifts', weddingLookupController.getShifts);
 
 /**
@@ -94,6 +69,8 @@ router.get('/shifts', weddingLookupController.getShifts);
  *   get:
  *     summary: Lấy thông tin chi tiết tiệc cưới
  *     tags: [Wedding Lookup]
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -104,39 +81,15 @@ router.get('/shifts', weddingLookupController.getShifts);
  *     responses:
  *       200:
  *         description: Thông tin chi tiết tiệc cưới
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 success:
- *                   type: boolean
- *                 data:
- *                   $ref: '#/components/schemas/Wedding'
+ *       401:
+ *         description: Chưa đăng nhập
+ *       403:
+ *         description: Không có quyền
  */
-router.get('/:id', weddingLookupController.getBookingDetail);
-
-/**
- * @swagger
- * /api/v1/wedding-service/lookup/foods:
- *   get:
- *     summary: Lấy danh sách món ăn
- *     tags: [Wedding Lookup]
- *     responses:
- *       200:
- *         description: Danh sách món ăn
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 success:
- *                   type: boolean
- *                 data:
- *                   type: array
- *                   items:
- *                     $ref: '#/components/schemas/Food'
- */
-router.get('/foods', foodController.getAllFoods.bind(foodController));
+router.get('/:id', 
+  authMiddleware,
+  requirePermission(PERMISSIONS.SEARCH_WEDDINGS),
+  weddingLookupController.getBookingDetail
+);
 
 module.exports = router;

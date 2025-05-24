@@ -9,7 +9,7 @@ export const fetchMonthlyReport = createAsyncThunk(
     try {
       const url = createUrlWithParams(REPORT_ENDPOINTS.MONTHLY, { year, month });
       const response = await axios.get(url);
-      return response.data;
+      return response.data.data;
     } catch (error) {
       return rejectWithValue(error.response?.data || { message: error.message });
     }
@@ -22,7 +22,7 @@ export const fetchRevenueTrend = createAsyncThunk(
     try {
       const url = createUrlWithParams(REPORT_ENDPOINTS.REVENUE_TREND, { months, month, year });
       const response = await axios.get(url);
-      return response.data;
+      return response.data.data;
     } catch (error) {
       return rejectWithValue(error.response?.data || { message: error.message });
     }

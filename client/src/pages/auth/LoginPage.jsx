@@ -20,13 +20,13 @@ const LoginPage = () => {
         <div className="auth-card login-card">
           <div className="auth-header">
             <h2 className="auth-title">Chào mừng</h2>
-            <p className="auth-subtitle">Đăng nhập vào acc của mày đi</p>
+            <p className="auth-subtitle">Đăng nhập vào tài khoản của bạn</p>
           </div>
           <div className="auth-body">
             <LoginForm />
           </div>
           <div className="auth-footer">
-            <p>Đéo có acc à? <a href="/register" className="auth-link">Đăng ký ngay</a></p>
+            <p>Bạn chưa có tài khoản? <a href="/register" className="auth-link">Đăng ký ngay</a></p>
           </div>
         </div>
       </div>

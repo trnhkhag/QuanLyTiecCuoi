@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const hallManagementController = require('../controllers/hallManagementController');
 const upload = require('../middlewares/uploadMiddleware');
+const { authMiddleware, requirePermission, PERMISSIONS } = require('../middleware/authMiddleware');
 
 /**
  * @swagger
@@ -31,6 +32,7 @@ const upload = require('../middlewares/uploadMiddleware');
  *                   items:
  *                     $ref: '#/components/schemas/Hall'
  */
+// Public route - anyone can view halls
 router.get('/halls', hallManagementController.getAllHalls);
 
 /**
@@ -59,6 +61,7 @@ router.get('/halls', hallManagementController.getAllHalls);
  *                 data:
  *                   $ref: '#/components/schemas/Hall'
  */
+// Public route - anyone can view hall details
 router.get('/halls/:id', hallManagementController.getHallById);
 
 /**
@@ -67,6 +70,8 @@ router.get('/halls/:id', hallManagementController.getHallById);
  *   post:
  *     summary: Tạo sảnh tiệc mới
  *     tags: [Hall Management]
+ *     security:
+ *       - bearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -93,8 +98,18 @@ router.get('/halls/:id', hallManagementController.getHallById);
  *     responses:
  *       201:
  *         description: Tạo sảnh tiệc thành công
+ *       401:
+ *         description: Chưa đăng nhập
+ *       403:
+ *         description: Không có quyền
  */
-router.post('/halls', upload.single('image'), hallManagementController.createHall);
+// Protected route - require authentication and permission
+router.post('/halls', 
+  authMiddleware, 
+  requirePermission(PERMISSIONS.MANAGE_HALLS),
+  upload.single('image'), 
+  hallManagementController.createHall
+);
 
 /**
  * @swagger
@@ -102,6 +117,8 @@ router.post('/halls', upload.single('image'), hallManagementController.createHal
  *   put:
  *     summary: Cập nhật thông tin sảnh tiệc
  *     tags: [Hall Management]
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -135,8 +152,17 @@ router.post('/halls', upload.single('image'), hallManagementController.createHal
  *     responses:
  *       200:
  *         description: Cập nhật sảnh tiệc thành công
+ *       401:
+ *         description: Chưa đăng nhập
+ *       403:
+ *         description: Không có quyền
  */
-router.put('/halls/:id', upload.single('image'), hallManagementController.updateHall);
+router.put('/halls/:id', 
+  authMiddleware,
+  requirePermission(PERMISSIONS.MANAGE_HALLS),
+  upload.single('image'), 
+  hallManagementController.updateHall
+);
 
 /**
  * @swagger
@@ -144,6 +170,8 @@ router.put('/halls/:id', upload.single('image'), hallManagementController.update
  *   delete:
  *     summary: Xóa sảnh tiệc
  *     tags: [Hall Management]
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -154,8 +182,16 @@ router.put('/halls/:id', upload.single('image'), hallManagementController.update
  *     responses:
  *       200:
  *         description: Xóa sảnh tiệc thành công
+ *       401:
+ *         description: Chưa đăng nhập
+ *       403:
+ *         description: Không có quyền
  */
-router.delete('/halls/:id', hallManagementController.deleteHall);
+router.delete('/halls/:id', 
+  authMiddleware,
+  requirePermission(PERMISSIONS.MANAGE_HALLS),
+  hallManagementController.deleteHall
+);
 
 /**
  * @swagger
@@ -178,6 +214,7 @@ router.delete('/halls/:id', hallManagementController.deleteHall);
  *                   items:
  *                     $ref: '#/components/schemas/HallType'
  */
+// Public route - anyone can view hall types
 router.get('/hall-types', hallManagementController.getAllHallTypes);
 
 /**
@@ -186,6 +223,8 @@ router.get('/hall-types', hallManagementController.getAllHallTypes);
  *   post:
  *     summary: Tạo loại sảnh mới
  *     tags: [Hall Management]
+ *     security:
+ *       - bearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -195,8 +234,16 @@ router.get('/hall-types', hallManagementController.getAllHallTypes);
  *     responses:
  *       201:
  *         description: Tạo loại sảnh thành công
+ *       401:
+ *         description: Chưa đăng nhập
+ *       403:
+ *         description: Không có quyền
  */
-router.post('/hall-types', hallManagementController.createHallType);
+router.post('/hall-types', 
+  authMiddleware,
+  requirePermission(PERMISSIONS.MANAGE_HALLS),
+  hallManagementController.createHallType
+);
 
 /**
  * @swagger
@@ -204,6 +251,8 @@ router.post('/hall-types', hallManagementController.createHallType);
  *   put:
  *     summary: Cập nhật thông tin loại sảnh
  *     tags: [Hall Management]
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -220,8 +269,16 @@ router.post('/hall-types', hallManagementController.createHallType);
  *     responses:
  *       200:
  *         description: Cập nhật loại sảnh thành công
+ *       401:
+ *         description: Chưa đăng nhập
+ *       403:
+ *         description: Không có quyền
  */
-router.put('/hall-types/:id', hallManagementController.updateHallType);
+router.put('/hall-types/:id', 
+  authMiddleware,
+  requirePermission(PERMISSIONS.MANAGE_HALLS),
+  hallManagementController.updateHallType
+);
 
 /**
  * @swagger
@@ -229,6 +286,8 @@ router.put('/hall-types/:id', hallManagementController.updateHallType);
  *   delete:
  *     summary: Xóa loại sảnh
  *     tags: [Hall Management]
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -239,7 +298,15 @@ router.put('/hall-types/:id', hallManagementController.updateHallType);
  *     responses:
  *       200:
  *         description: Xóa loại sảnh thành công
+ *       401:
+ *         description: Chưa đăng nhập
+ *       403:
+ *         description: Không có quyền
  */
-router.delete('/hall-types/:id', hallManagementController.deleteHallType);
+router.delete('/hall-types/:id', 
+  authMiddleware,
+  requirePermission(PERMISSIONS.MANAGE_HALLS),
+  hallManagementController.deleteHallType
+);
 
 module.exports = router;
