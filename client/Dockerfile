@@ -9,6 +9,10 @@ RUN npm install
 # Copy the rest of the application code
 COPY . .
 
+# Accept build argument for API URL
+ARG REACT_APP_API_URL=http://localhost:3001
+ENV REACT_APP_API_URL=$REACT_APP_API_URL
+
 # Build the application
 RUN npm run build
 

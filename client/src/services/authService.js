@@ -1,8 +1,9 @@
 import axios from 'axios';
+import { API_URL } from '../utils/env';
 
-// Create a dedicated axios instance for auth requests with direct base URL
+// Create a dedicated axios instance for auth requests with environment-based URL
 const authAxios = axios.create({
-  baseURL: 'http://localhost:3001'
+  baseURL: API_URL
 });
 
 // Debug logging for auth requests
