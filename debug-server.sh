@@ -3,7 +3,6 @@
 echo "🔍 QLTC Server Debug Script"
 echo "=========================="
 
-echo ""
 echo "1. Container Status:"
 docker-compose -f docker-compose.prod.yml ps
 
@@ -25,7 +24,12 @@ docker-compose -f docker-compose.prod.yml logs --tail 10 mysql
 
 echo ""
 echo "6. .env file check:"
-cat .env
+if [ -f ".env" ]; then
+    echo "✅ .env file exists"
+    cat .env
+else
+    echo "❌ .env file missing!"
+fi
 
 echo ""
 echo "7. Manual restart attempt:"
