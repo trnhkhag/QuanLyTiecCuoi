@@ -2,57 +2,64 @@ version: '3.8'
 
 services:
   qltc-client:
+    image: ${DOCKER_USERNAME}/qltc-client:latest
     restart: always
-    # No build context in production - use pre-built images
-    build: {}
+    ports:
+      - "80:80"
     environment:
-      - REACT_APP_API_URL=${API_URL:-http://localhost:3001}
-    # Add health check
+      - REACT_APP_API_URL=http://localhost:3001
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:80"]
       interval: 1m
       timeout: 10s
       retries: 3
+    networks:
+      - qltc-network
 
   qltc-server:
+    image: ${DOCKER_USERNAME}/qltc-server:latest
     restart: always
-    # No build context in production - use pre-built images
-    build: {}
+    ports:
+      - "3001:3001"
     environment:
       - NODE_ENV=production
       - PORT=3001
-      # Add secure environment variables - use .env file or secrets
-      - JWT_SECRET=${JWT_SECRET}
-      - DB_HOST=${DB_HOST}
+      - DB_HOST=mysql
+      - DB_PORT=3306
       - DB_USER=${DB_USER}
       - DB_PASSWORD=${DB_PASSWORD}
-      - DB_NAME=${DB_NAME}
-    # Add health check
+      - DB_DATABASE=${DB_DATABASE}
+      - DB_USER_PASSWORD=${DB_USER_PASSWORD}
+      - JWT_SECRET=${JWT_SECRET}
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:3001/health"]
       interval: 1m
       timeout: 10s
       retries: 3
-    # Resource limits
+    depends_on:
+      - mysql
+    networks:
+      - qltc-network
     deploy:
       resources:
         limits:
           cpus: '1'
           memory: 1G
 
-  # Add a database service for production
-  qltc-db:
-    image: mcr.microsoft.com/mssql/server:2019-latest
+  mysql:
+    image: mysql:8.0
     restart: always
     environment:
-      - ACCEPT_EULA=Y
-      - SA_PASSWORD=${DB_PASSWORD}
-      - MSSQL_PID=Express
+      - MYSQL_ROOT_PASSWORD=${DB_PASSWORD}
+      - MYSQL_DATABASE=${DB_DATABASE}
+      - MYSQL_USER=${DB_USER}
+      - MYSQL_PASSWORD=${DB_USER_PASSWORD}
     volumes:
-      - qltc-db-data:/var/opt/mssql
+      - mysql-data:/var/lib/mysql
+    ports:
+      - "3306:3306"
     networks:
       - qltc-network
-    # Resource limits
     deploy:
       resources:
         limits:
@@ -60,5 +67,9 @@ services:
           memory: 2G
 
 volumes:
-  qltc-db-data:
-    driver: local 
+  mysql-data:
+    driver: local
+
+networks:
+  qltc-network:
+    driver: bridge 
