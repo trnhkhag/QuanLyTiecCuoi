@@ -23,7 +23,6 @@ const RegisterForm = () => {
       setLoading(false);
     }
   };
-
   return (
     <div className="card shadow p-4">
       <h3 className="text-center mb-4">Đăng Ký</h3>
