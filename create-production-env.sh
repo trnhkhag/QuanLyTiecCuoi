@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# Script to create production .env file
-echo "Creating production .env file..."
+# Script to create production .env file for main branch
+echo "Creating production .env file for main branch..."
 
 cat > .env << 'EOF'
 # Production Environment Variables
