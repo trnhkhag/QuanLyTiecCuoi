@@ -10,6 +10,7 @@ import {
   EyeOutlined,
 } from '@ant-design/icons';
 import AdminHallService from '../../services/AdminHallService';
+import { FormattedPrice } from '../../components/common/FormattedPrice';
 
 const { TabPane } = Tabs;
 const { Option } = Select;
@@ -224,7 +225,7 @@ const HallList = () => {
       key: 'GiaThue',
       width: '15%',
       align: 'right',
-      render: (value) => `${value.toLocaleString('vi-VN')} đ`,
+      render: (value) => <FormattedPrice amount={value} />,
       sorter: (a, b) => a.GiaThue - b.GiaThue,
     },
     {
@@ -411,7 +412,7 @@ const HallList = () => {
             <p><strong>Tên sảnh:</strong> {selectedHall.TenSanh}</p>
             <p><strong>Loại sảnh:</strong> {selectedHall.TenLoai}</p>
             <p><strong>Sức chứa:</strong> {selectedHall.SucChua} khách</p>
-            <p><strong>Giá thuê:</strong> {selectedHall.GiaThue.toLocaleString('vi-VN')} đ</p>
+            <p><strong>Giá thuê:</strong> <FormattedPrice amount={selectedHall.GiaThue} /></p>
             {selectedHall.HinhAnh && (
               <div>
                 <strong>Hình ảnh:</strong>
@@ -513,7 +514,7 @@ const HallTypeList = () => {
       title: 'Giá bàn tối thiểu',
       dataIndex: 'GiaBanToiThieu',
       key: 'GiaBanToiThieu',
-      render: (value) => `${value.toLocaleString('vi-VN')} đ`,
+      render: (value) => <FormattedPrice amount={value} />,
     },
     {
       title: 'Thao tác',

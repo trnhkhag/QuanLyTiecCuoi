@@ -75,7 +75,7 @@ const weddingBookingRoutes = require('./routes/weddingBookingRoutes');
 const hallRoutes = require('./routes/hallRoutes');
 const serviceRoutes = require('./routes/serviceRoutes');
 const regulationRoutes = require('./routes/regulationRoutes');
-const weddingLookupRoutes = require('./routes/WeddingLookupRoutes');
+const weddingLookupRoutes = require('./routes/weddingLookupRoutes'); // Sửa từ WeddingLookupRoutes thành weddingLookupRoutes
 const hallManagementRoutes = require('./routes/hallManagementRoutes');
 const tiecCuoiRoutes = require('./routes/tiecCuoiRoutes');
 const shiftRoutes = require('./routes/shiftRoutes');
@@ -99,6 +99,9 @@ app.use('/api/services', serviceRoutes);
 app.use('/api/regulations', regulationRoutes);
 app.use('/api/lookup', weddingLookupRoutes);
 app.use('/api/lobby', hallManagementRoutes);
+
+// Thêm route mới cho /api/weddings để client có thể truy cập
+app.use('/api/weddings', weddingLookupRoutes);
 
 // Start server
 app.listen(PORT, () => {

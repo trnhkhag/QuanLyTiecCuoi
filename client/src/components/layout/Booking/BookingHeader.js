@@ -25,14 +25,14 @@ function BookingHeader() {
       label: 'Đặt tiệc',
       permission: PERMISSIONS.MANAGE_BOOKINGS
     },
-    {
-      to: '/booking/lookup',
-      label: 'Tra cứu tiệc cưới',
-      permission: PERMISSIONS.SEARCH_WEDDINGS
-    },
+    // {
+    //   to: '/booking/lookup',
+    //   label: 'Tra cứu tiệc cưới',
+    //   permission: PERMISSIONS.SEARCH_WEDDINGS
+    // },
     {
       to: '/booking/list',
-      label: 'Quản lý đặt tiệc',
+      label: 'Tra cứu đặt tiệc',
       permission: PERMISSIONS.MANAGE_BOOKINGS | PERMISSIONS.SEARCH_WEDDINGS
     },
     // {

@@ -27,11 +27,6 @@ const UserLayout = ({ children }) => {
       icon: <ShopOutlined />,
       label: 'Sảnh tiệc',
     },
-    {
-      key: '/booking/lookup',
-      icon: <SearchOutlined />,
-      label: 'Tra cứu',
-    },
   ];
 
   return (
@@ -42,44 +37,51 @@ const UserLayout = ({ children }) => {
         background: '#fff',
         boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
         padding: '0 50px',
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center'
       }}>
         <div style={{
           display: 'flex',
-          justifyContent: 'space-between',
           alignItems: 'center',
-          height: '100%'
+          height: '100%',
         }}>
-          <div style={{ display: 'flex', alignItems: 'center' }}>
-            <h1 style={{ 
-              margin: '0 24px 0 0',
-              fontSize: '20px',
-              fontWeight: 'bold',
-              color: '#1890ff'
-            }}>
-              <Link to="/booking" style={{ color: 'inherit' }}>
-                Tiệc Cưới Hoàng Gia
-              </Link>
-            </h1>
-            <Menu
-              mode="horizontal"
-              selectedKeys={[location.pathname]}
-              items={menuItems}
-              onClick={({ key }) => navigate(key)}
-              style={{ border: 'none', flex: 1 }}
-            />
-          </div>
+          <h1 style={{ 
+            margin: '0 24px 0 0',
+            fontSize: '20px',
+            fontWeight: 'bold',
+            color: '#1890ff'
+          }}>
+            <Link to="/booking" style={{ color: 'inherit' }}>
+              Tiệc Cưới Hoàng Gia
+            </Link>
+          </h1>
+        </div>
+
+        <Menu
+          mode="horizontal"
+          selectedKeys={[location.pathname]}
+          items={menuItems}
+          onClick={({ key }) => navigate(key)}
+          style={{ 
+            lineHeight: '64px', 
+            border: 'none',
+            flex: 1,
+            display: 'flex',
+            justifyContent: 'center'
+          }}
+        />
           
-          <div>
-            <Button 
-              type="primary" 
-              icon={<CalendarOutlined />}
-              onClick={() => navigate('/booking/new')}
-              style={{ marginRight: 16 }}
-            >
-              Đặt Tiệc
-            </Button>
-            <Avatar icon={<UserOutlined />} />
-          </div>
+        <div>
+          <Button 
+            type="primary" 
+            icon={<CalendarOutlined />}
+            onClick={() => navigate('/booking/new')}
+            style={{ marginRight: 16 }}
+          >
+            Đặt Tiệc
+          </Button>
+          <Avatar icon={<UserOutlined />} />
         </div>
       </Header>
 
