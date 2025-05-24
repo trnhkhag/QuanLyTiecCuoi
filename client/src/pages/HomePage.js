@@ -6,10 +6,13 @@ import {
   ShopOutlined,
   HeartOutlined,
   CheckCircleOutlined,
+  DollarOutlined,
+  TeamOutlined
 } from '@ant-design/icons';
 import UserLayout from '../components/layout/User/UserLayout';
 import { LoadingSpinner, ErrorMessage } from '../components/common/StatusComponents';
 import { HallCard } from '../components/common/Hall/HallCard';
+import { FormattedPrice } from '../components/common/FormattedPrice';
 import HallService from '../services/HallService';
 
 /**
@@ -77,6 +80,17 @@ function HomePage() {
   
   // Chỉ lấy 3 sảnh đầu tiên để hiển thị
   const featuredHalls = halls.slice(0, 3);
+
+  // Hàm để lấy URL hình ảnh từ đường dẫn trong database
+  const getImageUrl = (hall) => {
+    if (hall && hall.HinhAnh) {
+      // Lấy tên file từ đường dẫn đầy đủ
+      const fileName = hall.HinhAnh.split('/').pop();
+      return `http://localhost:3001/api/v1/wedding-service/lobby/image/${fileName}`;
+    }
+    // Fallback nếu không có hình ảnh
+    return '/assets/hall-1.jpg';
+  };
   
   return (
     <UserLayout>
@@ -168,6 +182,63 @@ function HomePage() {
               </Col>
             ))}
           </Row>
+        </div>
+
+        <div 
+          style={{ 
+            padding: '64px 24px',
+            background: '#fff',
+          }}
+        >
+          <h2 style={{ fontSize: '32px', marginBottom: '24px', textAlign: 'center' }}>
+            Sảnh Tiệc Nổi Bật
+          </h2>
+          
+          <Row gutter={[24, 24]}>
+            {featuredHalls.map(hall => (
+              <Col xs={24} sm={8} key={hall.ID_SanhTiec}>
+                <Card
+                  hoverable
+                  cover={
+                    <img
+                      alt={hall.TenSanh}
+                      src={getImageUrl(hall)}
+                      style={{ height: 200, objectFit: 'cover' }}
+                      onError={e => { e.target.src = '/assets/hall-1.jpg' }}
+                    />
+                  }
+                  actions={[
+                    <Link to={`/booking/halls/${hall.ID_SanhTiec}`}>
+                      <Button type="text">Chi tiết</Button>
+                    </Link>,
+                    <Link to={`/booking/new?hallId=${hall.ID_SanhTiec}`}>
+                      <Button type="primary">Đặt tiệc</Button>
+                    </Link>,
+                  ]}
+                >
+                  <Card.Meta
+                    title={hall.TenSanh}
+                    description={
+                      <>
+                        <p><TeamOutlined /> Sức chứa: {hall.SucChua} khách</p>
+                        <p><DollarOutlined /> Giá thuê: <FormattedPrice amount={hall.GiaThue} /></p>
+                        <p>Loại sảnh: {hall.TenLoai || "Cao cấp"}</p>
+                      </>
+                    }
+                  />
+                </Card>
+              </Col>
+            ))}
+          </Row>
+          
+          <div style={{ textAlign: 'center', marginTop: '32px' }}>
+            <Button 
+              type="primary"
+              onClick={() => navigate('/booking/halls')}
+            >
+              Xem tất cả sảnh tiệc
+            </Button>
+          </div>
         </div>
 
         <div 

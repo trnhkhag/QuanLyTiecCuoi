@@ -4,11 +4,16 @@ const path = require('path');
 // Cấu hình storage cho multer
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, 'uploads/halls/') // Thư mục lưu file
+    // Sử dụng đường dẫn tuyệt đối thay vì đường dẫn tương đối
+    const uploadPath = path.join(__dirname, '../../uploads/halls/');
+    console.log('Upload directory:', uploadPath);
+    cb(null, uploadPath)
   },
   filename: function (req, file, cb) {
     const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9)
-    cb(null, 'hall-' + uniqueSuffix + path.extname(file.originalname))
+    const fileName = 'hall-' + uniqueSuffix + path.extname(file.originalname);
+    console.log('Generated file name:', fileName);
+    cb(null, fileName)
   }
 });
 

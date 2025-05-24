@@ -25,26 +25,21 @@ function BookingHeader() {
       label: 'Đặt tiệc',
       permission: PERMISSIONS.MANAGE_BOOKINGS
     },
-    {
-      to: '/booking/lookup',
-      label: 'Tra cứu tiệc cưới',
-      permission: PERMISSIONS.SEARCH_WEDDINGS
-    },
+    // {
+    //   to: '/booking/lookup',
+    //   label: 'Tra cứu tiệc cưới',
+    //   permission: PERMISSIONS.SEARCH_WEDDINGS
+    // },
     {
       to: '/booking/list',
-      label: 'Quản lý đặt tiệc',
+      label: 'Tra cứu đặt tiệc',
       permission: PERMISSIONS.MANAGE_BOOKINGS | PERMISSIONS.SEARCH_WEDDINGS
     },
-    {
-      to: '/booking/regulations',
-      label: 'Quy định',
-      permission: null // Everyone can view regulations
-    },
-    {
-      to: '/booking/regulations/manage',
-      label: 'Quản lý quy định',
-      permission: PERMISSIONS.MANAGE_REGULATIONS
-    }
+    // {
+    //   to: '/booking/regulations/manage',
+    //   label: 'Quản lý quy định',
+    //   permission: PERMISSIONS.MANAGE_REGULATIONS
+    // }
   ];
 
   // Filter navigation items based on permissions
@@ -57,22 +52,16 @@ function BookingHeader() {
     <Navbar bg="white" expand="lg" className="shadow-sm mb-4">
       <Container>
         <Navbar.Brand as={Link} to="/">
-          <img 
-            src="/logo.png" 
-            alt="Wedding Management" 
-            height="40" 
-            className="d-inline-block align-top me-2"
-          />
-          Quản Lý Tiệc Cưới
+        Quản lý tiệc cưới
         </Navbar.Brand>
         
         <Navbar.Toggle aria-controls="basic-navbar-nav" />
         
         <Navbar.Collapse id="basic-navbar-nav">
           <Nav className="ms-auto">
-            <Nav.Link as={Link} to="/">
+            {/* <Nav.Link as={Link} to="/">
               Trở về Trang chủ
-            </Nav.Link>
+            </Nav.Link> */}
             {visibleNavItems.map((item, index) => (
               <Nav.Link 
                 key={index}

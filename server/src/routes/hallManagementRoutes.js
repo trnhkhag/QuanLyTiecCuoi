@@ -3,6 +3,8 @@ const router = express.Router();
 const hallManagementController = require('../controllers/hallManagementController');
 const upload = require('../middlewares/uploadMiddleware');
 const { authMiddleware, requirePermission, PERMISSIONS } = require('../middleware/authMiddleware');
+const path = require('path');
+const fs = require('fs');
 
 /**
  * @swagger
@@ -308,5 +310,29 @@ router.delete('/hall-types/:id',
   requirePermission(PERMISSIONS.MANAGE_HALLS),
   hallManagementController.deleteHallType
 );
+
+// Route đặc biệt để phục vụ hình ảnh - Endpoint mới
+router.get('/image/:filename', (req, res) => {
+  try {
+    const filename = req.params.filename;
+    console.log('Requested image:', filename);
+    
+    // Đường dẫn đến file hình ảnh trong container
+    const imagePath = path.join(__dirname, '../../uploads/halls', filename);
+    console.log('Image path:', imagePath);
+    
+    // Kiểm tra xem file có tồn tại không
+    if (fs.existsSync(imagePath)) {
+      console.log('Image file exists, sending...');
+      return res.sendFile(imagePath);
+    } else {
+      console.log('Image file not found');
+      return res.status(404).send('Image not found');
+    }
+  } catch (error) {
+    console.error('Error serving image:', error);
+    return res.status(500).send('Error serving image');
+  }
+});
 
 module.exports = router;

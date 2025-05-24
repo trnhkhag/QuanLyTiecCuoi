@@ -10,6 +10,7 @@ import {
   EyeOutlined,
 } from '@ant-design/icons';
 import AdminHallService from '../../services/AdminHallService';
+import { FormattedPrice } from '../../components/common/FormattedPrice';
 
 const { TabPane } = Tabs;
 const { Option } = Select;
@@ -66,7 +67,7 @@ const HallList = () => {
           uid: '-1',
           name: 'current-image.jpg',
           status: 'done',
-          url: `http://localhost:5000${hall.HinhAnh}`,
+          url: `http://localhost:3001/api/v1/wedding-service/lobby/image/${hall.HinhAnh.split('/').pop()}`,
         },
       ]);
     }
@@ -153,17 +154,6 @@ const HallList = () => {
     }
   };
 
-  const handlePriceChange = (value) => {
-    if (value < 0) {
-      form.setFields([
-        {
-          name: 'GiaThue',
-          errors: ['Giá thuê không thể âm'],
-        },
-      ]);
-    }
-  };
-
   const uploadProps = {
     beforeUpload: (file) => {
       const isImage = file.type.startsWith('image/');
@@ -188,7 +178,7 @@ const HallList = () => {
       render: (_, record) => (
         record.HinhAnh ? (
           <img
-            src={`http://localhost:5000${record.HinhAnh}`}
+            src={`http://localhost:3001/api/v1/wedding-service/lobby/image/${record.HinhAnh.split('/').pop()}`}
             alt={record.TenSanh}
             style={{ width: 100, height: 60, objectFit: 'cover' }}
           />
@@ -235,7 +225,7 @@ const HallList = () => {
       key: 'GiaThue',
       width: '15%',
       align: 'right',
-      render: (value) => `${value.toLocaleString('vi-VN')} đ`,
+      render: (value) => <FormattedPrice amount={value} />,
       sorter: (a, b) => a.GiaThue - b.GiaThue,
     },
     {
@@ -357,19 +347,25 @@ const HallList = () => {
             name="GiaThue"
             label="Giá thuê"
             rules={[
-              { required: true, message: 'Vui lòng nhập giá thuê' },
-              { type: 'number', min: 0, message: 'Giá thuê không thể âm' }
+              { required: true, message: 'Vui lòng nhập giá thuê' }
+              // Đã loại bỏ quy tắc kiểm tra giá trị âm
             ]}
             validateFirst={true}
           >
             <InputNumber
               style={{ width: '100%' }}
               min={0}
-              onChange={handlePriceChange}
-              onBlur={(e) => handlePriceChange(e.target.value)}
+              formatter={value => {
+                if (value === null || value === undefined) return '';
+                return `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+              }}
+              parser={value => {
+                if (!value) return 0;
+                const parsed = value.replace(/\$\s?|(,*)/g, '');
+                return parsed ? parseFloat(parsed) : 0;
+              }}
+              precision={0}
               addonAfter="VNĐ"
-              formatter={value => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
-              parser={value => value.replace(/\$\s?|(,*)/g, '')}
             />
           </Form.Item>
 
@@ -416,12 +412,12 @@ const HallList = () => {
             <p><strong>Tên sảnh:</strong> {selectedHall.TenSanh}</p>
             <p><strong>Loại sảnh:</strong> {selectedHall.TenLoai}</p>
             <p><strong>Sức chứa:</strong> {selectedHall.SucChua} khách</p>
-            <p><strong>Giá thuê:</strong> {selectedHall.GiaThue.toLocaleString('vi-VN')} đ</p>
+            <p><strong>Giá thuê:</strong> <FormattedPrice amount={selectedHall.GiaThue} /></p>
             {selectedHall.HinhAnh && (
               <div>
                 <strong>Hình ảnh:</strong>
                 <img
-                  src={`http://localhost:5000${selectedHall.HinhAnh}`}
+                  src={`http://localhost:3001/api/v1/wedding-service/lobby/image/${selectedHall.HinhAnh.split('/').pop()}`}
                   alt={selectedHall.TenSanh}
                   style={{ width: '100%', maxHeight: 400, objectFit: 'cover', marginTop: 8 }}
                 />
@@ -518,7 +514,7 @@ const HallTypeList = () => {
       title: 'Giá bàn tối thiểu',
       dataIndex: 'GiaBanToiThieu',
       key: 'GiaBanToiThieu',
-      render: (value) => `${value.toLocaleString('vi-VN')} đ`,
+      render: (value) => <FormattedPrice amount={value} />,
     },
     {
       title: 'Thao tác',

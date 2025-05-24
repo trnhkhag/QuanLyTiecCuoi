@@ -28,12 +28,6 @@ const AdminLayout = ({ children }) => {
 
   const allMenuItems = [
     {
-      key: '/admin',
-      icon: <DashboardOutlined />,
-      label: 'Dashboard',
-      permission: null // No permission required
-    },
-    {
       key: '/admin/halls',
       icon: <ShopOutlined />,
       label: 'Quản lý Sảnh cưới',
@@ -45,18 +39,12 @@ const AdminLayout = ({ children }) => {
       label: 'Quản lý Quy định',
       permission: PERMISSIONS.MANAGE_REGULATIONS
     },
-    {
-      key: '/admin/users',
-      icon: <TeamOutlined />,
-      label: 'Quản lý Người dùng',
-      permission: PERMISSIONS.MANAGE_USERS
-    },
-    {
-      key: '/admin/settings',
-      icon: <SettingOutlined />,
-      label: 'Cài đặt Hệ thống',
-      permission: PERMISSIONS.MANAGE_REGULATIONS // Admin level permission
-    },
+    // {
+    //   key: '/admin/users',
+    //   icon: <TeamOutlined />,
+    //   label: 'Quản lý Người dùng',
+    //   permission: PERMISSIONS.MANAGE_USERS
+    // },
   ];
 
   // Filter menu items based on permissions

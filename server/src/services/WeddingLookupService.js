@@ -1,4 +1,4 @@
-const pool = require('../config/db');
+const { pool } = require('../config/db');
 
 class WeddingLookupService {
   /**
@@ -7,9 +7,10 @@ class WeddingLookupService {
   async getAllBookings(filters = {}) {
     try {
       let query = `
-        SELECT t.ID_TiecCuoi, k.HoTen AS TenKhachHang, k.SoDienThoai,
-               s.TenSanh, t.NgayToChuc, c.TenCa, t.SoLuongBan,
-               t.SoBanDuTru, h.TienThanhToan AS TienCoc
+        SELECT t.ID_TiecCuoi, t.ID_KhachHang, k.HoTen AS TenKhachHang, k.SoDienThoai,
+               t.ID_SanhTiec, s.TenSanh, t.NgayToChuc, t.ID_Ca, c.TenCa, 
+               t.SoLuongBan, t.SoBanDuTru, t.TrangThai, t.ThoiDiemDat,
+               h.TienThanhToan AS TienCoc, s.GiaThue
         FROM TiecCuoi t
         JOIN KhachHang k ON t.ID_KhachHang = k.ID_KhachHang
         JOIN SanhTiec s ON t.ID_SanhTiec = s.ID_SanhTiec
@@ -21,7 +22,7 @@ class WeddingLookupService {
       const queryParams = [];
 
       if (filters.date) {
-        query += ' AND t.NgayToChuc = ?';
+        query += ' AND DATE(t.NgayToChuc) = ?';
         queryParams.push(filters.date);
       }
 
@@ -35,11 +36,26 @@ class WeddingLookupService {
         queryParams.push(`%${filters.hallName}%`);
       }
 
+      if (filters.hallId) {
+        query += ' AND t.ID_SanhTiec = ?';
+        queryParams.push(filters.hallId);
+      }
+      
+      if (filters.status) {
+        query += ' AND t.TrangThai = ?';
+        queryParams.push(filters.status);
+      }
+
       query += ' ORDER BY t.NgayToChuc DESC';
 
+      console.log('Query:', query);
+      console.log('Params:', queryParams);
+
       const [rows] = await pool.query(query, queryParams);
+      console.log(`Found ${rows.length} bookings`);
       return rows;
     } catch (error) {
+      console.error('Error in getAllBookings:', error);
       throw error;
     }
   }
@@ -51,8 +67,8 @@ class WeddingLookupService {
     try {
       const [rows] = await pool.query(
         `SELECT t.*, k.HoTen AS TenKhachHang, k.SoDienThoai,
-                s.TenSanh, s.GiaThue, c.TenCa,
-                h.TienThanhToan AS TienCoc
+                s.TenSanh, s.GiaThue, c.TenCa, c.ThoiGianBatDau, c.ThoiGianKetThuc,
+                h.TienThanhToan AS TienCoc, h.TongTien
          FROM TiecCuoi t
          JOIN KhachHang k ON t.ID_KhachHang = k.ID_KhachHang
          JOIN SanhTiec s ON t.ID_SanhTiec = s.ID_SanhTiec
@@ -70,17 +86,29 @@ class WeddingLookupService {
 
       // Lấy danh sách dịch vụ đi kèm
       const [services] = await pool.query(
-        `SELECT td.*, d.TenDichVu 
+        `SELECT td.*, d.TenDichVu, d.DonGia AS Gia
          FROM Tiec_DichVu td 
          JOIN DichVu d ON td.ID_DichVu = d.ID_DichVu
          WHERE td.ID_TiecCuoi = ?`,
         [bookingId]
       );
 
-      booking.services = services;
+      booking.DichVu = services;
+
+      // Lấy danh sách món ăn nếu có
+      const [foods] = await pool.query(
+        `SELECT tm.*, m.TenMonAn
+         FROM Tiec_MonAn tm
+         JOIN MonAn m ON tm.ID_MonAn = m.ID_MonAn
+         WHERE tm.ID_TiecCuoi = ?`,
+        [bookingId]
+      );
+
+      booking.MonAn = foods;
 
       return booking;
     } catch (error) {
+      console.error('Error in getBookingById:', error);
       throw error;
     }
   }

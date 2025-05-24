@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Table, Badge, Button, Form, Row, Col, Card } from 'react-bootstrap';
+import React, { useState, useEffect } from 'react';
+import { Table, Badge, Button, Form, Row, Col, Card, Alert } from 'react-bootstrap';
 import DatePicker from 'react-datepicker';
 import { Link } from 'react-router-dom';
 import BookingLayout from '../../components/layout/Booking/BookingLayout';
@@ -21,14 +21,77 @@ function BookingListPage() {
     updateFilter,
     applyFilters,
     resetFilters,
-    fetchBookings
+    fetchBookings,
+    checkApiConnection
   } = useBookingForm();
   
   // State cho view mode (list/grid)
   const [viewMode, setViewMode] = useState('list');
   
-  // Reference data
-  const [halls, setHalls] = useState([]);
+  // State cho thông tin kết nối API
+  const [apiStatus, setApiStatus] = useState({
+    checked: false,
+    connected: true
+  });
+  
+  // Kiểm tra kết nối API khi gặp lỗi
+  useEffect(() => {
+    if (error) {
+      checkApiStatus();
+    }
+  }, [error]);
+  
+  // Hàm kiểm tra kết nối API
+  const checkApiStatus = async () => {
+    const isConnected = await checkApiConnection();
+    setApiStatus({
+      checked: true,
+      connected: isConnected
+    });
+  };
+  
+  // Hàm thử tải lại dữ liệu
+  const handleRetry = () => {
+    fetchBookings();
+  };
+
+  // Hàm xử lý hiển thị lỗi với các tùy chọn phù hợp
+  const renderError = () => {
+    if (!error) return null;
+    
+    return (
+      <Alert variant="danger" className="mb-4">
+        <Alert.Heading>Không thể tải danh sách tiệc cưới</Alert.Heading>
+        <p>{error}</p>
+        <hr />
+        <div className="d-flex justify-content-end">
+          <Button onClick={handleRetry} variant="outline-danger">
+            <i className="bi bi-arrow-clockwise me-1"></i> Thử lại
+          </Button>
+        </div>
+      </Alert>
+    );
+  };
+  
+  // Format date to locale string
+  const formatDate = (dateString) => {
+    if (!dateString) return 'N/A';
+    try {
+      return new Date(dateString).toLocaleDateString('vi-VN');
+    } catch (error) {
+      return dateString;
+    }
+  };
+  
+  // Format datetime to locale string
+  const formatDateTime = (dateString) => {
+    if (!dateString) return 'N/A';
+    try {
+      return new Date(dateString).toLocaleString('vi-VN');
+    } catch (error) {
+      return dateString;
+    }
+  };
   
   return (
     <BookingLayout>
@@ -41,11 +104,22 @@ function BookingListPage() {
         </Link>
       </div>
       
+      {/* Hiển thị thông báo lỗi nếu có */}
+      {renderError()}
+      
+      {/* Hiển thị cảnh báo nếu không kết nối được API */}
+      {apiStatus.checked && !apiStatus.connected && (
+        <Alert variant="warning" className="mb-4">
+          <Alert.Heading>Không thể kết nối đến server</Alert.Heading>
+          <p>Vui lòng kiểm tra kết nối mạng và đảm bảo server đang hoạt động.</p>
+        </Alert>
+      )}
+      
       {/* Filter */}
       <Card className="mb-4">
         <Card.Body>
           <Row>
-            <Col md={3}>
+            <Col md={4}>
               <Form.Group className="mb-3">
                 <Form.Label>Ngày tổ chức</Form.Label>
                 <DatePicker selected={filters && filters.date ? new Date(filters.date) : null}
@@ -57,21 +131,18 @@ function BookingListPage() {
                 />
               </Form.Group>
             </Col>
-            <Col md={3}>
+            <Col md={4}>
               <Form.Group className="mb-3">
-                <Form.Label>Sảnh</Form.Label>
-                <Form.Select
-                  value={filters?.hallId || ''}
-                  onChange={(e) => updateFilter('hallId', e.target.value)}
-                >
-                  <option value="">Tất cả sảnh</option>
-                  {halls.map(hall => (
-                    <option key={hall.id} value={hall.id}>{hall.name}</option>
-                  ))}
-                </Form.Select>
+                <Form.Label>Tên khách hàng</Form.Label>
+                <Form.Control
+                  type="text"
+                  placeholder="Nhập tên khách hàng"
+                  value={filters?.customerName || ''}
+                  onChange={(e) => updateFilter('customerName', e.target.value)}
+                />
               </Form.Group>
             </Col>
-            <Col md={3}>
+            <Col md={4}>
               <Form.Group className="mb-3">
                 <Form.Label>Trạng thái</Form.Label>
                 <Form.Select
@@ -79,20 +150,18 @@ function BookingListPage() {
                   onChange={(e) => updateFilter('status', e.target.value)}
                 >
                   <option value="">Tất cả trạng thái</option>
-                  <option value="pending">Chờ xử lý</option>
-                  <option value="confirmed">Đã xác nhận</option>
-                  <option value="completed">Đã hoàn thành</option>
-                  <option value="cancelled">Đã hủy</option>
+                  <option value="pending">Chưa thanh toán còn lại</option>
+                  <option value="completed">Đã thanh toán</option>
                 </Form.Select>
               </Form.Group>
             </Col>
-            <Col md={3} className="d-flex align-items-end">
+            <Col md={12} className="d-flex justify-content-end">
               <div className="d-flex gap-2 mb-3">
                 <Button variant="primary" onClick={applyFilters}>
-                  Áp dụng
+                  <i className="bi bi-search me-1"></i> Tìm kiếm
                 </Button>
                 <Button variant="outline-secondary" onClick={resetFilters}>
-                  Đặt lại
+                  <i className="bi bi-arrow-counterclockwise me-1"></i> Đặt lại
                 </Button>
               </div>
             </Col>
@@ -102,7 +171,7 @@ function BookingListPage() {
       
       {/* View mode switcher */}
       <div className="d-flex justify-content-between align-items-center mb-3">
-        <div>Hiển thị {bookings?.length} đặt tiệc</div>
+        <div>Hiển thị {bookings?.length || 0} đặt tiệc</div>
         <div className="btn-group" role="group">
           <Button
             variant={viewMode === 'list' ? 'primary' : 'outline-primary'}
@@ -119,66 +188,44 @@ function BookingListPage() {
         </div>
       </div>
       
-      {/* Error message */}
-      <ErrorMessage message={error} />
-      
       {/* Loading indicator */}
       {loading ? (
         <LoadingSpinner />
       ) : (
         <>
-          {bookings?.length === 0 ? (
+          {bookings?.length === 0 && !error ? (
             <EmptyState message="Không tìm thấy đặt tiệc nào" />
           ) : viewMode === 'list' ? (
             /* List view */
             <Table striped bordered hover responsive>
               <thead>
                 <tr>
-                  <th>ID</th>
-                  <th>Tên chú rể</th>
-                  <th>Tên cô dâu</th>
+                  <th>ID Tiệc</th>
+                  <th>Tên khách hàng</th>
                   <th>Ngày tổ chức</th>
-                  <th>Ca</th>
-                  <th>Sảnh</th>
-                  <th>Số bàn</th>
+                  <th>Ca tiệc</th>
+                  <th>Thời điểm đặt</th>
+                  <th>Số bàn chính</th>
+                  <th>Số bàn dự trữ</th>
                   <th>Trạng thái</th>
-                  <th>Thao tác</th>
                 </tr>
               </thead>
               <tbody>
                 {bookings?.map(booking => (
-                  <tr key={booking.id}>
-                    <td>{booking.id}</td>
-                    <td>{booking.groomName}</td>
-                    <td>{booking.brideName}</td>
-                    <td>{new Date(booking.weddingDate).toLocaleDateString('vi-VN')}</td>
-                    <td>{booking.shiftName}</td>
-                    <td>{booking.hallName}</td>
-                    <td>{booking.tableCount}</td>
+                  <tr key={booking.id || booking.ID_TiecCuoi}>
+                    <td>{booking.ID_TiecCuoi || booking.id}</td>
+                    <td>{booking.TenKhachHang || 'N/A'}</td>
+                    <td>{formatDate(booking.NgayToChuc || booking.weddingDate)}</td>
+                    <td>{booking.TenCa || 'Ca ' + (booking.ID_Ca || 'N/A')}</td>
+                    <td>{formatDateTime(booking.ThoiDiemDat || booking.bookingDate)}</td>
+                    <td>{booking.SoLuongBan || 0}</td>
+                    <td>{booking.SoBanDuTru || 0}</td>
                     <td>
                       <Badge bg={
-                        booking.status === 'pending' ? 'warning' :
-                        booking.status === 'confirmed' ? 'info' :
-                        booking.status === 'completed' ? 'success' :
-                        'danger'
+                        (booking.TrangThai === 'Đã thanh toán' || booking.status === 'completed') ? 'success' : 'warning'
                       }>
-                        {booking.status === 'pending' ? 'Chờ xử lý' :
-                         booking.status === 'confirmed' ? 'Đã xác nhận' :
-                         booking.status === 'completed' ? 'Đã hoàn thành' :
-                         'Đã hủy'}
+                        {booking.TrangThai === 'Đã thanh toán' ? 'Đã thanh toán' : 'Chưa thanh toán còn lại'}
                       </Badge>
-                    </td>
-                    <td>
-                      <Link to={`/bookings/${booking.id}`}>
-                        <Button variant="outline-primary" size="sm" className="me-1">
-                          Chi tiết
-                        </Button>
-                      </Link>
-                      <Link to={`/bookings/${booking.id}/edit`}>
-                        <Button variant="outline-secondary" size="sm">
-                          Sửa
-                        </Button>
-                      </Link>
                     </td>
                   </tr>
                 ))}
@@ -188,7 +235,7 @@ function BookingListPage() {
             /* Grid view */
             <Row>
               {bookings.map(booking => (
-                <Col key={booking.id} md={6} lg={4} className="mb-4">
+                <Col key={booking.ID_TiecCuoi || booking.id} md={6} lg={4} className="mb-4">
                   <BookingCard booking={booking} />
                 </Col>
               ))}

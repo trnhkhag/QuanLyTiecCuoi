@@ -49,39 +49,24 @@ const HallTypeForm = ({ initialValues, onSubmit, onCancel }) => {
             name="GiaThue"
             label="Giá thuê"
             rules={[
-              { required: true, message: 'Vui lòng nhập giá thuê' },
-              {
-                validator: async (_, value) => {
-                  if (value === undefined || value === null) {
-                    return Promise.reject(new Error('Vui lòng nhập giá thuê'));
-                  }
-                  // Chuyển đổi value về số trước khi kiểm tra
-                  const numericValue = typeof value === 'string' ?
-                    parseFloat(value.replace(/[^0-9.-]+/g, '')) : value;
-
-                  if (isNaN(numericValue)) {
-                    return Promise.reject(new Error('Giá thuê không hợp lệ'));
-                  }
-
-                  if (numericValue < 0) {
-                    return Promise.reject(new Error('Giá thuê không thể âm'));
-                  }
-
-                  return Promise.resolve();
-                }
-              }
+              { required: true, message: 'Vui lòng nhập giá thuê' }
             ]}
           >
             <InputNumber
               style={{ width: '100%' }}
-              formatter={(value) =>
-                `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',') + ' VND'
-              }
+              formatter={(value) => {
+                if (value === null || value === undefined) return '';
+                return `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',') + ' VND';
+              }}
               parser={(value) => {
+                if (!value) return 0;
+                // Chỉ trích xuất các số từ chuỗi, loại bỏ tất cả ký tự không phải số
                 const parsed = value.replace(/[^0-9.-]+/g, '');
-                return parsed ? parseFloat(parsed) : '';
+                return parsed ? parseFloat(parsed) : 0;
               }}
               min={0}
+              precision={0} // Chỉ nhận số nguyên
+              step={1000} // Mỗi lần tăng/giảm 1000 đồng
             />
           </Form.Item>
         </Col>

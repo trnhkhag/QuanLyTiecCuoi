@@ -111,6 +111,17 @@ function HallListPage() {
     setFilteredHalls(result);
   }, [filters, halls]);
 
+  // Hàm để lấy URL hình ảnh từ đường dẫn trong database
+  const getImageUrl = (hall) => {
+    if (hall && hall.HinhAnh) {
+      // Lấy tên file từ đường dẫn đầy đủ
+      const fileName = hall.HinhAnh.split('/').pop();
+      return `http://localhost:3001/api/v1/wedding-service/lobby/image/${fileName}`;
+    }
+    // Fallback nếu không có hình ảnh
+    return '/assets/hall-1.jpg';
+  };
+
   if (loading) return (
     <UserLayout>
       <LoadingSpinner text="Đang tải danh sách sảnh..." />
@@ -195,7 +206,7 @@ function HallListPage() {
                 cover={
                   <img
                     alt={hall.TenSanh}
-                    src={`/assets/hall-${hall.ID_SanhTiec}.jpg`}
+                    src={getImageUrl(hall)}
                     style={{ height: 200, objectFit: 'cover' }}
                     onError={e => { e.target.src = '/assets/hall-1.jpg' }}
                   />
