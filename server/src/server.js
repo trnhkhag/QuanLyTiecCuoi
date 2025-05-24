@@ -8,8 +8,67 @@ require('dotenv').config();
 const PORT = process.env.PORT || 3001;
 app.use(cors());
 app.use(express.json());
-// Phục vụ static files từ thư mục uploads
-app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
+
+// Cấu hình phục vụ tập tin tĩnh - Đảm bảo đường dẫn đúng trong Docker
+const uploadsPath = path.join(__dirname, '../uploads');
+console.log('Serving static files from: ', uploadsPath);
+
+// Phục vụ các file tĩnh từ thư mục uploads
+app.use('/uploads', express.static(uploadsPath));
+
+// Thêm route debug đặc biệt để kiểm tra khả năng truy cập file
+app.get('/debug-file/:filename', (req, res) => {
+  const filename = req.params.filename;
+  const filePath = path.join(uploadsPath, 'halls', filename);
+  
+  console.log('Debug file access:', filePath);
+  
+  if (fs.existsSync(filePath)) {
+    console.log('File exists, sending file');
+    return res.sendFile(filePath);
+  } else {
+    console.log('File does not exist');
+    return res.status(404).json({ error: 'File not found', path: filePath });
+  }
+});
+
+// In thông tin chi tiết về các file trong thư mục uploads để debug
+const fs = require('fs');
+try {
+  if (fs.existsSync(uploadsPath)) {
+    console.log('Uploads directory exists at path:', uploadsPath);
+    const hallsPath = path.join(uploadsPath, 'halls');
+    if (fs.existsSync(hallsPath)) {
+      console.log('Halls directory exists at path:', hallsPath);
+      const files = fs.readdirSync(hallsPath);
+      console.log('Files in halls directory:', files);
+      
+      // Kiểm tra quyền truy cập file
+      files.forEach(file => {
+        try {
+          const filePath = path.join(hallsPath, file);
+          const stats = fs.statSync(filePath);
+          console.log(`File ${file}: size=${stats.size}, permissions=${stats.mode.toString(8)}`);
+        } catch (err) {
+          console.error(`Error checking file ${file}:`, err);
+        }
+      });
+    } else {
+      console.log('Halls directory does not exist');
+      // Tạo thư mục halls nếu chưa tồn tại
+      fs.mkdirSync(hallsPath, { recursive: true });
+      console.log('Created halls directory');
+    }
+  } else {
+    console.log('Uploads directory does not exist');
+    // Tạo thư mục uploads nếu chưa tồn tại
+    fs.mkdirSync(uploadsPath, { recursive: true });
+    fs.mkdirSync(path.join(uploadsPath, 'halls'), { recursive: true });
+    console.log('Created uploads/halls directories');
+  }
+} catch (err) {
+  console.error('Error checking uploads directory:', err);
+}
 
 // Import thêm các routes từ project phụ
 const weddingBookingRoutes = require('./routes/weddingBookingRoutes');

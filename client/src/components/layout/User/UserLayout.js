@@ -28,11 +28,6 @@ const UserLayout = ({ children }) => {
       label: 'Sảnh tiệc',
     },
     {
-      key: '/booking/regulations',
-      icon: <InfoCircleOutlined />,
-      label: 'Quy định',
-    },
-    {
       key: '/booking/lookup',
       icon: <SearchOutlined />,
       label: 'Tra cứu',
@@ -61,7 +56,7 @@ const UserLayout = ({ children }) => {
               fontWeight: 'bold',
               color: '#1890ff'
             }}>
-              <Link to="/" style={{ color: 'inherit' }}>
+              <Link to="/booking" style={{ color: 'inherit' }}>
                 Tiệc Cưới Hoàng Gia
               </Link>
             </h1>

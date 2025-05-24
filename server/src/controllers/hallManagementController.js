@@ -53,7 +53,10 @@ class HallManagementController {
       
       // Thêm đường dẫn ảnh nếu có upload file
       if (req.file) {
+        console.log('File uploaded:', req.file);
+        // Đảm bảo đường dẫn URL đúng định dạng dành cho client
         hallData.HinhAnh = '/uploads/halls/' + req.file.filename;
+        console.log('Đường dẫn file hình ảnh mới:', hallData.HinhAnh);
       }
       
       // Validate dữ liệu đầu vào
@@ -65,6 +68,7 @@ class HallManagementController {
       }
 
       const newHall = await hallManagementService.createHall(hallData);
+      console.log('Đã tạo sảnh mới thành công với dữ liệu:', newHall);
       res.status(201).json({
         success: true,
         message: 'Tạo sảnh mới thành công',
@@ -85,7 +89,8 @@ class HallManagementController {
     try {
       const hallId = req.params.id;
       const hallData = req.body;
-
+      console.log('Cập nhật sảnh ID:', hallId, 'với dữ liệu:', hallData);
+      
       // Validate dữ liệu đầu vào cơ bản
       if (!hallData.TenSanh || !hallData.SucChua || !hallData.GiaThue || !hallData.ID_LoaiSanh) {
         return res.status(400).json({
@@ -96,7 +101,9 @@ class HallManagementController {
 
       // Thêm đường dẫn ảnh nếu có upload file mới
       if (req.file) {
+        console.log('File uploaded for update:', req.file);
         hallData.HinhAnh = '/uploads/halls/' + req.file.filename;
+        console.log('Đường dẫn file hình ảnh cập nhật:', hallData.HinhAnh);
       }
 
       const updatedHall = await hallManagementService.updateHall(hallId, hallData);

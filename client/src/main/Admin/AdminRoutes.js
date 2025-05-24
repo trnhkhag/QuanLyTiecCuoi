@@ -11,7 +11,11 @@ function AdminRoutes() {
   return (
     <AdminLayout>
       <Routes>
-        <Route path="/" element={<DashboardPage />} />
+      <Route path="/" element={
+          <ProtectedRoute requiredPermission={PERMISSIONS.MANAGE_HALLS}>
+            <HallManagementPage />
+          </ProtectedRoute>
+        } />
         <Route path="/halls" element={
           <ProtectedRoute requiredPermission={PERMISSIONS.MANAGE_HALLS}>
             <HallManagementPage />

@@ -32,6 +32,7 @@ services:
     volumes:
       - /app/node_modules
       - ./server:/app
+      - uploads-data:/app/uploads
     environment:
       - NODE_ENV=development
       - DB_HOST=mysql
@@ -74,8 +75,9 @@ services:
 # Volumes for data persistence
 volumes:
   mysql-data:
+  uploads-data:
 
 # Networks for service communication
 networks:
   qltc-network:
-    driver: bridge 
+    driver: bridge
