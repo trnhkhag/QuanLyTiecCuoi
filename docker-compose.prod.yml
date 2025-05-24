@@ -1,91 +1,64 @@
 version: '3.8'
 
 services:
-  # Frontend React application - Production
   qltc-client:
-    image: ${BIZFLY_REGISTRY:-cr-hn-1.bizflycloud.vn}/${BIZFLY_UNIQUE_ID}/qltc-client:${IMAGE_TAG:-latest}
-    ports:
-      - "80:80"
+    restart: always
+    # No build context in production - use pre-built images
+    build: {}
     environment:
-      - NODE_ENV=production
-    networks:
-      - qltc-network
-    restart: unless-stopped
+      - REACT_APP_API_URL=${API_URL:-http://localhost:3001}
+    # Add health check
     healthcheck:
-      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:80"]
-      interval: 30s
+      test: ["CMD", "curl", "-f", "http://localhost:80"]
+      interval: 1m
       timeout: 10s
       retries: 3
-    depends_on:
-      - qltc-server
 
-  # Backend Node.js server - Production
   qltc-server:
-    image: ${BIZFLY_REGISTRY:-cr-hn-1.bizflycloud.vn}/${BIZFLY_UNIQUE_ID}/qltc-server:${IMAGE_TAG:-latest}
-    ports:
-      - "3001:3001"
+    restart: always
+    # No build context in production - use pre-built images
+    build: {}
     environment:
       - NODE_ENV=production
       - PORT=3001
-      - DB_HOST=mysql
-      - DB_PORT=3306
-      - DB_USER=${DB_USER:-root}
-      - DB_PASSWORD=${DB_PASSWORD:-Admin12345}
-      - DB_DATABASE=${DB_DATABASE:-TiecCuoiDB}
+      # Add secure environment variables - use .env file or secrets
       - JWT_SECRET=${JWT_SECRET}
-    env_file:
-      - .env.production
-    networks:
-      - qltc-network
-    restart: unless-stopped
+      - DB_HOST=${DB_HOST}
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_NAME=${DB_NAME}
+    # Add health check
     healthcheck:
-      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3001/health"]
-      interval: 30s
+      test: ["CMD", "curl", "-f", "http://localhost:3001/health"]
+      interval: 1m
       timeout: 10s
       retries: 3
-    depends_on:
-      mysql:
-        condition: service_healthy
+    # Resource limits
     deploy:
       resources:
         limits:
           cpus: '1'
           memory: 1G
 
-  # MySQL Database - Production
-  mysql:
-    image: mysql:8.0
-    command: --default-authentication-plugin=caching_sha2_password --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+  # Add a database service for production
+  qltc-db:
+    image: mcr.microsoft.com/mssql/server:2019-latest
+    restart: always
     environment:
-      - MYSQL_ROOT_PASSWORD=${DB_PASSWORD:-Admin12345}
-      - MYSQL_DATABASE=${DB_DATABASE:-TiecCuoiDB}
-      - MYSQL_USER=${DB_USER:-tieccuoi}
-      - MYSQL_PASSWORD=${DB_USER_PASSWORD:-tieccuoi123}
-    ports:
-      - "3306:3306"
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=${DB_PASSWORD}
+      - MSSQL_PID=Express
     volumes:
-      - mysql-data:/var/lib/mysql
-      - ./Database/init:/docker-entrypoint-initdb.d:ro
+      - qltc-db-data:/var/opt/mssql
     networks:
       - qltc-network
-    restart: unless-stopped
-    healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p$$MYSQL_ROOT_PASSWORD"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
+    # Resource limits
     deploy:
       resources:
         limits:
           cpus: '1'
           memory: 2G
 
-# Volumes for data persistence
 volumes:
-  mysql-data:
-    driver: local
-
-# Networks for service communication
-networks:
-  qltc-network:
-    driver: bridge 
+  qltc-db-data:
+    driver: local 

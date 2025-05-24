@@ -2,9 +2,9 @@ name: Development Docker CI
 
 on:
   push:
-    branches: [ develop, feature/*, dev, main ]
+    branches: [ develop, feature/*, dev ]
   pull_request:
-    branches: [ develop, main ]
+    branches: [ develop ]
   # Allow manual trigger
   workflow_dispatch:
 

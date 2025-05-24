@@ -95,13 +95,13 @@ jobs:
             echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
             
             # Stop existing containers
-            docker-compose -f docker-compose.prod.yml down
+            docker-compose -f docker-compose.prod.dockerhub.yml down
             
             # Pull latest images
-            docker-compose -f docker-compose.prod.yml pull
+            docker-compose -f docker-compose.prod.dockerhub.yml pull
             
             # Start containers
-            docker-compose -f docker-compose.prod.yml up -d
+            docker-compose -f docker-compose.prod.dockerhub.yml up -d
             
             # Clean up old images
             docker image prune -af
@@ -120,7 +120,7 @@ jobs:
             sleep 30
             
             # Check if services are running
-            docker-compose -f docker-compose.prod.yml ps
+            docker-compose -f docker-compose.prod.dockerhub.yml ps
             
             # Check service health
             curl -f http://localhost:80 || echo "Frontend health check failed"

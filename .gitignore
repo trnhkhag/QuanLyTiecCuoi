@@ -11,7 +11,6 @@
 .env.development.local
 .env.test.local
 .env.production.local
-.env.production
 
 # Build outputs
 /client/build
@@ -59,12 +58,3 @@ Thumbs.db
 ehthumbs.db
 Desktop.ini
 .github/workflows/docker-ci.yml
-
-# Docker Hub deployment configuration (contains sensitive data)
-.dockerhub-config
-.bizfly-config
-
-# Temporary deployment files
-*.tmp
-*.temp
-deployment-*.log
