@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import moment from 'moment';
-import { useBookingForm } from '../../hooks/Booking/useBookings';
+import { useBookingForm } from '../../hooks/Booking/useBookingFormFixed';
 import BookingBasicInfoAnt from '../../components/features/Booking/BookingBasicInfoAnt';
 import { Form, Button, Steps, message, Typography, Spin, Alert, Input, Tabs, Table, InputNumber } from 'antd';
 import { FormattedPrice } from '../../components/common/FormattedPrice';
