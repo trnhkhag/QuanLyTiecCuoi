@@ -2,13 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const app = require('./app');
 const path = require('path');
-
-// Load environment variables with error handling
-try {
-  require('dotenv').config();
-} catch (error) {
-  console.warn('Warning: dotenv config failed:', error.message);
-}
+require('dotenv').config();
 
 // Set port
 const PORT = process.env.PORT || 3001;
@@ -29,39 +23,51 @@ app.get('/debug-file/:filename', (req, res) => {
   
   console.log('Debug file access:', filePath);
   
-  const fs = require('fs');
-  try {
-    if (fs.existsSync(filePath)) {
-      console.log('File exists, sending file');
-      return res.sendFile(filePath);
-    } else {
-      console.log('File does not exist');
-      return res.status(404).json({ error: 'File not found', path: filePath });
-    }
-  } catch (error) {
-    console.error('Error checking file:', error);
-    return res.status(500).json({ error: 'Server error checking file' });
+  if (fs.existsSync(filePath)) {
+    console.log('File exists, sending file');
+    return res.sendFile(filePath);
+  } else {
+    console.log('File does not exist');
+    return res.status(404).json({ error: 'File not found', path: filePath });
   }
 });
 
-// Setup uploads directory with error handling
+// In thông tin chi tiết về các file trong thư mục uploads để debug
 const fs = require('fs');
 try {
-  if (!fs.existsSync(uploadsPath)) {
-    console.log('Creating uploads directory...');
+  if (fs.existsSync(uploadsPath)) {
+    console.log('Uploads directory exists at path:', uploadsPath);
+    const hallsPath = path.join(uploadsPath, 'halls');
+    if (fs.existsSync(hallsPath)) {
+      console.log('Halls directory exists at path:', hallsPath);
+      const files = fs.readdirSync(hallsPath);
+      console.log('Files in halls directory:', files);
+      
+      // Kiểm tra quyền truy cập file
+      files.forEach(file => {
+        try {
+          const filePath = path.join(hallsPath, file);
+          const stats = fs.statSync(filePath);
+          console.log(`File ${file}: size=${stats.size}, permissions=${stats.mode.toString(8)}`);
+        } catch (err) {
+          console.error(`Error checking file ${file}:`, err);
+        }
+      });
+    } else {
+      console.log('Halls directory does not exist');
+      // Tạo thư mục halls nếu chưa tồn tại
+      fs.mkdirSync(hallsPath, { recursive: true });
+      console.log('Created halls directory');
+    }
+  } else {
+    console.log('Uploads directory does not exist');
+    // Tạo thư mục uploads nếu chưa tồn tại
     fs.mkdirSync(uploadsPath, { recursive: true });
+    fs.mkdirSync(path.join(uploadsPath, 'halls'), { recursive: true });
+    console.log('Created uploads/halls directories');
   }
-  
-  const hallsPath = path.join(uploadsPath, 'halls');
-  if (!fs.existsSync(hallsPath)) {
-    console.log('Creating halls directory...');
-    fs.mkdirSync(hallsPath, { recursive: true });
-  }
-  
-  console.log('Upload directories ready');
-} catch (error) {
-  console.error('Warning: Could not setup upload directories:', error.message);
-  console.log('Server will continue without file upload capability');
+} catch (err) {
+  console.error('Error checking uploads directory:', err);
 }
 
 // Import thêm các routes từ project phụ
