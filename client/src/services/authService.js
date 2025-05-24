@@ -52,7 +52,7 @@ class AuthService {
       console.log('Attempting to register...');
       
       // Use authAxios with direct route path
-      const response = await authAxios.post('/api/auth/register', {
+      const response = await authAxios.post('/auth/register', {
         name,
         email,
         password
@@ -93,7 +93,7 @@ class AuthService {
       console.log('Login payload:', { email, password });
       
       // Use authAxios with direct route path
-      const response = await authAxios.post('/api/auth/login', {
+      const response = await authAxios.post('/auth/login', {
         email,
         password
       });

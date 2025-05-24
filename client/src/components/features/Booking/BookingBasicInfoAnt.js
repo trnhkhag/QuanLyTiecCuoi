@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import { Form, Select, DatePicker, InputNumber, Card, Alert } from 'antd';
 import { FormattedPrice } from '../../common/FormattedPrice';
 import moment from 'moment';
+import HallSelectWrapper from './HallSelectWrapper';
 
 const { Option } = Select;
 
@@ -13,9 +14,12 @@ const BookingBasicInfoAnt = ({ form, halls, shifts, selectedHall, fetchHallDetai
       fetchHallDetails(currentHallId);
     }
   }, [form, fetchHallDetails]);
+  // Lấy ID sảnh từ form
+  const hallId = form.getFieldValue('hallId');
+
   return (
     <Card variant="outlined">      
-    {selectedHall && (
+      {selectedHall && (
         <Alert
           type="info"
           message={`Sảnh đã chọn: ${selectedHall.TenSanh}`}
@@ -36,25 +40,10 @@ const BookingBasicInfoAnt = ({ form, halls, shifts, selectedHall, fetchHallDetai
         label="Chọn sảnh tiệc"
         rules={[{ required: true, message: 'Vui lòng chọn sảnh tiệc' }]}
       >
-        <Select
-          placeholder="Chọn sảnh tiệc"
-          optionFilterProp="children"
-          showSearch
-          onChange={(value) => {
-            // Gọi fetchHallDetails khi người dùng chọn sảnh mới
-            if (fetchHallDetails && value) {
-              fetchHallDetails(value);
-            }
-          }}
-        >            {Array.isArray(halls) && halls.length > 0 ? 
-            halls.map(hall => (
-              <Option key={`hall-${hall.ID_SanhTiec}`} value={hall.ID_SanhTiec || ''}>
-                {hall.TenSanh || 'Sảnh không xác định'}
-              </Option>
-            )) : 
-            <Option key="no-halls" value="">Không có sảnh tiệc</Option>
-          }
-        </Select>
+        <HallSelectWrapper 
+          halls={halls}
+          fetchHallDetails={fetchHallDetails}
+        />
       </Form.Item>
 
       <Form.Item
@@ -69,28 +58,26 @@ const BookingBasicInfoAnt = ({ form, halls, shifts, selectedHall, fetchHallDetai
         />
       </Form.Item>
       
-    <Form.Item
+      <Form.Item
         name="shiftId"
         label="Ca tiệc"
         rules={[{ required: true, message: 'Vui lòng chọn ca tiệc' }]}
       >        
-      <Select placeholder="Chọn ca tiệc">
-          {Array.isArray(shifts) && shifts.length > 0 ? (              shifts.map((shift, index) => {
-              console.log('Rendering shift:', shift); // Debug info
-              return (              
-                <Option 
-                  key={`shift-${shift.ID_Ca || index}`} 
-                  value={shift.ID_Ca}
-                >
-                  {shift.TenCa}
-                </Option>
-              );
-            })
-          ) : (
-            <Option key="no-shift" value="" disabled>
-              Không có ca tiệc
-            </Option>
-          )}
+        <Select
+          placeholder="Chọn ca tiệc"
+          showSearch
+        >
+          {Array.isArray(shifts) && shifts.length > 0 ? 
+            shifts.map((shift, index) => (
+              <Option 
+                key={`shift-${shift.ID_Ca || index}`} 
+                value={shift.ID_Ca}
+              >
+                {shift.TenCa}
+              </Option>
+            )) : 
+            <Option key="no-shift" value="" disabled>Không có ca tiệc</Option>
+          }
         </Select>
       </Form.Item>
 

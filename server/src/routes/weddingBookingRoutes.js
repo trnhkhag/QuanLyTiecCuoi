@@ -85,7 +85,7 @@ router.get('/:id',
  */
 router.post('/', 
   authMiddleware,
-  requirePermission(PERMISSIONS.MANAGE_BOOKINGS),
+  // Đã loại bỏ yêu cầu quyền MANAGE_BOOKINGS để cho phép tất cả người dùng đã đăng nhập đều có thể đặt tiệc
   weddingBookingController.createBooking
 );
 

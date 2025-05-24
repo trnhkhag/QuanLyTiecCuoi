@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import moment from 'moment';
-import { useBookingForm } from '../../hooks/Booking/useBookingFormFixed';
+import { useBookingForm } from '../../hooks/Booking/useBookings';
 import BookingBasicInfoAnt from '../../components/features/Booking/BookingBasicInfoAnt';
 import { Form, Button, Steps, message, Typography, Spin, Alert, Input, Tabs, Table, InputNumber } from 'antd';
 import { FormattedPrice } from '../../components/common/FormattedPrice';
@@ -37,14 +37,20 @@ const BookingFormPage = () => {
     calculateTotal,
     handleSubmit
   } = useBookingForm(preSelectedHallId);
-
   // Set initial values from URL params
   useEffect(() => {
     const hallId = searchParams.get('hallId');
     const date = searchParams.get('date');
     
     if (hallId) {
-      form.setFieldsValue({ hallId });
+      console.log('Setting initial hall ID from URL:', hallId);
+      // Chuyển đổi sang số để đảm bảo tương thích với component Select
+      const hallIdNumber = parseInt(hallId);
+      if (!isNaN(hallIdNumber)) {
+        form.setFieldsValue({ hallId: hallIdNumber });
+      } else {
+        form.setFieldsValue({ hallId });
+      }
       fetchHallDetails(hallId);
     }
     if (date) {

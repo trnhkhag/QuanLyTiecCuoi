@@ -26,63 +26,35 @@ function BookingRoutes() {
         <Routes>
           <Route path="" element={<BookingHomePage />} />
           
-          {/* Booking Management Routes - Require MANAGE_BOOKINGS */}
-          <Route path="new" element={
-            <ProtectedRoute requiredPermission={PERMISSIONS.MANAGE_BOOKINGS}>
-              <BookingFormPage />
-            </ProtectedRoute>
-          } />
-          <Route path="success" element={
-            <ProtectedRoute requiredPermission={PERMISSIONS.MANAGE_BOOKINGS}>
-              <BookingSuccessPage />
-            </ProtectedRoute>
+          {/* Booking Management Routes - Require MANAGE_BOOKINGS */}          <Route path="new" element={
+            <BookingFormPage />
+          } />          <Route path="success" element={
+            <BookingSuccessPage />
           } />
           <Route path="success/:id" element={
-            <ProtectedRoute requiredPermission={PERMISSIONS.MANAGE_BOOKINGS}>
-              <BookingSuccessPage />
-            </ProtectedRoute>
+            <BookingSuccessPage />
           } />
           
-          {/* Search and List Routes - Require MANAGE_BOOKINGS OR SEARCH_WEDDINGS */}
-          <Route path="list" element={
-            <ProtectedRoute requiredPermission={PERMISSIONS.MANAGE_BOOKINGS | PERMISSIONS.SEARCH_WEDDINGS}>
-              <BookingListPage />
-            </ProtectedRoute>
-          } />
-          <Route path="halls" element={
-            <ProtectedRoute requiredPermission={PERMISSIONS.MANAGE_BOOKINGS | PERMISSIONS.SEARCH_WEDDINGS}>
-              <HallListPage />
-            </ProtectedRoute>
-          } />
-          <Route path="halls/:id" element={
-            <ProtectedRoute requiredPermission={PERMISSIONS.MANAGE_BOOKINGS | PERMISSIONS.SEARCH_WEDDINGS}>
-              <HallDetailPage />
-            </ProtectedRoute>
-          } />
-          <Route path="detail/:id" element={
-            <ProtectedRoute requiredPermission={PERMISSIONS.MANAGE_BOOKINGS | PERMISSIONS.SEARCH_WEDDINGS}>
-              <HallDetailPage />
-            </ProtectedRoute>
+          {/* Search and List Routes - Require MANAGE_BOOKINGS OR SEARCH_WEDDINGS */}          <Route path="list" element={
+            <BookingListPage />
+          } /><Route path="halls" element={
+            <HallListPage />
+          } /><Route path="halls/:id" element={
+            <HallDetailPage />
+          } />          <Route path="detail/:id" element={
+            <HallDetailPage />
           } />
           
-          {/* Wedding Lookup Routes - Require SEARCH_WEDDINGS */}
-          <Route path="lookup" element={
-            <ProtectedRoute requiredPermission={PERMISSIONS.SEARCH_WEDDINGS}>
-              <WeddingLookupPage />
-            </ProtectedRoute>
+          {/* Wedding Lookup Routes - Require SEARCH_WEDDINGS */}          <Route path="lookup" element={
+            <WeddingLookupPage />
           } />
           <Route path="weddings/:id" element={
-            <ProtectedRoute requiredPermission={PERMISSIONS.SEARCH_WEDDINGS}>
-              <WeddingDetailPage />
-            </ProtectedRoute>
+            <WeddingDetailPage />
           } />
           
           {/* Regulation Routes */}
-          <Route path="regulations" element={<RegulationListPage />} />
-          <Route path="regulations/manage" element={
-            <ProtectedRoute requiredPermission={PERMISSIONS.MANAGE_REGULATIONS}>
-              <RegulationManagementPage />
-            </ProtectedRoute>
+          <Route path="regulations" element={<RegulationListPage />} />          <Route path="regulations/manage" element={
+            <RegulationManagementPage />
           } />
         </Routes>
       </div>

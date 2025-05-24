@@ -91,9 +91,8 @@ function App() {
               <AdminRoutes />
             </ProtectedRoute>
           } />
-          
-          <Route path="/booking/*" element={
-            <ProtectedRoute requiredPermission={PERMISSIONS.MANAGE_BOOKINGS | PERMISSIONS.SEARCH_WEDDINGS}>
+            <Route path="/booking/*" element={
+            <ProtectedRoute>
               <BookingRoutes />
             </ProtectedRoute>
           } />

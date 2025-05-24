@@ -11,6 +11,7 @@ import {
   Tag,
   Modal,
   Calendar,
+  message
 } from 'antd';
 import {
   CalendarOutlined,
@@ -26,6 +27,7 @@ import UserLayout from '../../components/layout/User/UserLayout';
 import { LoadingSpinner, ErrorMessage } from '../../components/common/StatusComponents';
 import { FormattedPrice } from '../../components/common/FormattedPrice';
 import HallService from '../../services/HallService';
+import authService, { PERMISSIONS } from '../../services/authService';
 
 moment.locale('vi');
 
@@ -93,11 +95,18 @@ const HallDetailPage = () => {
       ]);
     } catch (err) {
       console.error('Error fetching booked dates:', err);
+    }  };  const handleDateSelect = (date) => {
+    // User should be logged in to book a hall
+    if (authService.isLoggedIn()) {
+      // Chuyển đổi sang số để đảm bảo tương thích với form
+      const hallIdInt = parseInt(id);
+      navigate(`/booking/new?hallId=${hallIdInt}&date=${date.format('YYYY-MM-DD')}`);
+    } else {
+      // Show modal or navigate to login page if not logged in
+      message.error('Bạn cần đăng nhập để đặt tiệc.');
+      // Optionally redirect to login
+      navigate('/login');
     }
-  };
-
-  const handleDateSelect = (date) => {
-    navigate(`/booking/new?hallId=${id}&date=${date.format('YYYY-MM-DD')}`);
   };
 
   if (loading) return (
@@ -177,19 +186,30 @@ const HallDetailPage = () => {
                 </Descriptions.Item>
               </Descriptions>
 
-              <Divider />
-
-              <div style={{ marginBottom: 16 }}>
+              <Divider />              <div style={{ marginBottom: 16 }}>
                 <Rate disabled defaultValue={4.5} />
                 <span style={{ marginLeft: 8 }}>4.5/5 (120 đánh giá)</span>
               </div>
-
+              {!authService.isLoggedIn() && 
+                <div style={{ marginBottom: 12, color: '#ff4d4f' }}>
+                  Bạn cần đăng nhập để đặt tiệc.
+                </div>
+              }
               <Button
                 type="primary"
                 size="large"
                 block
                 icon={<CalendarOutlined />}
-                onClick={() => setShowCalendar(true)}
+                onClick={() => {
+                  if (authService.isLoggedIn()) {
+                    setShowCalendar(true);
+                  } else {
+                    message.error('Bạn cần đăng nhập để đặt tiệc.');
+                    navigate('/login');
+                  }
+                }}
+                disabled={!authService.isLoggedIn()}
+                title={!authService.isLoggedIn() ? "Bạn cần đăng nhập" : ""}
               >
                 Đặt Tiệc Ngay
               </Button>
@@ -227,22 +247,29 @@ const HallDetailPage = () => {
             src={selectedImage}
             style={{ width: '100%' }}
           />
-        </Modal>
-
-        <Modal
+        </Modal>        <Modal
           title="Chọn ngày đặt tiệc"
           open={showCalendar}
           onCancel={() => setShowCalendar(false)}
           footer={null}
         >
-          <Calendar
-            fullscreen={false}
-            disabledDate={disabledDate}
-            onSelect={(date) => {
-              setShowCalendar(false);
-              handleDateSelect(date);
-            }}
-          />
+          {authService.isLoggedIn() ? (
+            <Calendar
+              fullscreen={false}
+              disabledDate={disabledDate}
+              onSelect={(date) => {
+                setShowCalendar(false);
+                handleDateSelect(date);
+              }}
+            />
+          ) : (
+            <div style={{ padding: '20px', textAlign: 'center' }}>
+              <p style={{ color: '#ff4d4f', marginBottom: '20px' }}>
+                Bạn cần đăng nhập để đặt tiệc.
+              </p>
+              <Button onClick={() => setShowCalendar(false)}>Đóng</Button>
+            </div>
+          )}
         </Modal>
       </div>
     </UserLayout>

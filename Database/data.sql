@@ -118,6 +118,14 @@ INSERT INTO DichVu (TenDichVu, DonGia) VALUES
 ('Đội múa chuyên nghiệp', 6000000),
 ('Quay phim 4K', 15000000);
 
+-- Insert data into MonAn
+INSERT INTO MonAn (TenMonAn, DonGia) VALUES
+('Gà hấp lá chanh', 250000),
+('Bò lúc lắc', 300000),
+('Tôm nướng muối ớt', 350000),
+('Súp cua', 150000),
+('Chè hạt sen', 100000);
+
 -- Insert data into TiecCuoi
 -- Create weddings in the past, present, and future
 INSERT INTO TiecCuoi (ID_KhachHang, ID_SanhTiec, NgayToChuc, ID_Ca, ThoiDiemDat, SoLuongBan, SoBanDuTru) VALUES 

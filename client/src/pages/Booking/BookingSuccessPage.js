@@ -103,7 +103,8 @@ function BookingSuccessPage() {
           status="success"
           title="Đặt tiệc thành công!"          
           subTitle={
-            <div>              <Paragraph>
+            <div>              
+              <Paragraph>
                 Mã đơn đặt tiệc của bạn là: <strong>{bookingData.ID_TiecCuoi || bookingData.bookingId || bookingData.id || 'Đang xử lý'}</strong>
               </Paragraph>
               <Paragraph>
