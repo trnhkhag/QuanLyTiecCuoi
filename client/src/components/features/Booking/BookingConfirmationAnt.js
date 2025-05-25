@@ -1,9 +1,33 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Card, Row, Col, Statistic, Table } from 'antd';
 import { FormattedPrice } from '../../common/FormattedPrice';
 import Title from 'antd/lib/typography/Title';
+import authService from '../../../services/authService';
 
 const BookingConfirmationAnt = ({ form, selectedHall, totalAmount, shifts, foods = [] }) => {
+  const [currentUser, setCurrentUser] = useState(null);
+  
+  // Get logged in user information
+  useEffect(() => {
+    const user = authService.getCurrentUser()?.user;
+    if (user) {
+      console.log('Current user data:', user);
+      console.log('Phone fields:', {
+        SoDienThoai: user.SoDienThoai, 
+        phone: user.phone,
+        SDT: user.SDT
+      });
+      setCurrentUser(user);
+      // Pre-fill user information in the form
+      form.setFieldsValue({
+        customerName: user.name || user.username || '',
+        email: user.email || '',
+        phone: user.SoDienThoai || user.phone || user.SDT || '',
+        address: user.DiaChi || user.address || ''
+      });
+    }
+  }, [form]);
+  
   const formValues = form.getFieldsValue(true);
   
   // Tính toán chi tiết món ăn đã chọn
@@ -117,7 +141,19 @@ const BookingConfirmationAnt = ({ form, selectedHall, totalAmount, shifts, foods
         </Card>
       )}
       
-      {/* Phần tổng kết chi phí */}
+      {/* Phần tổng kết chi phí */}      {/* Thêm thông tin liên hệ từ người dùng đăng nhập */}
+      <Card size="small" title="Thông tin liên hệ" style={{ marginTop: 16 }}>
+        <Row gutter={[16, 8]}>
+          <Col span={12}>
+            <p><strong>Tên khách hàng:</strong> {currentUser?.name || form.getFieldValue('customerName') || 'Chưa cung cấp'}</p>
+            <p><strong>Email:</strong> {currentUser?.email || form.getFieldValue('email') || 'Chưa cung cấp'}</p>
+          </Col>            
+          <Col span={12}>
+            <p><strong>Số điện thoại:</strong> {currentUser?.SoDienThoai || currentUser?.phone || currentUser?.SDT || form.getFieldValue('phone') || 'Chưa cung cấp'}</p>
+          </Col>
+        </Row>
+      </Card>
+      
       <Card size="small" title="Tổng kết chi phí" style={{ marginTop: 16 }}>
         <Row>
           <Col span={12}>

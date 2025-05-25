@@ -7,6 +7,7 @@ import ServiceService from '../../services/ServiceService';
 import ShiftService from '../../services/ShiftService';
 import BookingService from '../../services/BookingService';
 import FoodService from '../../services/FoodService';
+import authService from '../../services/authService';
 
 export function useBookingForm(preSelectedHallId) {
   const navigate = useNavigate();
@@ -208,7 +209,6 @@ export function useBookingForm(preSelectedHallId) {
     setTotalAmount(total);
     return total;
   };
-
   const handleSubmit = async (values) => {
     try {
       setSubmitting(true);
@@ -229,10 +229,24 @@ export function useBookingForm(preSelectedHallId) {
       if (!values.shiftId) {
         throw new Error('Vui lòng chọn ca tiệc');
       }
-      
-      if (!values.customerName || !values.phone || !values.email) {
-        throw new Error('Vui lòng điền đầy đủ thông tin liên hệ');
+        // Kiểm tra nếu đã đăng nhập, lấy thông tin người dùng
+      const userData = authService.getCurrentUser()?.user;
+      if (!userData) {
+        throw new Error('Bạn cần đăng nhập để đặt tiệc');
       }
+        // Tự động điền thông tin từ user đã đăng nhập      values.customerName = userData.name || userData.username || 'Khách hàng';
+      values.email = userData.email || '';
+      values.phone = userData.SoDienThoai || userData.phone || userData.SDT || '';
+      
+      // Log user data structure for debugging
+      console.log('User data from auth:', userData);
+      console.log('Phone field values:', {
+        SoDienThoai: userData.SoDienThoai,
+        phone: userData.phone,
+        SDT: userData.SDT,
+        finalValue: values.phone
+      });
+      values.address = userData.DiaChi || userData.address || '';
       
       // Ghi log chi tiết để debug
       console.log('Date field exists:', !!values.date);

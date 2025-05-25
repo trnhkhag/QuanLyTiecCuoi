@@ -145,10 +145,7 @@ function BookingSuccessPage() {
             </Descriptions.Item>
             <Descriptions.Item label="Email">
               {bookingData.email}
-            </Descriptions.Item>
-            <Descriptions.Item label="Địa chỉ">
-              {bookingData.address}
-            </Descriptions.Item>            
+            </Descriptions.Item>          
             <Descriptions.Item label="Ngày tổ chức">
               {bookingData.weddingDate}
             </Descriptions.Item>

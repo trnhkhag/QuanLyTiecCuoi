@@ -5,9 +5,9 @@ import { useBookingForm } from '../../hooks/Booking/useBookings';
 import BookingBasicInfoAnt from '../../components/features/Booking/BookingBasicInfoAnt';
 import { Form, Button, Steps, message, Typography, Spin, Alert, Input, Tabs, Table, InputNumber } from 'antd';
 import { FormattedPrice } from '../../components/common/FormattedPrice';
-import BookingContactInfoAnt from '../../components/features/Booking/BookingContactInfoAnt';
 import BookingConfirmationAnt from '../../components/features/Booking/BookingConfirmationAnt';
 import UserLayout from '../../components/layout/User/UserLayout';
+import authService from '../../services/authService';
 
 const { Title } = Typography;
 const { Step } = Steps;
@@ -79,7 +79,6 @@ const BookingFormPage = () => {
       fetchHallDetails(values.hallId);
     }
   }, [form, selectedHall, fetchHallDetails]);
-
   // Define steps
   const steps = [
     {
@@ -240,12 +239,7 @@ const BookingFormPage = () => {
           </Form.Item>
         </div>
       )
-    },
-    {
-      title: 'Thông tin liên hệ',
-      content: <BookingContactInfoAnt />
-    },
-    {
+    },    {
       title: 'Xác nhận đặt tiệc',
       content: <BookingConfirmationAnt 
         form={form} 
@@ -255,12 +249,24 @@ const BookingFormPage = () => {
         foods={foods}
       />
     }
-  ];
-  const submitBooking = async () => {
+  ];  const submitBooking = async () => {
     try {
+      // Check if user is logged in before validating fields
+      const userData = authService.getCurrentUser()?.user;
+      if (!userData) {
+        message.error('Bạn cần đăng nhập để đặt tiệc');
+        navigate('/login');
+        return;
+      }
+      
       // Validate form fields
-      await form.validateFields();
+      await form.validateFields(['hallId', 'date', 'shiftId', 'guestCount', 'tableCount']);
       const values = form.getFieldsValue(true);
+      
+      // Set user information to form values      values.customerName = userData.name || userData.username || 'Khách hàng';
+      values.email = userData.email || '';
+      values.phone = userData.SoDienThoai || userData.phone || userData.SDT || '';
+      values.address = userData.DiaChi || userData.address || '';
       
       // Show loading message
       message.loading({ 
@@ -381,15 +387,9 @@ const BookingFormPage = () => {
               })
               .catch(() => {
                 message.error('Vui lòng điền đầy đủ thông tin cần thiết');
-              });
-          } else if (currentStep === 2 && step > currentStep) {
-            form.validateFields(['customerName', 'phone', 'email'])
-              .then(() => {
-                setCurrentStep(step);
-              })
-              .catch(() => {
-                message.error('Vui lòng điền đầy đủ thông tin liên hệ');
-              });
+              });          } else if (currentStep === 1 && step > currentStep) {
+            // Không còn bước thông tin liên hệ, chuyển thẳng sang xác nhận đặt tiệc
+            setCurrentStep(step);
           } else {
             // For other steps or going back, just update
             const values = form.getFieldsValue(true);
@@ -457,15 +457,20 @@ const BookingFormPage = () => {
             {currentStep === steps.length - 1 && (
             <Button 
               type="primary" 
-              onClick={async () => {
-                try {
-                  // Validate all form fields first
-                  await form.validateFields();
+              onClick={async () => {                try {
+                  // Validate only required fields without contact info
+                  await form.validateFields(['hallId', 'date', 'shiftId', 'guestCount', 'tableCount']);
                   // Additional validation for key fields
                   const values = form.getFieldsValue(true);
-                  if (!values.hallId || !values.date || !values.shiftId || 
-                      !values.customerName || !values.phone || !values.email) {
-                    message.error('Vui lòng điền đầy đủ thông tin bắt buộc');
+                  if (!values.hallId || !values.date || !values.shiftId) {
+                    message.error('Vui lòng điền đầy đủ thông tin cơ bản');
+                    return;
+                  }
+                  
+                  // Check if user is logged in
+                  if (!authService.isLoggedIn()) {
+                    message.error('Bạn cần đăng nhập để đặt tiệc');
+                    navigate('/login');
                     return;
                   }
                   

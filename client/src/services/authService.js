@@ -135,10 +135,18 @@ class AuthService {
   /**
    * Get the current user from local storage
    * @returns {Object|null} The current user or null if not logged in
-   */
-  getCurrentUser() {
+   */  getCurrentUser() {
     const userJson = localStorage.getItem('user');
-    return userJson ? JSON.parse(userJson) : null;
+    const userData = userJson ? JSON.parse(userJson) : null;
+    if (userData && userData.user) {
+      console.log('Debug - Auth user data structure:', userData.user);
+      console.log('Debug - Phone fields available:', {
+        SoDienThoai: userData.user.SoDienThoai,
+        phone: userData.user.phone,
+        SDT: userData.user.SDT
+      });
+    }
+    return userData;
   }
 
   /**
