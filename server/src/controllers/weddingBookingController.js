@@ -214,6 +214,7 @@ class WeddingBookingController {
         date: req.query.date,
         hallId: req.query.hallId ? parseInt(req.query.hallId) : null,
         customerId: req.query.customerId ? parseInt(req.query.customerId) : null,
+        customerName: req.query.customerName || '',
         status: req.query.status
       };
       
@@ -360,7 +361,8 @@ class WeddingBookingController {
         error: error.message 
       });
     }
-  }}
+  }
+}
 
 
 module.exports = new WeddingBookingController();

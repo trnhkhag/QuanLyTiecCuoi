@@ -410,7 +410,7 @@ class WeddingBookingService {
   async getAllBookings(filters = {}) {
     try {
       let query = `
-        SELECT t.*, s.TenSanh, s.GiaThue, c.TenCa, kh.TenKhachHang, kh.SoDienThoai
+        SELECT t.*, s.TenSanh, s.GiaThue, c.TenCa, kh.HoTen, kh.SoDienThoai
         FROM TiecCuoi t
         JOIN SanhTiec s ON t.ID_SanhTiec = s.ID_SanhTiec
         JOIN CaTiec c ON t.ID_Ca = c.ID_Ca
@@ -428,7 +428,7 @@ class WeddingBookingService {
       
       // Lọc theo tên khách hàng
       if (filters.customerName) {
-        query += " AND kh.TenKhachHang LIKE ?";
+        query += " AND kh.HoTen LIKE ?";
         queryParams.push(`%${filters.customerName}%`);
       }
       

@@ -27,7 +27,7 @@ export function BookingCard({ booking }) {
   const bookingId = booking.ID_TiecCuoi || booking.id || 'N/A';
   
   // Tên khách hàng
-  const customerName = booking.TenKhachHang || 'N/A';
+  const customerName = booking.HoTen || 'N/A';
   
   // Ngày tổ chức
   const weddingDate = booking.NgayToChuc || booking.weddingDate;

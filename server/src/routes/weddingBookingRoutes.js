@@ -26,7 +26,7 @@ const { authMiddleware, requirePermission, PERMISSIONS } = require('../middlewar
  *       403:
  *         description: Không có quyền
  */
-router.get('/', 
+router.get('/',
   authMiddleware,
   requirePermission(PERMISSIONS.MANAGE_BOOKINGS),
   weddingBookingController.getAllBookings
