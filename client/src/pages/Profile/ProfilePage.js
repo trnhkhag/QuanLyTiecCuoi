@@ -6,7 +6,7 @@ import {
   ChangePasswordForm,
   WeddingHistory
 } from '../../components/Profile';
-import UserInfoDisplay from '../../components/UserInfoDisplay.jsx';
+
 import './ProfilePage.css';
 
 const ProfilePage = () => {
@@ -141,9 +141,6 @@ const ProfilePage = () => {
         <div className="profile-content">
           {activeTab === 'profile' && (
             <div className="tab-content">
-              {/* Test component để kiểm tra Redux real-time update */}
-              <UserInfoDisplay />
-              
               {profile?.userType === 'customer' ? (
                 <CustomerProfile
                   profile={profile}

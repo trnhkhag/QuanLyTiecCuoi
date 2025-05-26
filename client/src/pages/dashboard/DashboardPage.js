@@ -101,7 +101,7 @@ const DashboardPage = () => {
             <div className="col-md-8">
               <h1 className="hero-title">
                 <FontAwesomeIcon icon={faHeart} className="heart-icon" />
-                Chào mừng đến với QLTC
+                Chào mừng đến với Trung Tâm Tiệc Cưới C4
               </h1>
               <p className="hero-subtitle">Hệ thống quản lý tiệc cưới chuyên nghiệp</p>
               <p className="hero-description">

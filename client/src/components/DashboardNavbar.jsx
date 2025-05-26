@@ -82,7 +82,7 @@ const DashboardNavbar = () => {
   return (
     <nav className="dashboard-nav">
       <div className="nav-logo">
-        <h1>QLTC</h1>
+        <h1>Trung Tâm Tiệc Cưới C4</h1>
       </div>
       
       <ul className="nav-links">

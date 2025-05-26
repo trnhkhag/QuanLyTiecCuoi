@@ -10,18 +10,27 @@ const PasswordInput = forwardRef((props, ref) => {
   const [showPassword, setShowPassword] = useState(false);
   
   return (
-    <div style={{ position: 'relative' }}>
+    <div style={{ 
+      display: 'flex', 
+      width: '100%',
+      height: '38px',
+      border: '1px solid #ced4da',
+      borderRadius: '0.375rem',
+      overflow: 'hidden'
+    }}>
       <input
         ref={ref}
         type={showPassword ? "text" : "password"}
         placeholder={placeholder}
         style={{
-          width: '100%',
-          padding: '0.375rem 2.5rem 0.375rem 0.75rem',
-          border: '1px solid #ced4da',
-          borderRadius: '0.375rem',
+          flex: '5',
+          padding: '0.375rem 0.75rem',
+          border: 'none',
           fontSize: '1rem',
-          lineHeight: '1.5'
+          lineHeight: '1.5',
+          outline: 'none',
+          height: '100%',
+          boxSizing: 'border-box'
         }}
         {...inputProps}
       />
@@ -29,16 +38,20 @@ const PasswordInput = forwardRef((props, ref) => {
         type="button"
         onClick={() => setShowPassword(!showPassword)}
         style={{ 
-          position: 'absolute',
-          right: '8px',
-          top: '50%',
-          transform: 'translateY(-50%)',
+          flex: '1',
           border: 'none',
-          background: 'transparent',
+          borderLeft: '1px solid #ced4da',
+          background: '#f8f9fa',
           cursor: 'pointer',
-          padding: '4px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
           color: '#6c757d',
-          fontSize: '16px'
+          fontSize: '14px',
+          minWidth: '40px',
+          outline: 'none',
+          height: '100%',
+          boxSizing: 'border-box'
         }}
       >
         {showPassword ? <EyeInvisibleOutlined /> : <EyeOutlined />}

@@ -46,8 +46,8 @@ const validateRegister = [
     .withMessage('Please provide a valid email address'),
   body('phoneNumber')
     .optional()
-    .isMobilePhone('vi-VN')
-    .withMessage('Please provide a valid Vietnamese phone number'),
+    .matches(/^[0-9]{10,11}$/)
+    .withMessage('Phone number must be 10-11 digits'),
   body('password')
     .isLength({ min: 6 })
     .withMessage('Password must be at least 6 characters long'),
