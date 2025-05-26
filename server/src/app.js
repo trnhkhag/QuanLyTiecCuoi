@@ -11,7 +11,7 @@ const profileRoutes = require('./routes/profileRoutes');
 const hallManagementRoutes = require('./routes/hallManagementRoutes');
 const regulationRoutes = require('./routes/regulationRoutes');
 const serviceRoutes = require('./routes/serviceRoutes');
-const weddingLookupRoutes = require('./routes/WeddingLookupRoutes'); // Sửa đúng chữ hoa/thường
+const weddingLookupRoutes = require('./routes/weddingLookupRoutes');
 const weddingBookingRoutes = require('./routes/weddingBookingRoutes');
 
 // Initialize Express app
