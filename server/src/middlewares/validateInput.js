@@ -44,6 +44,10 @@ const validateRegister = [
   body('email')
     .isEmail()
     .withMessage('Please provide a valid email address'),
+  body('phoneNumber')
+    .optional()
+    .isMobilePhone('vi-VN')
+    .withMessage('Please provide a valid Vietnamese phone number'),
   body('password')
     .isLength({ min: 6 })
     .withMessage('Password must be at least 6 characters long'),
