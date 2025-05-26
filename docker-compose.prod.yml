@@ -37,7 +37,8 @@ services:
       timeout: 10s
       retries: 3
     depends_on:
-      - mysql
+      mysql:
+        condition: service_healthy
     networks:
       - qltc-network
     deploy:
@@ -48,6 +49,7 @@ services:
 
   mysql:
     image: mysql:8.0
+    command: --default-authentication-plugin=caching_sha2_password --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
     restart: always
     environment:
       - MYSQL_ROOT_PASSWORD=${DB_PASSWORD}
@@ -61,6 +63,11 @@ services:
       - "3306:3306"
     networks:
       - qltc-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p$$MYSQL_ROOT_PASSWORD"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
     deploy:
       resources:
         limits:
