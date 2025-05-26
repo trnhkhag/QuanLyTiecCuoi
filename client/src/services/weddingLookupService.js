@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:3001/api';
-const API_BASE = `${API_URL}/lookup`;
+const API_BASE = `${API_URL}/weddings`;
 
 export const searchWeddings = async (params) => {
   try {
@@ -26,3 +26,8 @@ export const getWeddingById = async (id) => {
     throw new Error(error.response?.data?.message || 'Lỗi khi gọi API');
   }
 };
+
+export default {
+  searchWeddings,
+  getWeddingById,
+}; 
