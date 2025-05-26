@@ -107,7 +107,7 @@ const InvoiceDetail = ({ invoice }) => {
             
             <div className="detail-row penalty-row">
               <div className="detail-label">Tổng phải thanh toán:</div>
-              <div className="detail-value penalty-total">{formatCurrency(invoice.TongTien + invoice.TienPhat)}</div>
+              <div className="detail-value penalty-total">{formatCurrency(Number(invoice.TongTien) + Number(invoice.TienPhat))}</div>
             </div>
           </>
         )}
