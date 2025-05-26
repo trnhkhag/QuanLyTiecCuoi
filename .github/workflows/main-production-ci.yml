@@ -80,6 +80,9 @@ jobs:
             # Navigate to project directory
             cd ${{ secrets.PROJECT_PATH }}
             
+            # Ensure we're in the right directory
+            pwd
+            
             # Pull latest code from main branch
             git pull origin main
             
