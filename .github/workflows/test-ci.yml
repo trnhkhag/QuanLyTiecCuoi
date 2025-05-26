@@ -1,0 +1,25 @@
+name: Test CI
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ test ]
+
+jobs:
+  test-build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        
+      - name: Test basic commands
+        run: |
+          echo "Testing basic commands..."
+          ls -la
+          pwd
+          echo "Test completed successfully!"
+          
+      - name: Test Docker availability
+        run: |
+          docker --version
+          docker-compose --version 
