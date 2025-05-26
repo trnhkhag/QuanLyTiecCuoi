@@ -99,6 +99,23 @@
   box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.08);
 }
 
+/* PasswordInput component styling */
+.form-group > div[style*="display: flex"] {
+  border: 2px solid #e9d5ff;
+  border-radius: 10px;
+  transition: all 0.3s ease;
+}
+
+.form-group > div[style*="display: flex"]:focus-within {
+  border-color: #a855f7;
+  box-shadow: 0 0 0 3px rgba(168, 85, 247, 0.08);
+}
+
+.form-group > div[style*="display: flex"].error {
+  border-color: #ef4444;
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.08);
+}
+
 .error-text {
   color: #ef4444;
   font-size: 0.8rem;

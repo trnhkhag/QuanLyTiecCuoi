@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import ProfileService from '../../services/ProfileService';
+import PasswordInput from '../common/PasswordInput';
 import './ProfileComponents.css';
 
 const ChangePasswordForm = ({ onSuccess }) => {
@@ -125,8 +126,7 @@ const ChangePasswordForm = ({ onSuccess }) => {
             <i className="fas fa-lock"></i>
             Mật khẩu hiện tại
           </label>
-          <input
-            type="password"
+          <PasswordInput
             id="currentPassword"
             name="currentPassword"
             value={formData.currentPassword}
@@ -142,8 +142,7 @@ const ChangePasswordForm = ({ onSuccess }) => {
             <i className="fas fa-key"></i>
             Mật khẩu mới
           </label>
-          <input
-            type="password"
+          <PasswordInput
             id="newPassword"
             name="newPassword"
             value={formData.newPassword}
@@ -159,8 +158,7 @@ const ChangePasswordForm = ({ onSuccess }) => {
             <i className="fas fa-check-circle"></i>
             Xác nhận mật khẩu mới
           </label>
-          <input
-            type="password"
+          <PasswordInput
             id="confirmPassword"
             name="confirmPassword"
             value={formData.confirmPassword}
