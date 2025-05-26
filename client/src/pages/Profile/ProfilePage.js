@@ -1,11 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import ProfileService from '../../services/ProfileService';
-import {
-  CustomerProfile,
-  EmployeeProfile,
-  ChangePasswordForm,
-  WeddingHistory
-} from '../../components/profile';
+import CustomerProfile from '../../components/profile/CustomerProfile.js';
+import EmployeeProfile from '../../components/profile/EmployeeProfile.js';
+import ChangePasswordForm from '../../components/profile/ChangePasswordForm.js';
+import WeddingHistory from '../../components/profile/WeddingHistory.js';
 import UserInfoDisplay from '../../components/UserInfoDisplay.jsx';
 import './ProfilePage.css';
 
