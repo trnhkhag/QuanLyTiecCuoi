@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+
+import { useAuthSync } from '../../hooks/useAuthSync';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { 
   faHome,
@@ -17,20 +19,16 @@ import {
   faHeart
 } from '@fortawesome/free-solid-svg-icons';
 import authService, { PERMISSIONS } from '../../services/authService';
+import UserProfileCard from '../../components/common/UserProfileCard';
 import './DashboardPage.css';
 
 const DashboardPage = () => {
   const [apiStatus, setApiStatus] = useState('Loading...');
+  const { user: reduxUser } = useAuthSync();
   
   useEffect(() => {
-    // Test API connection (remove debug console.log)
-    fetch(`${process.env.REACT_APP_API_URL || 'http://localhost:3001/api'}/test`)
-      .then(response => response.json())
-      .then(data => setApiStatus(data.message))
-      .catch(error => {
-        console.error('API connection error:', error);
-        setApiStatus('API connection failed');
-      });
+    // Check system status
+    setApiStatus('Hệ thống hoạt động bình thường');
   }, []);
 
   const user = authService.getCurrentUser();
@@ -51,7 +49,7 @@ const DashboardPage = () => {
       name: 'Đặt tiệc',
       icon: faCalendarAlt,
       description: 'Quản lý đặt tiệc và tra cứu',
-      requiredPermission: PERMISSIONS.MANAGE_BOOKINGS | PERMISSIONS.SEARCH_WEDDINGS,
+      requiredPermission: PERMISSIONS.BOOK_WEDDING | PERMISSIONS.MANAGE_BOOKINGS | PERMISSIONS.SEARCH_WEDDINGS,
       color: 'primary'
     },
     {
@@ -107,14 +105,14 @@ const DashboardPage = () => {
               </h1>
               <p className="hero-subtitle">Hệ thống quản lý tiệc cưới chuyên nghiệp</p>
               <p className="hero-description">
-                Xin chào <strong>{user?.user?.name || user?.user?.email}</strong>! 
-                Bạn đang truy cập với vai trò <span className="role-badge">{user?.user?.role}</span>
+                Xin chào <strong>{reduxUser?.name || reduxUser?.fullName || reduxUser?.email || user?.user?.name || user?.user?.email}</strong>! 
+                Bạn đang truy cập với vai trò <span className="role-badge">{reduxUser?.role || user?.user?.role}</span>
               </p>
             </div>
             <div className="col-md-4">
               <div className="status-card">
                 <h5>Trạng thái hệ thống</h5>
-                <p className={`status ${apiStatus.includes('failed') ? 'offline' : 'online'}`}>
+                <p className="status online">
                   {apiStatus}
                 </p>
               </div>

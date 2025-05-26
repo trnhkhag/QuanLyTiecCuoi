@@ -87,8 +87,8 @@ class SqlUserRepository {
         
         const taiKhoanId = taiKhoanResult.insertId;
         
-        // 2. Assign default role (assuming roleId 2 is for regular users)
-        const defaultRoleId = 2; // Regular user role
+        // 2. Assign default role for customer
+        const defaultRoleId = 7; // Customer role
         
         const assignRoleQuery = `
           INSERT INTO TaiKhoan_VaiTro (ID_TaiKhoan, ID_VaiTro)
@@ -103,12 +103,12 @@ class SqlUserRepository {
           VALUES (?, ?, ?, ?)
         `;
         
-        // Generate a random phone number for now (since it's required)
-        const randomPhone = `0${Math.floor(100000000 + Math.random() * 900000000)}`;
+        // Use provided phone number or generate a random one if not provided
+        const phoneNumber = user.phoneNumber || `0${Math.floor(100000000 + Math.random() * 900000000)}`;
         
         const [khachHangResult] = await connection.execute(
           createKhachHangQuery, 
-          [user.name, randomPhone, user.email, taiKhoanId]
+          [user.name, phoneNumber, user.email, taiKhoanId]
         );
         
         if (!khachHangResult.insertId) {
@@ -124,7 +124,8 @@ class SqlUserRepository {
           ID_TaiKhoan: taiKhoanId,
           HoTen: user.name,
           Email: user.email,
-          TenVaiTro: 'user' // Default role name
+          SoDienThoai: phoneNumber,
+          TenVaiTro: 'customer' // Customer role name
         };
         
         console.log(`User registered successfully, Account ID: ${taiKhoanId}, Customer ID: ${newUser.ID_KhachHang}`);
@@ -166,6 +167,8 @@ class SqlUserRepository {
           COALESCE(kh.Email, '') as Email,
           COALESCE(kh.ID_KhachHang, 0) as ID_KhachHang,
           COALESCE(nv.ID_NhanVien, 0) as ID_NhanVien,
+          kh.SoDienThoai,
+          kh.DiaChi,
           vt.ID_VaiTro,
           vt.TenVaiTro
         FROM TaiKhoan tk
@@ -230,6 +233,10 @@ class SqlUserRepository {
         employeeId: user.ID_NhanVien > 0 ? user.ID_NhanVien : null,
         name: user.HoTen,
         email: user.Email,
+        SoDienThoai: user.SoDienThoai || null,
+        phone: user.SoDienThoai || null, // Alias for compatibility
+        DiaChi: user.DiaChi || null,
+        address: user.DiaChi || null, // Alias for compatibility
         role: user.TenVaiTro || 'customer',
         permissions: permissions,
         totalPermissions: totalPermissions // Total permissions value for bitwise operations
@@ -239,8 +246,14 @@ class SqlUserRepository {
       const payload = {
         user: {
           id: userProfile.id,
+          customerId: userProfile.customerId,
+          employeeId: userProfile.employeeId,
           name: userProfile.name,
           email: userProfile.email,
+          SoDienThoai: userProfile.SoDienThoai,
+          phone: userProfile.phone,
+          DiaChi: userProfile.DiaChi,
+          address: userProfile.address,
           role: userProfile.role,
           permissions: totalPermissions // Include in JWT for authorization
         }

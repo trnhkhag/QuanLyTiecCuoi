@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import authService from '../services/authService';
 import { toast } from 'react-toastify';
+import PasswordInput from './common/PasswordInput';
 
 const RegisterForm = () => {
   const { register, handleSubmit, formState: { errors }, watch } = useForm();
@@ -14,7 +15,8 @@ const RegisterForm = () => {
   const onSubmit = async (data) => {
     try {
       setLoading(true);
-      await authService.register(data.name, data.email, data.password);
+      // Thêm userType là customer khi đăng ký
+      await authService.register(data.name, data.email, data.phoneNumber, data.password, 'customer');
       toast.success('Đăng ký thành công!');
       navigate('/dashboard');
     } catch (error) {
@@ -67,37 +69,62 @@ const RegisterForm = () => {
         </div>
 
         <div className="mb-3">
-          <label htmlFor="password" className="form-label">Mật khẩu</label>
+          <label htmlFor="phoneNumber" className="form-label">Số điện thoại</label>
           <input
-            type="password"
-            className={`form-control ${errors.password ? 'is-invalid' : ''}`}
+            type="tel"
+            className={`form-control ${errors.phoneNumber ? 'is-invalid' : ''}`}
+            id="phoneNumber"
+            placeholder="Nhập số điện thoại"
+            {...register('phoneNumber', { 
+              required: 'Số điện thoại là bắt buộc',
+              pattern: {
+                value: /^[0-9]{10,11}$/,
+                message: 'Số điện thoại phải có 10-11 chữ số'
+              }
+            })}
+          />
+          {errors.phoneNumber && (
+            <div className="invalid-feedback">{errors.phoneNumber.message}</div>
+          )}
+        </div>
+
+        <div className="mb-3">
+          <label htmlFor="password" className="form-label">Mật khẩu</label>
+          <PasswordInput
             id="password"
+            showStrengthIndicator={true}
+            watchValue={password}
+            className={errors.password ? 'is-invalid' : ''}
             {...register('password', { 
               required: 'Mật khẩu là bắt buộc',
               minLength: {
-                value: 6,
-                message: 'Mật khẩu phải có ít nhất 6 ký tự'
+                value: 8,
+                message: 'Mật khẩu phải có ít nhất 8 ký tự'
+              },
+              pattern: {
+                value: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/,
+                message: 'Mật khẩu phải chứa ít nhất 1 chữ hoa, 1 chữ thường, 1 số và 1 ký tự đặc biệt'
               }
             })}
           />
           {errors.password && (
-            <div className="invalid-feedback">{errors.password.message}</div>
+            <div className="invalid-feedback d-block">{errors.password.message}</div>
           )}
         </div>
 
         <div className="mb-3">
           <label htmlFor="confirmPassword" className="form-label">Xác nhận mật khẩu</label>
-          <input
-            type="password"
-            className={`form-control ${errors.confirmPassword ? 'is-invalid' : ''}`}
+          <PasswordInput
             id="confirmPassword"
+            placeholder="Nhập lại mật khẩu"
+            className={errors.confirmPassword ? 'is-invalid' : ''}
             {...register('confirmPassword', { 
               required: 'Vui lòng xác nhận mật khẩu',
               validate: value => value === password || 'Mật khẩu không khớp'
             })}
           />
           {errors.confirmPassword && (
-            <div className="invalid-feedback">{errors.confirmPassword.message}</div>
+            <div className="invalid-feedback d-block">{errors.confirmPassword.message}</div>
           )}
         </div>
 

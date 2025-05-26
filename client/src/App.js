@@ -1,8 +1,7 @@
 //Main App component
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
-import axios from 'axios';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'react-toastify/dist/ReactToastify.css';
 import './App.css';
@@ -32,20 +31,6 @@ import AdminRoutes from './main/Admin/AdminRoutes';
 import BookingRoutes from './main/Booking/BookingRoutes';
 
 function App() {
-  const [apiStatus, setApiStatus] = useState('Loading...');
-
-  useEffect(() => {
-    // Test API connection
-    const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:3001/api';
-    axios.get(`${API_URL}/test`)
-      .then(response => {
-        setApiStatus(response.data.message);
-      })
-      .catch(error => {
-        console.error('API connection error:', error);
-        setApiStatus('API connection failed. Please make sure the server is running.');
-      });
-  }, []);
 
   return (
     <BrowserRouter>
@@ -92,7 +77,7 @@ function App() {
             </ProtectedRoute>
           } />
             <Route path="/booking/*" element={
-            <ProtectedRoute>
+            <ProtectedRoute requiredPermission={PERMISSIONS.BOOK_WEDDING | PERMISSIONS.MANAGE_BOOKINGS | PERMISSIONS.SEARCH_WEDDINGS}>
               <BookingRoutes />
             </ProtectedRoute>
           } />

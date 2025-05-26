@@ -42,19 +42,21 @@ VALUES
 -- Quản lý người dùng (chỉ admin)  
 (7, 'manage_users', 'Quản lý người dùng', 64),
 -- Xem thông tin cá nhân (tất cả user)
-(8, 'view_profile', 'Xem và sửa thông tin cá nhân', 128);
+(8, 'view_profile', 'Xem và sửa thông tin cá nhân', 128),
+-- Đặt tiệc cưới (cho khách hàng)
+(9, 'book_wedding', 'Đặt tiệc cưới cho khách hàng', 256);
 
 -- Create admin account
 INSERT INTO TaiKhoan (ID_TaiKhoan, Username, PasswordHash)
 VALUES 
-(1, 'admin@example.com', '$2a$10$gYfELbVDT3m3AbP3R2RQSODTjCFhzBn9i7n3jnGHJm.tFcXfPAU8u'), -- 'admin123' hashed
-(2, 'manager@example.com', '$2a$10$Z..kHQ/9renYhfzEwxUps.t0g23z7lZMrRdY8PASbV4HXpigL83e.'), -- 'password123' hashed
-(3, 'receptionist@example.com', '$2a$10$Z..kHQ/9renYhfzEwxUps.t0g23z7lZMrRdY8PASbV4HXpigL83e.'), -- 'password123' hashed
-(4, 'accountant@example.com', '$2a$10$Z..kHQ/9renYhfzEwxUps.t0g23z7lZMrRdY8PASbV4HXpigL83e.'), -- 'password123' hashed
-(5, 'kitchen@example.com', '$2a$10$Z..kHQ/9renYhfzEwxUps.t0g23z7lZMrRdY8PASbV4HXpigL83e.'), -- 'password123' hashed
-(6, 'adminstaff@example.com', '$2a$10$Z..kHQ/9renYhfzEwxUps.t0g23z7lZMrRdY8PASbV4HXpigL83e.'), -- 'password123' hashed
-(7, 'trinhhoang@gmail.com', '$2a$10$Z..kHQ/9renYhfzEwxUps.t0g23z7lZMrRdY8PASbV4HXpigL83e.'), -- 'password123' hashed
-(8, 'trinhhoang2525@gmail.com', '$2a$10$k4TTTEAQt140CP/P56SY7.nlGBJZtpwlSt/OAyzhiBWvJvivAP6VC'); -- 'password123' hashed
+(1, 'admin@example.com', '$2a$10$PZmadlJzIA9WCvZyVEmbOOVW6/w4K6lL3XAs3LA3f4auJ.NVqqSwK'), -- 'Admin123!' hashed
+(2, 'manager@example.com', '$2a$10$PZmadlJzIA9WCvZyVEmbOOVW6/w4K6lL3XAs3LA3f4auJ.NVqqSwK'), -- 'Admin123!' hashed
+(3, 'receptionist@example.com', '$2a$10$PZmadlJzIA9WCvZyVEmbOOVW6/w4K6lL3XAs3LA3f4auJ.NVqqSwK'), -- 'Admin123!' hashed
+(4, 'accountant@example.com', '$2a$10$PZmadlJzIA9WCvZyVEmbOOVW6/w4K6lL3XAs3LA3f4auJ.NVqqSwK'), -- 'Admin123!' hashed
+(5, 'kitchen@example.com', '$2a$10$PZmadlJzIA9WCvZyVEmbOOVW6/w4K6lL3XAs3LA3f4auJ.NVqqSwK'), -- 'Admin123!' hashed
+(6, 'adminstaff@example.com', '$2a$10$PZmadlJzIA9WCvZyVEmbOOVW6/w4K6lL3XAs3LA3f4auJ.NVqqSwK'), -- 'Admin123!' hashed
+(7, 'trinhhoang@gmail.com', '$2a$10$PZmadlJzIA9WCvZyVEmbOOVW6/w4K6lL3XAs3LA3f4auJ.NVqqSwK'), -- 'Admin123!' hashed
+(8, 'trinhhoang2525@gmail.com', '$2a$10$PZmadlJzIA9WCvZyVEmbOOVW6/w4K6lL3XAs3LA3f4auJ.NVqqSwK'); -- 'Admin123!' hashed
 
 -- Assign permissions to roles
 INSERT INTO VaiTro_Quyen (ID_VaiTro, ID_Quyen)
@@ -86,8 +88,8 @@ VALUES
 (6, 1), -- MANAGE_HALLS (Quản lý Sảnh)
 (6, 8), -- VIEW_PROFILE
 
--- Customer - Chỉ có quyền xem thông tin cá nhân
-(7, 8);
+-- Customer - Có quyền xem thông tin cá nhân và đặt tiệc cưới
+(7, 8), (7, 9);
 
 -- Assign roles to accounts
 INSERT INTO TaiKhoan_VaiTro (ID_TaiKhoan, ID_VaiTro)
@@ -112,10 +114,10 @@ VALUES
 (6, 'Hoàng Văn Hành', 'Nhân viên hành chính', 6);
 
 -- Create KhachHang records for customer accounts
-INSERT INTO KhachHang (ID_KhachHang, HoTen, SoDienThoai, Email, ID_TaiKhoan)
+INSERT INTO KhachHang (ID_KhachHang, HoTen, SoDienThoai, Email, ID_TaiKhoan, DiaChi)
 VALUES
-(1, 'Trịnh Văn Hoàng', '0905123456', 'trinhhoang@gmail.com', 7),
-(2, 'Nguyễn Thị Mai', '0905654321', 'trinhhoang2525@gmail.com', 8);
+(1, 'Trịnh Văn Hoàng', '0905123456', 'trinhhoang@gmail.com', 7, '123 Nguyễn Văn Cừ, Quận 5, Hồ Chí Minh'),
+(2, 'Nguyễn Thị Mai', '0905654321', 'trinhhoang2525@gmail.com', 8, '456 Lê Văn Sỹ, Quận 1, Hồ Chí Minh');
 
 -- Insert sample SanhTiec records (Wedding Halls)
 INSERT INTO SanhTiec (ID_SanhTiec, TenSanh, SucChua, GiaThue, ID_LoaiSanh) VALUES

@@ -39,7 +39,7 @@ const invoiceService = {
   // Get invoice by ID
   getInvoiceById: async (id) => {
     try {
-      const response = await axios.get(`${API_URL}/v1/${id}`);
+      const response = await axios.get(`${API_URL}/${id}`);
       return response.data;
     } catch (error) {
       console.error(`Error fetching invoice ${id}:`, error);
@@ -61,7 +61,7 @@ const invoiceService = {
   // Update an invoice
   updateInvoice: async (id, invoiceData) => {
     try {
-      const response = await axios.put(`${API_URL}/v1/${id}`, invoiceData);
+      const response = await axios.put(`${API_URL}/${id}`, invoiceData);
       return response.data;
     } catch (error) {
       console.error(`Error updating invoice ${id}:`, error);
@@ -72,7 +72,7 @@ const invoiceService = {
   // Delete an invoice
   deleteInvoice: async (id) => {
     try {
-      const response = await axios.delete(`${API_URL}/v1/${id}`);
+      const response = await axios.delete(`${API_URL}/${id}`);
       return response.data;
     } catch (error) {
       console.error(`Error deleting invoice ${id}:`, error);

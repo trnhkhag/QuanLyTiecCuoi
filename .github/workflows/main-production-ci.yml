@@ -44,7 +44,7 @@ jobs:
             ${{ secrets.DOCKER_USERNAME }}/qltc-client:latest
             ${{ secrets.DOCKER_USERNAME }}/qltc-client:${{ github.sha }}
           build-args: |
-            REACT_APP_API_URL=http://103.153.72.156:3001
+            REACT_APP_API_URL=http://35.198.222.241:3001/api
           cache-from: type=registry,ref=${{ secrets.DOCKER_USERNAME }}/qltc-client:buildcache
           cache-to: type=registry,ref=${{ secrets.DOCKER_USERNAME }}/qltc-client:buildcache,mode=max
 

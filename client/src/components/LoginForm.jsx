@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import authService from '../services/authService';
 import { toast } from 'react-toastify';
+import PasswordInput from './common/PasswordInput';
 
 const LoginForm = () => {
   const { register, handleSubmit, formState: { errors } } = useForm();
@@ -48,16 +49,19 @@ const LoginForm = () => {
 
         <div className="mb-3">
           <label htmlFor="password" className="form-label">Mật khẩu</label>
-          <input
-            type="password"
-            className={`form-control ${errors.password ? 'is-invalid' : ''}`}
+          <PasswordInput
             id="password"
+            className={errors.password ? 'is-invalid' : ''}
             {...register('password', { 
-              required: 'Mật khẩu là bắt buộc'
+              required: 'Mật khẩu là bắt buộc',
+              minLength: {
+                value: 6,
+                message: 'Mật khẩu phải có ít nhất 6 ký tự'
+              }
             })}
           />
           {errors.password && (
-            <div className="invalid-feedback">{errors.password.message}</div>
+            <div className="invalid-feedback d-block">{errors.password.message}</div>
           )}
         </div>
 

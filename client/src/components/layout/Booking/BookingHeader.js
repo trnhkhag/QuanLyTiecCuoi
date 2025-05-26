@@ -18,12 +18,12 @@ function BookingHeader() {
     {
       to: '/booking/halls',
       label: 'Sảnh tiệc',
-      permission: PERMISSIONS.MANAGE_BOOKINGS | PERMISSIONS.SEARCH_WEDDINGS
+      permission: PERMISSIONS.MANAGE_BOOKINGS | PERMISSIONS.SEARCH_WEDDINGS | PERMISSIONS.BOOK_WEDDING
     },
     {
       to: '/booking/new',
       label: 'Đặt tiệc',
-      permission: PERMISSIONS.MANAGE_BOOKINGS
+      permission: PERMISSIONS.MANAGE_BOOKINGS | PERMISSIONS.BOOK_WEDDING
     },
     // {
     //   to: '/booking/lookup',

@@ -33,7 +33,8 @@ export const PERMISSIONS = {
   VIEW_REPORTS: 16,
   MANAGE_REGULATIONS: 32,
   MANAGE_USERS: 64,
-  VIEW_PROFILE: 128
+  VIEW_PROFILE: 128,
+  BOOK_WEDDING: 256  // Quyền đặt tiệc cho customer
 };
 
 /**
@@ -44,10 +45,12 @@ class AuthService {
    * Register a new user
    * @param {string} name - User's name
    * @param {string} email - User's email
+   * @param {string} phoneNumber - User's phone number
    * @param {string} password - User's password
+   * @param {string} userType - User type (default: 'customer')
    * @returns {Promise} - Response from the API
    */
-  async register(name, email, password) {
+  async register(name, email, phoneNumber, password, userType = 'customer') {
     try {
       console.log('Attempting to register...');
       
@@ -55,7 +58,9 @@ class AuthService {
       const response = await authAxios.post('/auth/register', {
         name,
         email,
-        password
+        phoneNumber,
+        password,
+        userType
       });
       
       if (response.data.token) {
@@ -141,9 +146,8 @@ class AuthService {
     if (userData && userData.user) {
       console.log('Debug - Auth user data structure:', userData.user);
       console.log('Debug - Phone fields available:', {
-        SoDienThoai: userData.user.SoDienThoai,
         phone: userData.user.phone,
-        SDT: userData.user.SDT
+        address: userData.user.address
       });
     }
     return userData;

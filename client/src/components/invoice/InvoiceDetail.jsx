@@ -1,8 +1,11 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import pdfService from '../../services/pdfService';
 import '../../styles/invoice.css';
 
 const InvoiceDetail = ({ invoice }) => {
+  const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
+
   if (!invoice) {
     return <div className="invoice-loading">Đang tải...</div>;
   }
@@ -32,6 +35,20 @@ const InvoiceDetail = ({ invoice }) => {
   // Helper to check if there's a penalty
   const hasPenalty = () => {
     return invoice.TienPhat && invoice.TienPhat > 0;
+  };
+
+  // Handle PDF generation
+  const handlePrintInvoice = async () => {
+    try {
+      setIsGeneratingPDF(true);
+      await pdfService.generateInvoicePDF(invoice);
+      // Success message could be shown here if needed
+    } catch (error) {
+      console.error('Error generating PDF:', error);
+      alert('Không thể tạo file PDF. Vui lòng thử lại.');
+    } finally {
+      setIsGeneratingPDF(false);
+    }
   };
 
   return (
@@ -118,8 +135,13 @@ const InvoiceDetail = ({ invoice }) => {
         <Link to="/invoices" className="back-btn">
           <i className="fas fa-arrow-left"></i> Quay lại
         </Link>
-        <button className="print-btn">
-          <i className="fas fa-print"></i> In hóa đơn
+        <button 
+          className="print-btn" 
+          onClick={handlePrintInvoice}
+          disabled={isGeneratingPDF}
+        >
+          <i className={`fas ${isGeneratingPDF ? 'fa-spinner fa-spin' : 'fa-print'}`}></i> 
+          {isGeneratingPDF ? 'Đang tạo PDF...' : 'In hóa đơn'}
         </button>
       </div>
     </div>

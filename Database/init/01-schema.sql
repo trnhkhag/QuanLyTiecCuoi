@@ -47,6 +47,7 @@ CREATE TABLE KhachHang (
     SoDienThoai VARCHAR(15) UNIQUE NOT NULL,
     Email VARCHAR(100) UNIQUE NOT NULL,
     ID_TaiKhoan INT UNIQUE NOT NULL,
+    DiaChi VARCHAR(255),
     FOREIGN KEY (ID_TaiKhoan) REFERENCES TaiKhoan(ID_TaiKhoan)
 );
 

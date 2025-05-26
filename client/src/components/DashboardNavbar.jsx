@@ -47,7 +47,7 @@ const DashboardNavbar = () => {
       path: '/booking',
       icon: <FontAwesomeIcon icon={faCalendarAlt} />,
       label: 'Đặt tiệc',
-      permission: PERMISSIONS.MANAGE_BOOKINGS | PERMISSIONS.SEARCH_WEDDINGS
+      permission: PERMISSIONS.MANAGE_BOOKINGS | PERMISSIONS.SEARCH_WEDDINGS | PERMISSIONS.BOOK_WEDDING
     },
     {
       path: '/invoices',

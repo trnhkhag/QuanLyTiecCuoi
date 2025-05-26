@@ -12,11 +12,10 @@ const BookingConfirmationAnt = ({ form, selectedHall, totalAmount, shifts, foods
     const user = authService.getCurrentUser()?.user;
     if (user) {
       console.log('Current user data:', user);
-      console.log('Phone fields:', {
-        SoDienThoai: user.SoDienThoai, 
-        phone: user.phone,
-        SDT: user.SDT
-      });
+              console.log('Phone fields:', {
+          phone: user.phone,
+          address: user.address
+        });
       setCurrentUser(user);
       // Pre-fill user information in the form
       form.setFieldsValue({
@@ -149,7 +148,7 @@ const BookingConfirmationAnt = ({ form, selectedHall, totalAmount, shifts, foods
             <p><strong>Email:</strong> {currentUser?.email || form.getFieldValue('email') || 'Chưa cung cấp'}</p>
           </Col>            
           <Col span={12}>
-            <p><strong>Số điện thoại:</strong> {currentUser?.SoDienThoai || currentUser?.phone || currentUser?.SDT || form.getFieldValue('phone') || 'Chưa cung cấp'}</p>
+            <p><strong>Số điện thoại:</strong> {currentUser?.phone || form.getFieldValue('phone') || 'Chưa cung cấp'}</p>
           </Col>
         </Row>
       </Card>

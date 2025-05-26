@@ -19,9 +19,9 @@ export const loginUser = createAsyncThunk(
 
 export const registerUser = createAsyncThunk(
   'auth/register',
-  async ({ name, email, password }, { rejectWithValue }) => {
+  async ({ name, email, phoneNumber, password, userType = 'customer' }, { rejectWithValue }) => {
     try {
-      const response = await axios.post(AUTH_ENDPOINTS.REGISTER, { name, email, password });
+      const response = await axios.post(AUTH_ENDPOINTS.REGISTER, { name, email, phoneNumber, password, userType });
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response.data);
@@ -80,6 +80,12 @@ const authSlice = createSlice({
     clearAuthError: (state) => {
       state.error = null;
     },
+    updateUserProfile: (state, action) => {
+      if (state.user) {
+        state.user = { ...state.user, ...action.payload };
+        localStorage.setItem('user', JSON.stringify(state.user));
+      }
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -121,6 +127,6 @@ const authSlice = createSlice({
   },
 });
 
-export const { setToken, setUser, clearAuthError } = authSlice.actions;
+export const { setToken, setUser, clearAuthError, updateUserProfile } = authSlice.actions;
 
 export default authSlice.reducer; 

@@ -313,11 +313,7 @@ const InvoicesPage = () => {
             <h1>Quản lý hóa đơn</h1>
             <p>Xem, tạo và quản lý các hóa đơn tiệc cưới</p>
           </div>
-          <div className="header-actions">
-            <button className="create-btn">
-              <i className="fas fa-plus"></i> Tạo hóa đơn mới
-            </button>
-          </div>
+        
         </div>
         
         {/* Filter and sort controls */}

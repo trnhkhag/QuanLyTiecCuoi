@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import ProfileService from '../../services/ProfileService';
-import CustomerProfile from '../../components/Profile/CustomerProfile';
-import EmployeeProfile from '../../components/Profile/EmployeeProfile';
-import ChangePasswordForm from '../../components/Profile/ChangePasswordForm';
-import WeddingHistory from '../../components/Profile/WeddingHistory';
+import CustomerProfile from '../../components/profile/CustomerProfile';
+import EmployeeProfile from '../../components/profile/EmployeeProfile';
+import ChangePasswordForm from '../../components/profile/ChangePasswordForm';
+import WeddingHistory from '../../components/profile/WeddingHistory';
+import UserInfoDisplay from '../../components/UserInfoDisplay';
 import './ProfilePage.css';
 
 const ProfilePage = () => {
@@ -138,6 +139,9 @@ const ProfilePage = () => {
         <div className="profile-content">
           {activeTab === 'profile' && (
             <div className="tab-content">
+              {/* Test component để kiểm tra Redux real-time update */}
+              <UserInfoDisplay />
+              
               {profile?.userType === 'customer' ? (
                 <CustomerProfile
                   profile={profile}

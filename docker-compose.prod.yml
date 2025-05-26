@@ -7,7 +7,7 @@ services:
     ports:
       - "80:80"
     environment:
-      - REACT_APP_API_URL=http://103.153.72.156:3001
+      - REACT_APP_API_URL=http://35.198.222.241:3001/api
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:80"]
       interval: 1m

@@ -265,8 +265,8 @@ const BookingFormPage = () => {
       
       // Set user information to form values      values.customerName = userData.name || userData.username || 'Khách hàng';
       values.email = userData.email || '';
-      values.phone = userData.SoDienThoai || userData.phone || userData.SDT || '';
-      values.address = userData.DiaChi || userData.address || '';
+      values.phone = userData.phone || '';
+      values.address = userData.address || '';
       
       // Show loading message
       message.loading({ 

@@ -169,47 +169,23 @@ const MonthlyReportPage = () => {
               {loading.trend ? (
                 <div className="text-center py-5">Đang tải dữ liệu...</div>
               ) : revenueTrend && revenueTrend.trend && revenueTrend.trend.length > 0 ? (
-                <>
-                  {/* Additional trend statistics */}
-                  <Row className="mb-4">
-                    <Col md={4}>
-                      <div className="trend-stat">
-                        <div className="trend-stat-label">Tổng doanh thu</div>
-                        <div className="trend-stat-value">{formatCurrency(revenueTrend.totalRevenue || 0)}</div>
-                      </div>
-                    </Col>
-                    <Col md={4}>
-                      <div className="trend-stat">
-                        <div className="trend-stat-label">Tổng số tiệc cưới</div>
-                        <div className="trend-stat-value">{revenueTrend.totalWeddings || 0}</div>
-                      </div>
-                    </Col>
-                    <Col md={4}>
-                      <div className="trend-stat">
-                        <div className="trend-stat-label">Doanh thu trung bình hàng tháng</div>
-                        <div className="trend-stat-value">{formatCurrency(revenueTrend.averageMonthlyRevenue || 0)}</div>
-                      </div>
-                    </Col>
-                  </Row>
-                  {/* Chart */}
-                  <ResponsiveContainer width="100%" height={400}>
-                    <LineChart data={revenueTrend.trend}>
-                      <CartesianGrid strokeDasharray="3 3" />
-                      <XAxis dataKey="label" />
-                      <YAxis />
-                      <Tooltip formatter={(value) => formatCurrency(value)} />
-                      <Legend />
-                      <Line 
-                        type="monotone" 
-                        dataKey="revenue" 
-                        stroke="#8884d8" 
-                        name="Doanh thu" 
-                        strokeWidth={2}
-                        activeDot={{ r: 8 }}
-                      />
-                    </LineChart>
-                  </ResponsiveContainer>
-                </>
+                <ResponsiveContainer width="100%" height={400}>
+                  <LineChart data={revenueTrend.trend}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="label" />
+                    <YAxis />
+                    <Tooltip formatter={(value) => formatCurrency(value)} />
+                    <Legend />
+                    <Line 
+                      type="monotone" 
+                      dataKey="revenue" 
+                      stroke="#8884d8" 
+                      name="Doanh thu" 
+                      strokeWidth={2}
+                      activeDot={{ r: 8 }}
+                    />
+                  </LineChart>
+                </ResponsiveContainer>
               ) : (
                 <div className="no-data-message">Không có dữ liệu</div>
               )}

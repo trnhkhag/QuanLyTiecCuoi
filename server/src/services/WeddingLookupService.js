@@ -65,9 +65,10 @@ class WeddingLookupService {
    */
   async getBookingById(bookingId) {
     try {
+      //s.TenSanh, s.GiaThue, c.TenCa, c.ThoiGianBatDau, c.ThoiGianKetThuc,
       const [rows] = await pool.query(
         `SELECT t.*, k.HoTen AS TenKhachHang, k.SoDienThoai,
-                s.TenSanh, s.GiaThue, c.TenCa, c.ThoiGianBatDau, c.ThoiGianKetThuc,
+                s.TenSanh, s.GiaThue, c.TenCa, 
                 h.TienThanhToan AS TienCoc, h.TongTien
          FROM TiecCuoi t
          JOIN KhachHang k ON t.ID_KhachHang = k.ID_KhachHang
@@ -79,7 +80,7 @@ class WeddingLookupService {
       );
 
       if (rows.length === 0) {
-        throw new Error('Không tìm thấy tiệc cưới');
+        throw new Error("Không tìm thấy tiệc cưới");
       }
 
       const booking = rows[0];
