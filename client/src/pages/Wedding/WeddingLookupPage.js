@@ -20,7 +20,7 @@ import {
 } from '@ant-design/icons';
 import UserLayout from '../../components/layout/User/UserLayout';
 import { LoadingSpinner, FormattedPrice, FormattedDate } from '../../components/common/StatusComponents';
-import { getWeddingById } from '../../services/WeddingLookupService';
+import { getWeddingById } from '../../services/weddingLookupService';
 
 const { Title, Text } = Typography;
 

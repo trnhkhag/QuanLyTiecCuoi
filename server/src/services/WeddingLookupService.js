@@ -1,6 +1,6 @@
 const { pool } = require('../config/db');
 
-class WeddingLookupService {
+class weddingLookupService {
   /**
    * Lấy danh sách các tiệc cưới có thể lọc theo ngày hoặc tên khách hàng
    */
@@ -115,4 +115,4 @@ class WeddingLookupService {
   }
 }
 
-module.exports = new WeddingLookupService();
+module.exports = new weddingLookupService();

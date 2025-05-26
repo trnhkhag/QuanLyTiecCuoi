@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { Card, Spinner, Alert, Table, Row, Col, Badge, Button } from 'react-bootstrap';
-import { getWeddingById } from '../../services/WeddingLookupService';
+import { getWeddingById } from '../../services/weddingLookupService';
 import BookingLayout from '../../components/layout/Booking/BookingLayout';
 
 function WeddingDetailPage() {

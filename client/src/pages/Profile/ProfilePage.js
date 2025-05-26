@@ -5,7 +5,7 @@ import {
   EmployeeProfile,
   ChangePasswordForm,
   WeddingHistory
-} from '../../components/Profile';
+} from '../../components/profile';
 import UserInfoDisplay from '../../components/UserInfoDisplay.jsx';
 import './ProfilePage.css';
 

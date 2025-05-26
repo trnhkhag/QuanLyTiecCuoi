@@ -1,5 +1,5 @@
 // filepath: d:\CNPM\QuanLyTiecCuoi\server\TraCuuTiecCuoi\weddingLookupController.js
-const weddingLookupService = require('../services/WeddingLookupService');
+const weddingLookupService = require('../services/weddingLookupService');
 
 /**
  * Controller quản lý API tra cứu thông tin tiệc cưới

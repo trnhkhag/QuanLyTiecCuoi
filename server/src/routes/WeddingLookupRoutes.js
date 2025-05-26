@@ -1,7 +1,7 @@
 // filepath: d:\CNPM\QuanLyTiecCuoi\server\TraCuuTiecCuoi\weddingLookupRoutes.js
 const express = require('express');
 const router = express.Router();
-const WeddingLookupService = require('../services/WeddingLookupService');
+const weddingLookupService = require('../services/weddingLookupService');
 
 /**
  * @route   GET /api/weddings
@@ -12,7 +12,7 @@ router.get('/', async (req, res) => {
   try {
     console.log('GET /api/weddings API được gọi', req.query);
     const filters = req.query;
-    const bookings = await WeddingLookupService.getAllBookings(filters);
+    const bookings = await weddingLookupService.getAllBookings(filters);
     
     res.json({
       success: true,
@@ -37,7 +37,7 @@ router.get('/filter', async (req, res) => {
   try {
     console.log('GET /api/weddings/filter API được gọi', req.query);
     const filters = req.query;
-    const bookings = await WeddingLookupService.getAllBookings(filters);
+    const bookings = await weddingLookupService.getAllBookings(filters);
     
     res.json({
       success: true,
@@ -63,7 +63,7 @@ router.get('/:id', async (req, res) => {
     console.log('GET /api/weddings/:id API được gọi với ID:', req.params.id);
     const bookingId = req.params.id;
     
-    const booking = await WeddingLookupService.getBookingById(bookingId);
+    const booking = await weddingLookupService.getBookingById(bookingId);
     
     res.json({
       success: true,
