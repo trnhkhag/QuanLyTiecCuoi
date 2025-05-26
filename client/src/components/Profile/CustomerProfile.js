@@ -1,14 +1,15 @@
 import React, { useState } from 'react';
-import ProfileService from '../../services/ProfileService';
+import useProfile from '../../hooks/useProfile';
 import './ProfileComponents.css';
 
 const CustomerProfile = ({ profile, onUpdate }) => {
+  const { updateProfile, updateLoading, updateError } = useProfile();
+  
   const [formData, setFormData] = useState({
     fullName: profile?.fullName || '',
     phoneNumber: profile?.phoneNumber || '',
     email: profile?.email || ''
   });
-  const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
   const [isEditing, setIsEditing] = useState(false);
   const [successMessage, setSuccessMessage] = useState('');
@@ -58,14 +59,13 @@ const CustomerProfile = ({ profile, onUpdate }) => {
       return;
     }
 
-    setLoading(true);
     setSuccessMessage('');
 
     try {
-      const response = await ProfileService.updateCustomerProfile(formData);
+      const result = await updateProfile(formData);
       
-      if (response.success) {
-        setSuccessMessage(response.message);
+      if (result.type.endsWith('/fulfilled')) {
+        setSuccessMessage('Cập nhật thông tin thành công');
         onUpdate(formData);
         setIsEditing(false);
         
@@ -74,12 +74,10 @@ const CustomerProfile = ({ profile, onUpdate }) => {
           setSuccessMessage('');
         }, 3000);
       } else {
-        setErrors({ general: response.message });
+        setErrors({ general: updateError || 'Lỗi khi cập nhật thông tin' });
       }
     } catch (error) {
       setErrors({ general: 'Lỗi khi cập nhật thông tin' });
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -209,7 +207,7 @@ const CustomerProfile = ({ profile, onUpdate }) => {
               type="button"
               className="cancel-btn"
               onClick={handleCancel}
-              disabled={loading}
+              disabled={updateLoading}
             >
               <i className="fas fa-times"></i>
               Hủy
@@ -217,9 +215,9 @@ const CustomerProfile = ({ profile, onUpdate }) => {
             <button
               type="submit"
               className="save-btn"
-              disabled={loading}
+              disabled={updateLoading}
             >
-              {loading ? (
+              {updateLoading ? (
                 <>
                   <i className="fas fa-spinner fa-spin"></i>
                   Đang lưu...

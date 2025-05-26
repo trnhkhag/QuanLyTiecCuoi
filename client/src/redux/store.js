@@ -4,6 +4,7 @@ import invoiceReducer from './slices/invoice.slice';
 import weddingReducer from './slices/wedding.slice';
 import reportReducer from './slices/report.slice';
 import uiReducer from './slices/ui.slice';
+import profileReducer from './slices/profile.slice';
 
 // Configure the Redux store
 const store = configureStore({
@@ -13,6 +14,7 @@ const store = configureStore({
     weddings: weddingReducer,
     reports: reportReducer,
     ui: uiReducer,
+    profile: profileReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

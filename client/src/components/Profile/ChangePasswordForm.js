@@ -1,15 +1,22 @@
 import React, { useState } from 'react';
-import ProfileService from '../../services/ProfileService';
+import useProfile from '../../hooks/useProfile';
 import PasswordInput from '../common/PasswordInput';
 import './ProfileComponents.css';
 
 const ChangePasswordForm = ({ onSuccess }) => {
+  const { 
+    updatePassword, 
+    passwordChangeLoading, 
+    passwordChangeError, 
+    passwordChangeSuccess,
+    clearPasswordSuccess 
+  } = useProfile();
+  
   const [formData, setFormData] = useState({
     currentPassword: '',
     newPassword: '',
     confirmPassword: ''
   });
-  const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
   const [successMessage, setSuccessMessage] = useState('');
 
@@ -58,14 +65,13 @@ const ChangePasswordForm = ({ onSuccess }) => {
       return;
     }
 
-    setLoading(true);
     setSuccessMessage('');
 
     try {
-      const response = await ProfileService.changePassword(formData);
+      const result = await updatePassword(formData);
       
-      if (response.success) {
-        setSuccessMessage(response.message);
+      if (result.type.endsWith('/fulfilled')) {
+        setSuccessMessage('Đổi mật khẩu thành công');
         setFormData({
           currentPassword: '',
           newPassword: '',
@@ -79,14 +85,13 @@ const ChangePasswordForm = ({ onSuccess }) => {
         // Clear success message after 5 seconds
         setTimeout(() => {
           setSuccessMessage('');
+          clearPasswordSuccess();
         }, 5000);
       } else {
-        setErrors({ general: response.message });
+        setErrors({ general: passwordChangeError || 'Lỗi khi đổi mật khẩu' });
       }
     } catch (error) {
       setErrors({ general: 'Lỗi khi đổi mật khẩu' });
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -174,7 +179,7 @@ const ChangePasswordForm = ({ onSuccess }) => {
             type="button"
             className="cancel-btn"
             onClick={handleReset}
-            disabled={loading}
+            disabled={passwordChangeLoading}
           >
             <i className="fas fa-undo"></i>
             Làm mới
@@ -182,9 +187,9 @@ const ChangePasswordForm = ({ onSuccess }) => {
           <button
             type="submit"
             className="save-btn"
-            disabled={loading}
+            disabled={passwordChangeLoading}
           >
-            {loading ? (
+            {passwordChangeLoading ? (
               <>
                 <i className="fas fa-spinner fa-spin"></i>
                 Đang đổi mật khẩu...

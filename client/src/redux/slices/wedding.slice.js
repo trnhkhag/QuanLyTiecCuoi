@@ -30,9 +30,16 @@ export const fetchWeddingById = createAsyncThunk(
 
 export const createWedding = createAsyncThunk(
   'weddings/create',
-  async (weddingData, { rejectWithValue }) => {
+  async (weddingData, { rejectWithValue, dispatch }) => {
     try {
       const response = await axios.post(WEDDING_ENDPOINTS.CA_TIEC.BASE, weddingData);
+      
+      // Nếu tạo wedding thành công, cập nhật wedding history trong profile
+      if (response.data && response.data.data) {
+        const { addWeddingToHistory } = await import('./profile.slice');
+        dispatch(addWeddingToHistory(response.data.data));
+      }
+      
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response?.data || { message: error.message });

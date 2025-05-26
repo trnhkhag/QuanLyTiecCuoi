@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
 import moment from 'moment';
 import { useBookingForm } from '../../hooks/Booking/useBookings';
+import { addWeddingToHistory } from '../../redux/slices/profile.slice';
 import BookingBasicInfoAnt from '../../components/features/Booking/BookingBasicInfoAnt';
 import { Form, Button, Steps, message, Typography, Spin, Alert, Input, Tabs, Table, InputNumber } from 'antd';
 import { FormattedPrice } from '../../components/common/FormattedPrice';
@@ -17,6 +19,7 @@ const { Step } = Steps;
  */
 const BookingFormPage = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const [searchParams] = useSearchParams();
   const [form] = Form.useForm();
   const [currentStep, setCurrentStep] = useState(0);
@@ -321,6 +324,22 @@ const BookingFormPage = () => {
         foods: values.foods || {},
         foodsData: foods || []
       };
+
+      // Cập nhật wedding history trong Redux
+      const weddingHistoryData = {
+        ID_TiecCuoi: successData.ID_TiecCuoi,
+        TenSanh: selectedHall?.TenSanh || '',
+        LoaiSanh: selectedHall?.TenLoai || 'Chung',
+        TenCa: shiftName,
+        SoLuongBan: values.tableCount || 0,
+        SoBanDuTru: 0,
+        ThoiDiemDat: new Date().toISOString(),
+        TongDaThanhToan: Math.round(totalAmount * 0.5), // Tiền cọc
+        TrangThai: 'Đang xử lý',
+        NgayToChuc: values.date ? values.date.format('YYYY-MM-DD') : null
+      };
+      
+      dispatch(addWeddingToHistory(weddingHistoryData));
       
       // Save to localStorage as backup
       localStorage.setItem('bookingSuccessData', JSON.stringify(successData));

@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import ProfileService from '../../services/ProfileService';
+import React, { useState } from 'react';
+import useProfile from '../../hooks/useProfile';
 import {
   CustomerProfile,
   EmployeeProfile,
@@ -10,48 +10,20 @@ import {
 import './ProfilePage.css';
 
 const ProfilePage = () => {
-  const [profile, setProfile] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
+  const {
+    profile,
+    weddingHistory,
+    permissions,
+    loading,
+    error,
+    loadProfile,
+  } = useProfile();
+  
   const [activeTab, setActiveTab] = useState('profile');
-  const [permissions, setPermissions] = useState([]);
-
-  useEffect(() => {
-    loadProfile();
-    loadPermissions();
-  }, []);
-
-  const loadProfile = async () => {
-    setLoading(true);
-    try {
-      const response = await ProfileService.getProfile();
-      if (response.success) {
-        setProfile(response.data);
-        setError('');
-      } else {
-        setError(response.message);
-      }
-    } catch (error) {
-      setError('Lỗi khi tải thông tin profile');
-      console.error('Error loading profile:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const loadPermissions = async () => {
-    try {
-      const response = await ProfileService.getUserPermissions();
-      if (response.success) {
-        setPermissions(response.data.permissions || []);
-      }
-    } catch (error) {
-      console.error('Error loading permissions:', error);
-    }
-  };
 
   const handleProfileUpdate = (updatedData) => {
-    setProfile(prev => ({ ...prev, ...updatedData }));
+    // Profile update will be handled by Redux actions in the component
+    console.log('Profile updated:', updatedData);
   };
 
   const handlePasswordChange = () => {
@@ -117,7 +89,7 @@ const ProfilePage = () => {
             Đổi mật khẩu
           </button>
 
-          {profile?.userType === 'customer' && profile?.weddingHistory?.length > 0 && (
+          {profile?.userType === 'customer' && weddingHistory?.length > 0 && (
             <button
               className={`tab-btn ${activeTab === 'history' ? 'active' : ''}`}
               onClick={() => setActiveTab('history')}
@@ -161,9 +133,9 @@ const ProfilePage = () => {
             </div>
           )}
 
-          {activeTab === 'history' && profile?.weddingHistory && (
+          {activeTab === 'history' && weddingHistory && (
             <div className="tab-content">
-              <WeddingHistory history={profile.weddingHistory} />
+              <WeddingHistory history={weddingHistory} />
             </div>
           )}
 
