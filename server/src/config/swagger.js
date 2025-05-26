@@ -2,7 +2,7 @@ const swaggerJsdoc = require('swagger-jsdoc');
 const path = require('path');
 
 const serverUrl = process.env.NODE_ENV === 'production' 
-  ? 'http://103.153.72.156:3001' 
+  ? 'http://34.70.80.83:3001' 
   : 'http://localhost:3001';
 
 const options = {
